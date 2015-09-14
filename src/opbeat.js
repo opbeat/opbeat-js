@@ -1,10 +1,10 @@
 ;(function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     define(function () {
-      return (root.opbeat = factory())
+      return (root.Opbeat = factory())
     })
   } else {
-    root.opbeat = factory()
+    root.Opbeat = factory()
   }
 }(this, function () {
   // Opbeat factory
