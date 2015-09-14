@@ -22,6 +22,8 @@
   }
 
   function Opbeat () {
+    this.VERSION = '0.0.1'
+
     this.options = defaultOptions
   }
 
