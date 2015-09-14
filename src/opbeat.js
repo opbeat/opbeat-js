@@ -24,6 +24,7 @@
   function Opbeat () {
     this.VERSION = '0.0.1'
 
+    this.isInstalled = false
     this.options = defaultOptions
   }
 
@@ -48,6 +49,11 @@
    */
 
   Opbeat.prototype.install = function () {
+    if (isPlatformSupport() && !this.isInstalled) {
+      TraceKit.report.subscribe(onTraceKitReport.bind(this))
+      this.isInstalled = true
+    }
+
     return this
 
   }
@@ -58,6 +64,9 @@
    * @return {Opbeat}
    */
   Opbeat.prototype.uninstall = function () {
+    TraceKit.report.uninstall()
+    this.isInstalled = false
+
     return this
   }
 
@@ -90,6 +99,19 @@
    */
   Opbeat.prototype.setExtraContext = function (extra) {
     return this
+  }
+
+  // Privates
+
+  var onTraceKitReport = function () {
+    console.log('onTraceKitReport', arguments)
+
+  }
+
+  var isPlatformSupport = function () {
+    // TODO: Add some platform checks
+    return true
+
   }
 
   return new Opbeat()
