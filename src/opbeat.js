@@ -7,9 +7,22 @@
     root.Opbeat = factory()
   }
 }(this, function () {
-  // Opbeat factory
+  var defaultOptions = {
+    apiHost: 'https://opbeat.com',
+    logger: 'javascript',
+    collectHttp: true,
+    ignoreErrors: [],
+    ignoreUrls: [],
+    whitelistUrls: [],
+    includePaths: [],
+    collectWindowErrors: true,
+    extra: {
+      frame_info: {}
+    }
+  }
 
   function Opbeat () {
+    this.options = defaultOptions
   }
 
   return {}
