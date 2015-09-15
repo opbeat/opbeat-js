@@ -50,7 +50,7 @@ Opbeat.prototype.config = function (options) {
 
 Opbeat.prototype.install = function () {
   if (this.isPlatformSupport() && !this.isInstalled) {
-    TraceKit.report.subscribe(this.onTraceKitReport)
+    TraceKit.report.subscribe(this.onTraceKitReport.bind(this))
     this.isInstalled = true
   }
 
