@@ -8,10 +8,14 @@ function Opbeat () {
   this.isInstalled = false
 
   this.options = {
+    VERSION: this.VERSION,
     orgId: null,
     appId: null,
     token: null,
-    VERSION: this.VERSION
+    context: {
+      user: null,
+      extra: null
+    }
   }
 
   this.isPlatformSupport = function () {
@@ -109,6 +113,8 @@ Opbeat.prototype.captureException = function (ex, options) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setUserContext = function (user) {
+  this.options.context.user = user
+
   return this
 }
 
