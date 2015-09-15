@@ -3,7 +3,7 @@ var transport = require('./transport')
 
 module.exports = {
   normalizeFrame: function normalizeFrame (frame, options) {
-    options = options | {}
+    options = options || {}
 
     if (!frame.url) return
 
@@ -19,7 +19,7 @@ module.exports = {
   },
 
   traceKitStackToOpbeatException: function (stackInfo, options) {
-    options = options | {}
+    options = options || {}
     stackInfo.frames = []
 
     if (stackInfo.stack && stackInfo.stack.length) {
@@ -36,7 +36,8 @@ module.exports = {
   },
 
   processException: function processException (exception, options) {
-    options = options | {}
+    options = options || {}
+
     var stacktrace, label, i
 
     var type = exception.type
