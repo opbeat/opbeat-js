@@ -22,12 +22,12 @@ function Opbeat () {
     return true
   }
 
-  this.onTraceKitReport = function (stackInfo, options) {
-    logger.log('onTraceKitReport', stackInfo, options)
+  this.onTraceKitReport = function (stackInfo) {
+    logger.log('opbeat.onTraceKitReport', stackInfo)
 
-    var exception = exceptionist.traceKitStackToOpbeatException(stackInfo, options)
+    var exception = exceptionist.traceKitStackToOpbeatException(stackInfo, this.options)
 
-    exceptionist.processException(exception, options)
+    exceptionist.processException(exception, this.options)
   }
 
 }
