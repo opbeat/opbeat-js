@@ -12,7 +12,7 @@ module.exports = {
       'filename': frame.url,
       'lineno': frame.line,
       'colno': frame.column,
-      'function': frame.func || '?'
+      'function': frame.func || '[anonymous]'
     }
 
     return normalized
