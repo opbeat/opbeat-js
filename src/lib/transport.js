@@ -25,6 +25,8 @@ module.exports = {
       return
     }
 
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+
     if (headers) {
       for (header in headers) {
         if (headers.hasOwnProperty(header)) {
@@ -60,7 +62,7 @@ module.exports = {
 
     logger.log('opbeat.transport._makeRequest', url, data, headers)
 
-    xhr.send(data)
+    xhr.send(JSON.stringify(data))
 
   },
 
