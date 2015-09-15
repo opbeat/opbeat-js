@@ -1,20 +1,18 @@
 require('TraceKit')
 var exceptionist = require('./lib/exceptionist')
 var logger = require('./lib/logger')
-
-var defaultOptions = {
-  organizationId: 'b3eba3d11f6e4c3a9db52f477caa4fa2',
-  appId: 'e9797db8c7',
-  clientToken: '6451721d51b6d95cf6c6b09498feafd865f1f976'
-}
 var utils = require('./lib/utils')
 
 function Opbeat () {
   this.VERSION = '0.0.1'
-
   this.isInstalled = false
-  this.options = defaultOptions
-  this.options.VERSION = this.VERSION
+
+  this.options = {
+    orgId: 'b3eba3d11f6e4c3a9db52f477caa4fa2',
+    appId: 'e9797db8c7',
+    token: '6451721d51b6d95cf6c6b09498feafd865f1f976',
+    VERSION: this.VERSION
+  }
 
   this.isPlatformSupport = function () {
     return typeof Array.prototype.forEach === 'function' &&

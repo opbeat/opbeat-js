@@ -4,10 +4,10 @@ module.exports = {
   sendToOpbeat: function (data, options) {
     logger.log('opbeat.transport.sendToOpbeat', data, options)
 
-    var url = 'https://cors-anywhere.herokuapp.com/intake.opbeat.com:443/api/v1/organizations/' + options.organizationId + '/apps/' + options.appId + '/errors/'
+    var url = 'https://cors-anywhere.herokuapp.com/intake.opbeat.com:443/api/v1/organizations/' + options.orgId + '/apps/' + options.appId + '/errors/'
 
     var headers = {
-      'Authorization': 'Bearer ' + options.clientToken,
+      'Authorization': 'Bearer ' + options.token,
       'x-opbeat-client': 'opbeat-js/' + options.VERSION,
     }
 
