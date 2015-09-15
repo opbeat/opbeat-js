@@ -9,6 +9,13 @@ module.exports = {
       width: x,
       height: y
     }
+  },
+
+  mergeObject: function (o1, o2) {
+    var a, o3 = {}
+    for (a in o1) { o3[a] = o1[a]; }
+    for (a in o2) { o3[a] = o2[a]; }
+    return o3
   }
 
 }
