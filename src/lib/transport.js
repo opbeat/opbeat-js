@@ -25,7 +25,7 @@ module.exports = {
       return
     }
 
-    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+    xhr.setRequestHeader('Content-Type', 'application/json')
 
     if (headers) {
       for (header in headers) {
