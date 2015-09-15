@@ -1,4 +1,5 @@
 var logger = require('./logger')
+var transport = require('./transport')
 
 module.exports = {
   normalizeFrame: function normalizeFrame (frame, options) {
@@ -85,6 +86,7 @@ module.exports = {
 
     logger.log('opbeat.exceptionst.processException', data)
 
+    transport.sendToOpbeat(data, options)
 
   }
 
