@@ -77,13 +77,18 @@ module.exports = {
     label = lineno ? message + ' at ' + lineno : message
 
     var data = {
+      message: label,
+      culprit: fileurl,
       exception: {
         type: type,
         value: message
       },
       stacktrace: stacktrace,
-      culprit: fileurl,
-      message: label
+      user: null,
+      timestamp: null,
+      level: null,
+      logger: null,
+      machine: null
     }
 
     data.extra = this.getBrowserSpecificMetadata()
