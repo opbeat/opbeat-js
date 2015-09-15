@@ -1,5 +1,6 @@
 var logger = require('./logger')
 var transport = require('./transport')
+var utils = require('./utils')
 
 module.exports = {
   normalizeFrame: function normalizeFrame (frame, options) {
@@ -84,6 +85,26 @@ module.exports = {
       culprit: fileurl,
       message: label
     }
+
+    var viewportInfo = utils.getViewPortInfo()
+    var extra = {
+      'environment': {
+        'utcOffset': new Date().getTimezoneOffset() / - 60.0,
+        'browserWidth': viewportInfo.width,
+        'browserHeight': viewportInfo.height,
+        'screenWidth': screen.width,
+        'screenHeight': screen.height,
+        'userLanguage': navigator.userLanguage,
+        'userAgent': navigator.userAgent,
+        'platform': navigator.platform
+      },
+      'page': {
+        'referer': document.referrer,
+        'host': document.domain,
+        'location': location.href
+      }
+    }
+    data.extra = extra
 
     logger.log('opbeat.exceptionst.processException', data)
 
