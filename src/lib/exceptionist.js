@@ -81,8 +81,8 @@ module.exports = {
         value: message
       },
       stacktrace: stacktrace,
-      timestamp: null,
       user: options.context.user || null,
+      timestamp: (new Date).getTime(),
       level: null,
       logger: null,
       machine: null
