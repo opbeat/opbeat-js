@@ -86,6 +86,14 @@ module.exports = {
       message: label
     }
 
+    data.extra = this.getBrowserSpecificMetadata()
+
+    logger.log('opbeat.exceptionst.processException', data)
+    transport.sendToOpbeat(data, options)
+
+  },
+
+  getBrowserSpecificMetadata: function () {
     var viewportInfo = utils.getViewPortInfo()
     var extra = {
       'environment': {
@@ -104,12 +112,8 @@ module.exports = {
         'location': location.href,
       }
     }
-    data.extra = extra
 
-    logger.log('opbeat.exceptionst.processException', data)
-
-    transport.sendToOpbeat(data, options)
-
+    return extra
   }
 
 }
