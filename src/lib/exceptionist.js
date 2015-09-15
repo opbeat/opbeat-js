@@ -83,7 +83,8 @@ module.exports = {
       message: label
     }
 
-    logger.log('processException', data)
+    logger.log('opbeat.exceptionst.processException', data)
+
 
   }
 
