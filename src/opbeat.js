@@ -125,6 +125,8 @@ Opbeat.prototype.setUserContext = function (user) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setExtraContext = function (extra) {
+  this.options.context.extra = user
+
   return this
 }
 
