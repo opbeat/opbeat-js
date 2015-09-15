@@ -15,6 +15,7 @@ function Opbeat () {
 
   this.isInstalled = false
   this.options = defaultOptions
+  this.options.VERSION = this.VERSION
 
   this.isPlatformSupport = function () {
     // TODO: Add some platform checks
