@@ -2,8 +2,9 @@ var logger = require('./logger')
 
 module.exports = {
   sendToOpbeat: function (data, options) {
-    var url = 'https://intake.opbeat.com/api/v1/organizations/' + options.organizationId + '/apps/' + options.appId + '/errors/'
+    logger.log('opbeat.transport.sendToOpbeat', data, options)
 
+    var url = 'https://intake.opbeat.com/api/v1/organizations/' + options.organizationId + '/apps/' + options.appId + '/errors/'
     var data = {
 
     }
