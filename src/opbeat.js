@@ -1,4 +1,5 @@
 require('TraceKit')
+var exceptionist = require('./lib/exceptionist')
 var logger = require('./lib/logger')
 
 var defaultOptions = {
@@ -19,6 +20,10 @@ function Opbeat () {
 
   this.onTraceKitReport = function (stackInfo, options) {
     logger.log('onTraceKitReport', stackInfo, options)
+
+    var exception = exceptionist.traceKitStackToOpbeatException(stackInfo, options)
+
+    exceptionist.processException(exception, options)
   }
 
 }
