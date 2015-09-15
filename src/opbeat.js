@@ -5,6 +5,9 @@ var logger = require('./lib/logger')
 var defaultOptions = {
   apiHost: 'https://opbeat.com',
   logger: 'javascript',
+  organizationId: 123,
+  appId: 123,
+  clientToken: 'kenneth'
 }
 
 function Opbeat () {
