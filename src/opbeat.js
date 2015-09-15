@@ -18,8 +18,9 @@ function Opbeat () {
   this.options.VERSION = this.VERSION
 
   this.isPlatformSupport = function () {
-    // TODO: Add some platform checks
-    return true
+    return typeof Array.prototype.forEach === 'function' &&
+      typeof JSON.stringify === 'function'
+
   }
 
   this.onTraceKitReport = function (stackInfo) {
