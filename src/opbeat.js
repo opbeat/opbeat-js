@@ -73,6 +73,24 @@ Opbeat.prototype.uninstall = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.captureException = function (ex, options) {
+  if (!(ex instanceof Error)) {
+    throw 'Passed exception needs to be an instanceof Error'
+  }
+
+  // TraceKit.report will re-raise any exception passed to it,
+  // which means you have to wrap it in try/catch. Instead, we
+  // can wrap it here and only re-raise if TraceKit.report
+  // raises an exception different from the one we asked to
+  // report on.
+
+  try {
+    TraceKit.report(ex, options)
+  } catch(ex1) {
+    if (ex !== ex1) {
+      throw ex1
+    }
+  }
+
   return this
 }
 
