@@ -39,7 +39,7 @@ module.exports = {
   processException: function processException (exception, options) {
     options = options || {}
 
-    var stacktrace, label, i
+    var stacktrace
 
     var type = exception.type
     var message = String(exception.message) | 'Script error'
@@ -71,7 +71,7 @@ module.exports = {
     }
 
     // Human readable label
-    label = lineno ? message + ' at ' + lineno : message
+    var label = lineno ? message + ' at ' + lineno : message
 
     var data = {
       message: label,
@@ -99,19 +99,19 @@ module.exports = {
     var viewportInfo = utils.getViewPortInfo()
     var extra = {
       'environment': {
-        'utcOffset': new Date().getTimezoneOffset() / - 60.0,
+        'utcOffset': new Date().getTimezoneOffset() / -60.0,
         'browserWidth': viewportInfo.width,
         'browserHeight': viewportInfo.height,
-        'screenWidth': screen.width,
-        'screenHeight': screen.height,
+        'screenWidth': window.screen.width,
+        'screenHeight': window.screen.height,
         'language': navigator.language,
         'userAgent': navigator.userAgent,
-        'platform': navigator.platform,
+        'platform': navigator.platform
       },
       'page': {
         'referer': document.referrer,
         'host': document.domain,
-        'location': location.href,
+        'location': window.location.href
       }
     }
 

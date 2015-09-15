@@ -8,7 +8,7 @@ module.exports = {
 
     var headers = {
       'Authorization': 'Bearer ' + options.token,
-      'x-opbeat-client': 'opbeat-js/' + options.VERSION,
+      'x-opbeat-client': 'opbeat-js/' + options.VERSION
     }
 
     this._makeRequest(url, data, headers)
@@ -25,7 +25,7 @@ module.exports = {
     xhr.setRequestHeader('Content-Type', 'application/json')
 
     if (headers) {
-      for (header in headers) {
+      for (var header in headers) {
         if (headers.hasOwnProperty(header)) {
           xhr.setRequestHeader(header.toLowerCase(), headers[header])
         }
@@ -39,9 +39,8 @@ module.exports = {
     }
 
     xhr.onreadystatechange = function (evt) {
-      var status, err
       if (xhr.readyState === 4) {
-        status = xhr.status
+        var status = xhr.status
         if (status > 399 && status < 600) {
           // An http 4xx or 5xx error. Signal an error.
           var err = new Error(url + ' HTTP status: ' + status)

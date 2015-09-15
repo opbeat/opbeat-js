@@ -53,7 +53,7 @@ Opbeat.prototype.config = function (options) {
 
 Opbeat.prototype.install = function () {
   if (this.isPlatformSupport() && !this.isInstalled) {
-    TraceKit.report.subscribe(this.onTraceKitReport.bind(this))
+    window.TraceKit.report.subscribe(this.onTraceKitReport.bind(this))
     this.isInstalled = true
   }
 
@@ -67,7 +67,7 @@ Opbeat.prototype.install = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.uninstall = function () {
-  TraceKit.report.uninstall()
+  window.TraceKit.report.uninstall()
   this.isInstalled = false
 
   return this
@@ -82,7 +82,7 @@ Opbeat.prototype.uninstall = function () {
  */
 Opbeat.prototype.captureException = function (ex, options) {
   if (!(ex instanceof Error)) {
-    throw 'Passed exception needs to be an instanceof Error'
+    throw new Error('Passed exception needs to be an instanceof Error')
   }
 
   // TraceKit.report will re-raise any exception passed to it,
@@ -92,7 +92,7 @@ Opbeat.prototype.captureException = function (ex, options) {
   // report on.
 
   try {
-    TraceKit.report(ex, options)
+    window.TraceKit.report(ex, options)
   } catch(ex1) {
     if (ex !== ex1) {
       throw ex1
