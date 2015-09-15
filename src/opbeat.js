@@ -7,6 +7,7 @@ var defaultOptions = {
   appId: 'e9797db8c7',
   clientToken: '6451721d51b6d95cf6c6b09498feafd865f1f976'
 }
+var utils = require('./lib/utils')
 
 function Opbeat () {
   this.VERSION = '0.0.1'
@@ -39,6 +40,7 @@ function Opbeat () {
  */
 
 Opbeat.prototype.config = function (options) {
+  this.options = utils.mergeObject(this.options, options)
   return this
 }
 
