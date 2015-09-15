@@ -94,14 +94,14 @@ module.exports = {
         'browserHeight': viewportInfo.height,
         'screenWidth': screen.width,
         'screenHeight': screen.height,
-        'userLanguage': navigator.userLanguage,
+        'language': navigator.language,
         'userAgent': navigator.userAgent,
-        'platform': navigator.platform
+        'platform': navigator.platform,
       },
       'page': {
         'referer': document.referrer,
         'host': document.domain,
-        'location': location.href
+        'location': location.href,
       }
     }
     data.extra = extra
