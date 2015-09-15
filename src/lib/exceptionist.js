@@ -81,8 +81,8 @@ module.exports = {
         value: message
       },
       stacktrace: stacktrace,
-      user: null,
       timestamp: null,
+      user: options.context.user || null,
       level: null,
       logger: null,
       machine: null
