@@ -18,11 +18,6 @@ function Opbeat () {
     }
   }
 
-  this.isPlatformSupport = function () {
-    return typeof Array.prototype.forEach === 'function' &&
-      typeof JSON.stringify === 'function'
-
-  }
 
   this.onTraceKitReport = function (stackInfo) {
     logger.log('opbeat.onTraceKitReport', stackInfo)
@@ -32,6 +27,9 @@ function Opbeat () {
     exceptionist.processException(exception, this.options)
   }
 
+Opbeat.prototype.isPlatformSupport = function () {
+  return typeof Array.prototype.forEach === 'function' &&
+    typeof JSON.stringify === 'function'
 }
 
 /*
