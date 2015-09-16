@@ -89,7 +89,7 @@ Opbeat.prototype.captureException = function (ex, options) {
   }
 
   if (!(ex instanceof Error)) {
-    throw new Error('Passed exception needs to be an instanceof Error')
+    throw new Error("Can't capture exception. Passed exception needs to be an instanceof Error")
   }
 
   // TraceKit.report will re-raise any exception passed to it,
