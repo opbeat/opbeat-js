@@ -10,7 +10,7 @@ module.exports = {
 
     // normalize the frames data
     var normalized = {
-      'filename': frame.url,
+      'filename': this.cleanFileUrl(frame.url),
       'lineno': frame.line,
       'colno': frame.column,
       'function': frame.func || '[anonymous]'
@@ -36,6 +36,22 @@ module.exports = {
 
   },
 
+  cleanFileUrl: function (fileUrl) {
+    if (!fileUrl) {
+      fileUrl = ''
+    }
+
+    if (fileUrl.indexOf(window.location.href) > -1) {
+      fileUrl = fileUrl.replace(window.location.href, '')
+    }
+
+    if (!fileUrl) {
+      fileUrl = '/'
+    }
+
+    return fileUrl
+  },
+
   processException: function processException (exception, options) {
     options = options || {}
 
@@ -43,9 +59,9 @@ module.exports = {
 
     var type = exception.type
     var message = String(exception.message) | 'Script error'
-    var fileurl = exception.fileurl
     var lineno = exception.lineno
     var frames = exception.frames
+    var fileurl = this.cleanFileUrl(exception.fileurl)
 
     if (frames && frames.length) {
       // Opbeat.com expects frames oldest to newest
