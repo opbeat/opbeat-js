@@ -3,26 +3,26 @@ var transport = require('./transport')
 var utils = require('./utils')
 
 module.exports = {
-  normalizeFrame: function normalizeFrame (frame, options) {
+  buildOpbeatFrame: function buildOpbeatFrame (stack, options) {
     options = options || {}
 
-    if (!frame.url) return
+    if (!stack.url) return
 
     // normalize the frames data
-    var normalized = {
-      'filename': this.cleanFileUrl(frame.url),
-      'lineno': frame.line,
-      'colno': frame.column,
-      'function': frame.func || '[anonymous]'
+    var frame = {
+      'filename': this.cleanFileUrl(stack.url),
+      'lineno': stack.line,
+      'colno': stack.column,
+      'function': stack.func || '[anonymous]'
     }
 
     // Contexts
-    var contexts = this.getExceptionContexts(frame.url, frame.line)
-    normalized.pre_context = contexts.preContext
-    normalized.context_line = contexts.contextLine
-    normalized.post_context = contexts.postContext
+    var contexts = this.getExceptionContexts(stack.url, stack.line)
+    frame.pre_context = contexts.preContext
+    frame.context_line = contexts.contextLine
+    frame.post_context = contexts.postContext
 
-    return normalized
+    return frame
   },
 
   traceKitStackToOpbeatException: function (stackInfo, options) {
@@ -31,7 +31,7 @@ module.exports = {
 
     if (stackInfo.stack && stackInfo.stack.length) {
       stackInfo.stack.forEach(function (stack, i) {
-        var frame = this.normalizeFrame(stack)
+        var frame = this.buildOpbeatFrame(stack)
         if (frame) {
           stackInfo.frames.push(frame)
         }
