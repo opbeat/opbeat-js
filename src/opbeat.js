@@ -2,21 +2,11 @@ require('TraceKit')
 var exceptionist = require('./lib/exceptionist')
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
+var config = require('./lib/config')
 
 function Opbeat () {
   this.isInstalled = false
-
-  this.options = {
-    VERSION: this.VERSION,
-    orgId: null,
-    appId: null,
-    token: null,
-    context: {
-      user: null,
-      extra: null
-    }
-  }
-
+  this.options = config.getConfig()
 
   this.onTraceKitReport = function (stackInfo) {
     logger.log('opbeat.onTraceKitReport', stackInfo)
