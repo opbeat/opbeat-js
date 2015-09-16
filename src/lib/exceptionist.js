@@ -76,7 +76,7 @@ module.exports = {
     // Overrride culprit from first frame, if filename is missing
     if (!culprit && frames.length && frames[0].filename.length) {
       culprit = frames[0].filename
-    } else if (!fileUrl) {
+    } else if (!culprit) {
       culprit = '/'
     }
 
