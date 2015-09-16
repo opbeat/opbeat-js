@@ -51,11 +51,6 @@ module.exports = {
       fileUrl = fileUrl.replace(window.location.href, '')
     }
 
-    if (!fileUrl) {
-      // Assume it's an inline script, so use location path
-      fileUrl = window.location.pathname + ' (inline script)'
-    }
-
     return fileUrl
   },
 
@@ -83,11 +78,15 @@ module.exports = {
       frames: frames
     }
 
-    // Overrride culprit from first frame, if filename is missing
-    if (!culprit && frames.length && frames[0].filename.length) {
-      culprit = frames[0].filename
-    } else if (!culprit) {
-      culprit = '/'
+    // Set fileUrl from last frame, if filename is missing
+    if (!fileUrl && frames.length) {
+      var lastFrame = frames[frames.length - 1]
+      if (lastFrame.filename) {
+        fileUrl = lastFrame.filename
+      } else {
+        // If filename empty, use location path and assume inline script
+        fileUrl = window.location.pathname + ' (inline script)'
+      }
     }
 
     var culprit = fileUrl
