@@ -24,6 +24,9 @@ module.exports = {
     }
 
     return o3
-  }
+  },
 
+  isUndefined: function (obj) {
+    return (typeof obj) === 'undefined'
+  }
 }
