@@ -8,7 +8,7 @@ module.exports = {
 
     var headers = {
       'Authorization': 'Bearer ' + options.token,
-      'x-opbeat-client': 'opbeat-js/' + options.VERSION
+      'X-Opbeat-Client': 'opbeat-js/' + options.VERSION
     }
 
     this._makeRequest(url, data, headers)
