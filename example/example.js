@@ -25,3 +25,7 @@ function divide (a, b) {
     Opbeat.captureException(e)
   }
 }
+
+document.querySelector('.btn-test4').addEventListener('click', function () {
+  divide(123 / 2)
+}, false)
