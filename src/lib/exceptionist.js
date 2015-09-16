@@ -16,6 +16,12 @@ module.exports = {
       'function': frame.func || '[anonymous]'
     }
 
+    // Contexts
+    var contexts = this.getExceptionContexts(frame.url, frame.line)
+    normalized.pre_context = contexts.preContext
+    normalized.context_line = contexts.contextLine
+    normalized.post_context = contexts.postContext
+
     return normalized
   },
 
@@ -109,6 +115,47 @@ module.exports = {
     logger.log('opbeat.exceptionst.processException', data)
     transport.sendToOpbeat(data, options)
 
+  },
+
+  getExceptionContexts: function (url, line) {
+    var source = window.TraceKit.computeStackTrace.getSource(url)
+    line -= 1; // convert line to 0-based index
+
+    var linesBefore = 5
+    var linesAfter = 5
+
+    var contexts = {
+      preContext: [],
+      contextLine: null,
+      postContext: []
+    }
+
+    if (source.length) {
+      // Pre context
+      var preStartIndex = Math.max(0, line - linesBefore - 1)
+      var preEndIndex = Math.min(source.length, line - 1)
+      for (var i = preStartIndex; i <= preEndIndex; ++i) {
+        if (!utils.isUndefined(source[i])) {
+          contexts.preContext.push(source[i])
+        }
+      }
+
+      // Line context
+      contexts.contextLine = source[line]
+
+      // Post context
+      var postStartIndex = Math.min(source.length, line + 1)
+      var postEndIndex = Math.min(source.length, line + linesAfter)
+      for (var i = postStartIndex; i <= postEndIndex; ++i) {
+        if (!utils.isUndefined(source[i])) {
+          contexts.postContext.push(source[i])
+        }
+      }
+    }
+
+    logger.log('Opbeat.getExceptionContexts', contexts)
+
+    return contexts
   },
 
   getBrowserSpecificMetadata: function () {
