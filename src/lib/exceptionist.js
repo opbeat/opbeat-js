@@ -45,10 +45,6 @@ module.exports = {
       fileUrl = fileUrl.replace(window.location.href, '')
     }
 
-    if (!fileUrl) {
-      fileUrl = '/'
-    }
-
     return fileUrl
   },
 
@@ -82,9 +78,11 @@ module.exports = {
       frames: frames
     }
 
-    // Overrride fileurl from first frame
-    if (!fileurl && frames.length && frames[0].filename.length) {
-      fileurl = frames[0].filename
+    // Overrride culprit from first frame, if filename is missing
+    if (!culprit && frames.length && frames[0].filename.length) {
+      culprit = frames[0].filename
+    } else if (!fileUrl) {
+      culprit = '/'
     }
 
     var data = {
