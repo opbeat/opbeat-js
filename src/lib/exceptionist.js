@@ -47,8 +47,10 @@ module.exports = {
       fileUrl = ''
     }
 
-    if (fileUrl.indexOf(window.location.href) > -1) {
-      fileUrl = fileUrl.replace(window.location.href, '')
+    var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port: '')
+
+    if (fileUrl.indexOf(origin) > -1) {
+      fileUrl = fileUrl.replace(origin + '/', '')
     }
 
     return fileUrl
