@@ -4,7 +4,6 @@ var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 
 function Opbeat () {
-  this.VERSION = '0.0.1'
   this.isInstalled = false
 
   this.options = {
@@ -26,6 +25,8 @@ function Opbeat () {
 
     exceptionist.processException(exception, this.options)
   }
+
+Opbeat.prototype.VERSION = '0.0.1'
 
 Opbeat.prototype.isPlatformSupport = function () {
   return typeof Array.prototype.forEach === 'function' &&
