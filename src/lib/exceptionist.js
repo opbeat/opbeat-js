@@ -66,16 +66,15 @@ module.exports = {
 
     var type = exception.name
     var message = String(exception.message) || 'Script error'
-    var fileurl = this.cleanFileUrl(exception.fileurl)
+    var fileUrl = this.cleanFileUrl(exception.fileurl)
     var frames = exception.frames || []
-    var culprit = fileurl
 
     if (frames && frames.length) {
       // Opbeat.com expects frames oldest to newest and JS sends them as newest to oldest
       frames.reverse()
-    } else if (fileurl) {
+    } else if (fileUrl) {
       frames.push({
-        filename: fileurl,
+        filename: fileUrl,
         lineno: lineno
       })
     }
@@ -90,6 +89,8 @@ module.exports = {
     } else if (!culprit) {
       culprit = '/'
     }
+
+    var culprit = fileUrl
 
     var data = {
       message: type + ': ' + message,
