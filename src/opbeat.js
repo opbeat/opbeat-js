@@ -16,6 +16,12 @@ function Opbeat () {
     exceptionist.processException(exception, this.options)
   }
 
+  if (config.isConfigValid(this.options)) {
+    this.install()
+  }
+
+}
+
 Opbeat.prototype.VERSION = '0.0.1'
 
 Opbeat.prototype.isPlatformSupport = function () {
