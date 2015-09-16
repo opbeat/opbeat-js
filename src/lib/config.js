@@ -16,6 +16,15 @@ module.exports = {
     var config = defaults
 
     return config
-  }
+  },
+
+  isConfigValid: function (config) {
+    var requiredKeys = ['appId', 'orgId', 'token']
+    var values = requiredKeys.map(function (key) {
+      return config[key] === undefined
+    })
+
+    return values.indexOf(true) === -1
+  },
 
 }
