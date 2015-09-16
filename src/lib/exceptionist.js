@@ -45,6 +45,11 @@ module.exports = {
       fileUrl = fileUrl.replace(window.location.href, '')
     }
 
+    if (!fileUrl) {
+      // Assume it's an inline script, so use location path
+      fileUrl = window.location.pathname + ' (inline script)'
+    }
+
     return fileUrl
   },
 
