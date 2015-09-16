@@ -84,6 +84,10 @@ Opbeat.prototype.uninstall = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.captureException = function (ex, options) {
+  if (!this.isInstalled) {
+    throw new Error("Can't capture exception. Opbeat isn't intialized")
+  }
+
   if (!(ex instanceof Error)) {
     throw new Error('Passed exception needs to be an instanceof Error')
   }
