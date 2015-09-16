@@ -4,7 +4,7 @@ module.exports = {
   sendToOpbeat: function (data, options) {
     logger.log('opbeat.transport.sendToOpbeat', data, options)
 
-    var url = 'https://dry-eyrie-9578.herokuapp.com/intake.opbeat.com:443/api/v1/organizations/' + options.orgId + '/apps/' + options.appId + '/errors/'
+    var url = 'https://intake.opbeat.com/api/v1/organizations/' + options.orgId + '/apps/' + options.appId + '/client-side/errors/'
 
     var headers = {
       'Authorization': 'Bearer ' + options.token,
