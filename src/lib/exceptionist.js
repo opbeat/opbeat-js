@@ -105,7 +105,7 @@ module.exports = {
     data.extra = this.getBrowserSpecificMetadata()
 
     if (options.context.extra) {
-      data.data = utils.mergeObject(data.extra, options.context.extra)
+      data.extra = utils.mergeObject(data.extra, options.context.extra)
     }
 
     logger.log('opbeat.exceptionst.processException', data)
