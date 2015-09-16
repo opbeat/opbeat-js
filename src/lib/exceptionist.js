@@ -62,11 +62,6 @@ module.exports = {
     if (frames && frames.length) {
       // Opbeat.com expects frames oldest to newest and JS sends them as newest to oldest
       frames.reverse()
-
-      if (frames[0].lineno) {
-        message = message + ' at ' + frames[0].lineno
-      }
-
     } else if (fileurl) {
       frames.push({
         filename: fileurl,
@@ -86,7 +81,7 @@ module.exports = {
     }
 
     var data = {
-      message: message,
+      message: type + ': ' + message,
       culprit: culprit,
       exception: {
         type: type,
