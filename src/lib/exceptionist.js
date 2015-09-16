@@ -57,41 +57,39 @@ module.exports = {
 
     var stacktrace
 
-    var type = exception.type
-    var message = String(exception.message) | 'Script error'
-    var lineno = exception.lineno
-    var frames = exception.frames
+    var type = exception.name
+    var message = String(exception.message) || 'Script error'
     var fileurl = this.cleanFileUrl(exception.fileurl)
+    var frames = exception.frames || []
+    var culprit = fileurl
 
     if (frames && frames.length) {
-      // Opbeat.com expects frames oldest to newest
-      // and JS sends them as newest to oldest
+      // Opbeat.com expects frames oldest to newest and JS sends them as newest to oldest
       frames.reverse()
 
-      stacktrace = {
-        frames: frames
+      if (frames[0].lineno) {
+        message = message + ' at ' + frames[0].lineno
       }
 
     } else if (fileurl) {
-      stacktrace = {
-        frames: [{
-          filename: fileurl,
-          lineno: lineno
-        }]
-      }
+      frames.push({
+        filename: fileurl,
+        lineno: lineno
+      })
+    }
+
+    stacktrace = {
+      frames: frames
     }
 
     // Overrride fileurl from first frame
-    if (frames && frames.length && frames[0].filename) {
+    if (!fileurl && frames.length && frames[0].filename.length) {
       fileurl = frames[0].filename
     }
 
-    // Human readable label
-    var label = lineno ? message + ' at ' + lineno : message
-
     var data = {
-      message: label,
-      culprit: fileurl,
+      message: message,
+      culprit: culprit,
       exception: {
         type: type,
         value: message
