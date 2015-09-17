@@ -2,8 +2,32 @@ var logger = require('./logger')
 var transport = require('./transport')
 var utils = require('./utils')
 var stacktraceGps = require('stacktrace-gps')
+var StackTrace = require('stacktrace-js')
+
+var sourceCache = {}
 
 module.exports = {
+  processWindowError: function (msg, file, line, col, error, options) {
+    StackTrace.fromError(error, {
+      sourceCache: sourceCache
+    }).then(function (stackFrames) {
+      var exception = {
+        'message': error.message,
+        'type': error.name,
+        'fileurl': file,
+        'lineno': line,
+        'colno': col,
+        'stack': stackFrames
+      }
+
+      this.stackInfoToOpbeatException(exception, options).then(function (exception) {
+        this.processException(exception, options)
+      }.bind(this))
+
+    }.bind(this))
+
+  },
+
   buildOpbeatFrame: function buildOpbeatFrame (stack, options) {
     options = options || {}
 
@@ -135,7 +159,8 @@ module.exports = {
 
   getExceptionContexts: function (url, line) {
     return new Promise(function (resolve, reject ) {
-      var gps = new stacktraceGps()
+      var gps = new stacktraceGps({
+      sourceCache})
 
       gps._get(url).then(function (source) {
         source = source.split('\n')

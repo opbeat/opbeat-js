@@ -1,4 +1,3 @@
-var StackTrace = require('stacktrace-js')
 var exceptionist = require('./lib/exceptionist')
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
@@ -7,15 +6,6 @@ var config = require('./lib/config')
 function Opbeat () {
   this.isInstalled = false
   this.options = config.getConfig()
-
-  this.onExceptionReport = function (stackInfo) {
-    logger.log('opbeat.onExceptionReport', stackInfo)
-
-    exceptionist.stackInfoToOpbeatException(stackInfo, this.options).then(function (exception) {
-      exceptionist.processException(exception, this.options)
-    })
-
-  }
 
   if (config.isConfigValid(this.options)) {
     this.install()
@@ -53,23 +43,9 @@ Opbeat.prototype.config = function (options) {
 
 Opbeat.prototype.install = function () {
   if (this.isPlatformSupport() && !this.isInstalled) {
-    var that = this
-
     window.onerror = function (msg, file, line, col, error) {
-      StackTrace.fromError(error).then(function (stackFrames) {
-        var exception = {
-          'message': error.message,
-          'type': error.name,
-          'fileurl': file,
-          'lineno': line,
-          'colno': col,
-          'stack': stackFrames
-        }
-
-        that.onExceptionReport.call(this, exception)
-
-      })
-    }
+      exceptionist.processWindowError(msg, file, line, col, error, this.options)
+    }.bind(this)
 
     this.isInstalled = true
   }
