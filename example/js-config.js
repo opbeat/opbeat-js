@@ -13,17 +13,11 @@ Opbeat.setUserContext({
 
 // Test functions
 function multiply (a, b) {
-  'use strict'
   return a * b
 }
 
 function divide (a, b) {
-  'use strict'
-  try {
-    return multiply(add(a, b), a, b) / c
-  } catch (e) {
-    Opbeat.captureException(e)
-  }
+  return multiply(add(a, b), a, b) / c
 }
 
 document.querySelector('.btn-test4').addEventListener('click', function () {
