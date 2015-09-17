@@ -1,4 +1,4 @@
-require('TraceKit')
+var StackTrace = require('stacktrace-js')
 var exceptionist = require('./lib/exceptionist')
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
@@ -8,12 +8,13 @@ function Opbeat () {
   this.isInstalled = false
   this.options = config.getConfig()
 
-  this.onTraceKitReport = function (stackInfo) {
-    logger.log('opbeat.onTraceKitReport', stackInfo)
+  this.onExceptionReport = function (stackInfo) {
+    logger.log('opbeat.onExceptionReport', stackInfo)
 
-    var exception = exceptionist.traceKitStackToOpbeatException(stackInfo, this.options)
+    exceptionist.stackInfoToOpbeatException(stackInfo, this.options).then(function (exception) {
+      exceptionist.processException(exception, this.options)
+    })
 
-    exceptionist.processException(exception, this.options)
   }
 
   if (config.isConfigValid(this.options)) {
@@ -52,7 +53,24 @@ Opbeat.prototype.config = function (options) {
 
 Opbeat.prototype.install = function () {
   if (this.isPlatformSupport() && !this.isInstalled) {
-    window.TraceKit.report.subscribe(this.onTraceKitReport.bind(this))
+    var that = this
+
+    window.onerror = function (msg, file, line, col, error) {
+      StackTrace.fromError(error).then(function (stackFrames) {
+        var exception = {
+          'message': error.message,
+          'type': error.name,
+          'fileurl': file,
+          'lineno': line,
+          'colno': col,
+          'stack': stackFrames
+        }
+
+        that.onExceptionReport.call(this, exception)
+
+      })
+    }
+
     this.isInstalled = true
   }
 
@@ -94,13 +112,13 @@ Opbeat.prototype.captureException = function (ex, options) {
   // raises an exception different from the one we asked to
   // report on.
 
-  try {
-    window.TraceKit.report(ex, options)
-  } catch(ex1) {
-    if (ex !== ex1) {
-      throw ex1
-    }
-  }
+  // try {
+  //   window.TraceKit.report(ex, options)
+  // } catch(ex1) {
+  //   if (ex !== ex1) {
+  //     throw ex1
+  //   }
+  // }
 
   return this
 }
