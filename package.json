@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "browserify": "^11.1.0",
-    "browserify-shim": "^3.8.10",
-    "tracekit": "^0.3.0",
+    "stacktrace-gps": "^2.2.0",
+    "stacktrace-js": "stacktracejs/stacktrace.js",
     "vinyl-source-stream": "^1.1.0"
   },
   "devDependencies": {
@@ -26,10 +26,4 @@
     "gulp-serve": "^0.2.0",
     "gulp-uglify": "^1.0.1"
   },
-  "browserify": {
-    "transform": [ "browserify-shim" ]
-  },
-  "browserify-shim": {
-    "./node_modules/tracekit/tracekit.js": { "exports": "global:TraceKit" }
-  }
 }

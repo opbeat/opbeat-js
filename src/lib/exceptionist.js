@@ -1,42 +1,56 @@
 var logger = require('./logger')
 var transport = require('./transport')
 var utils = require('./utils')
+var stacktraceGps = require('stacktrace-gps')
 
 module.exports = {
   buildOpbeatFrame: function buildOpbeatFrame (stack, options) {
     options = options || {}
 
-    if (!stack.url) return
+    return new Promise(function (resolve, reject) {
+      if (!stack.fileName) {
+        resolve({})
+      }
 
-    // normalize the frames data
-    var frame = {
-      'filename': this.cleanFileUrl(stack.url),
-      'lineno': stack.line,
-      'colno': stack.column,
-      'function': stack.func || '[anonymous]'
-    }
+      // normalize the frames data
+      var frame = {
+        'filename': this.cleanFileUrl(stack.fileName),
+        'lineno': stack.lineNumber,
+        'colno': stack.columnNumber,
+        'function': stack.functionName || '[anonymous]'
+      }
 
-    // Contexts
-    var contexts = this.getExceptionContexts(stack.url, stack.line)
-    frame.pre_context = contexts.preContext
-    frame.context_line = contexts.contextLine
-    frame.post_context = contexts.postContext
+      // Contexts
+      this.getExceptionContexts(stack.fileName, stack.lineNumber).then(function (contexts) {
+        frame.pre_context = contexts.preContext
+        frame.context_line = contexts.contextLine
+        frame.post_context = contexts.postContext
 
-    return frame
+        resolve(frame)
+      })
+
+    }.bind(this))
+
   },
 
-  traceKitStackToOpbeatException: function (stackInfo, options) {
+  stackInfoToOpbeatException: function (stackInfo, options) {
     options = options || {}
-    stackInfo.frames = []
 
-    if (stackInfo.stack && stackInfo.stack.length) {
-      stackInfo.stack.forEach(function (stack, i) {
-        var frame = this.buildOpbeatFrame(stack)
-        if (frame) {
-          stackInfo.frames.push(frame)
-        }
-      }.bind(this))
-    }
+    return new Promise(function (resolve, reject) {
+      if (stackInfo.stack && stackInfo.stack.length) {
+        var framesPromises = stackInfo.stack.map(function (stack, i) {
+          return this.buildOpbeatFrame(stack)
+        }.bind(this))
+
+        Promise.all(framesPromises).then(function (frames) {
+          stackInfo.frames = frames
+          resolve(stackInfo)
+        })
+      }
+
+    }.bind(this))
+
+    stackInfo.frames = []
 
     return stackInfo
 
@@ -61,7 +75,7 @@ module.exports = {
 
     var stacktrace
 
-    var type = exception.name
+    var type = exception.type
     var message = String(exception.message) || 'Script error'
     var fileUrl = this.cleanFileUrl(exception.fileurl)
     var frames = exception.frames || []
@@ -72,7 +86,7 @@ module.exports = {
     } else if (fileUrl) {
       frames.push({
         filename: fileUrl,
-        lineno: lineno
+        lineno: exception.lineno
       })
     }
 
@@ -101,7 +115,7 @@ module.exports = {
         value: message
       },
       stacktrace: stacktrace,
-      user: options.context.user || null,
+      user: options.context ? options.context.user : null,
       timestamp: parseInt((new Date).getTime() / 1000, 10),
       level: null,
       logger: null,
@@ -110,7 +124,7 @@ module.exports = {
 
     data.extra = this.getBrowserSpecificMetadata()
 
-    if (options.context.extra) {
+    if (options.context && options.context.extra) {
       data.extra = utils.mergeObject(data.extra, options.context.extra)
     }
 
@@ -120,44 +134,51 @@ module.exports = {
   },
 
   getExceptionContexts: function (url, line) {
-    var source = window.TraceKit.computeStackTrace.getSource(url)
-    line -= 1; // convert line to 0-based index
+    return new Promise(function (resolve, reject ) {
+      var gps = new stacktraceGps()
 
-    var linesBefore = 5
-    var linesAfter = 5
+      gps._get(url).then(function (source) {
+        source = source.split('\n')
+        line -= 1; // convert line to 0-based index
 
-    var contexts = {
-      preContext: [],
-      contextLine: null,
-      postContext: []
-    }
+        var linesBefore = 5
+        var linesAfter = 5
 
-    if (source.length) {
-      // Pre context
-      var preStartIndex = Math.max(0, line - linesBefore - 1)
-      var preEndIndex = Math.min(source.length, line - 1)
-      for (var i = preStartIndex; i <= preEndIndex; ++i) {
-        if (!utils.isUndefined(source[i])) {
-          contexts.preContext.push(source[i])
+        var contexts = {
+          preContext: [],
+          contextLine: null,
+          postContext: []
         }
-      }
 
-      // Line context
-      contexts.contextLine = source[line]
+        if (source.length) {
+          // Pre context
+          var preStartIndex = Math.max(0, line - linesBefore - 1)
+          var preEndIndex = Math.min(source.length, line - 1)
+          for (var i = preStartIndex; i <= preEndIndex; ++i) {
+            if (!utils.isUndefined(source[i])) {
+              contexts.preContext.push(source[i])
+            }
+          }
 
-      // Post context
-      var postStartIndex = Math.min(source.length, line + 1)
-      var postEndIndex = Math.min(source.length, line + linesAfter)
-      for (var i = postStartIndex; i <= postEndIndex; ++i) {
-        if (!utils.isUndefined(source[i])) {
-          contexts.postContext.push(source[i])
+          // Line context
+          contexts.contextLine = source[line]
+
+          // Post context
+          var postStartIndex = Math.min(source.length, line + 1)
+          var postEndIndex = Math.min(source.length, line + linesAfter)
+          for (var i = postStartIndex; i <= postEndIndex; ++i) {
+            if (!utils.isUndefined(source[i])) {
+              contexts.postContext.push(source[i])
+            }
+          }
         }
-      }
-    }
 
-    logger.log('Opbeat.getExceptionContexts', contexts)
+        logger.log('Opbeat.getExceptionContexts', contexts)
+        resolve(contexts)
+      })
 
-    return contexts
+    })
+
   },
 
   getBrowserSpecificMetadata: function () {
