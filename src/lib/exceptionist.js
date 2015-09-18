@@ -42,7 +42,7 @@ module.exports = {
       }
 
       // Resolve contexts
-      var contextsResolver = this.getExceptionContexts(stack.fileName, stack.lineNumber);
+      var contextsResolver = this.getExceptionContexts(stack.fileName, stack.lineNumber)
       contextsResolver.then(function (contexts) {
         frame.pre_context = contexts.preContext
         frame.context_line = contexts.contextLine
@@ -50,15 +50,15 @@ module.exports = {
       })
 
       // Detect Sourcemaps
-      var sourceMapResolver = this.getFileSourceMapUrl(stack.fileName);
-      sourceMapResolver.then(function(sourceMapUrl) {
+      var sourceMapResolver = this.getFileSourceMapUrl(stack.fileName)
+      sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
-      }).catch(function() {})
+      }).catch(function () {})
 
       // Resolve frame when everything is over
-      utils.promiseAny([sourceMapResolver, contextsResolver]).then(function() {
+      utils.promiseAny([sourceMapResolver, contextsResolver]).then(function () {
         resolve(frame)
-      });
+      })
 
     }.bind(this))
 
@@ -116,7 +116,7 @@ module.exports = {
       })
     }
 
-    stacktrace = {
+    var stacktrace = {
       frames: frames
     }
 
@@ -168,7 +168,7 @@ module.exports = {
       return null
     }
 
-    if(fileUrl.split('/').length >1) {
+    if (fileUrl.split('/').length > 1) {
       fileBasePath = fileUrl.split('/').slice(0, -1).join('/') + '/'
     } else {
       fileBasePath = '/'
@@ -187,9 +187,7 @@ module.exports = {
         } else {
           reject(null)
         }
-      }).catch(function(e) {
-        console.error('e', e);
-      })
+      }).catch(reject)
 
     })
   },
