@@ -1,4 +1,5 @@
 var logger = require('./logger')
+var config = require('./config')
 var transport = require('./transport')
 var utils = require('./utils')
 var stacktraceGps = require('stacktrace-gps')
@@ -7,7 +8,8 @@ var StackTrace = require('stacktrace-js')
 var sourceCache = {}
 
 module.exports = {
-  processWindowError: function (msg, file, line, col, error, options) {
+
+  processWindowError: function (msg, file, line, col, error) {
     StackTrace.fromError(error, {
       sourceCache: sourceCache
     }).then(function (stackFrames) {
@@ -20,17 +22,15 @@ module.exports = {
         'stack': stackFrames
       }
 
-      this.stackInfoToOpbeatException(exception, options).then(function (exception) {
-        this.processException(exception, options)
+      this.stackInfoToOpbeatException(exception).then(function (exception) {
+        this.processException(exception)
       }.bind(this))
 
     }.bind(this))
 
   },
 
-  buildOpbeatFrame: function buildOpbeatFrame (stack, options) {
-    options = options || {}
-
+  buildOpbeatFrame: function buildOpbeatFrame (stack) {
     return new Promise(function (resolve, reject) {
 
       // Build Opbeat frame data
@@ -64,9 +64,7 @@ module.exports = {
 
   },
 
-  stackInfoToOpbeatException: function (stackInfo, options) {
-    options = options || {}
-
+  stackInfoToOpbeatException: function (stackInfo) {
     return new Promise(function (resolve, reject) {
       if (stackInfo.stack && stackInfo.stack.length) {
         var framesPromises = stackInfo.stack.map(function (stack, i) {
@@ -102,11 +100,7 @@ module.exports = {
     return fileUrl
   },
 
-  processException: function processException (exception, options) {
-    options = options || {}
-
-    var stacktrace
-
+  processException: function processException (exception) {
     var type = exception.type
     var message = String(exception.message) || 'Script error'
     var fileUrl = this.cleanFileUrl(exception.fileurl)
@@ -147,7 +141,7 @@ module.exports = {
         value: message
       },
       stacktrace: stacktrace,
-      user: options.context ? options.context.user : null,
+      user: config.get('context.user'),
       timestamp: parseInt((new Date).getTime() / 1000, 10),
       level: null,
       logger: null,
@@ -156,12 +150,12 @@ module.exports = {
 
     data.extra = this.getBrowserSpecificMetadata()
 
-    if (options.context && options.context.extra) {
-      data.extra = utils.mergeObject(data.extra, options.context.extra)
+    if (config.get('context.extra')) {
+      data.extra = utils.mergeObject(data.extra, config.get('context.extra'))
     }
 
     logger.log('opbeat.exceptionst.processException', data)
-    transport.sendToOpbeat(data, options)
+    transport.sendToOpbeat(data)
 
   },
 

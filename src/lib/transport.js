@@ -1,14 +1,15 @@
 var logger = require('./logger')
+var config = require('./config')
 
 module.exports = {
-  sendToOpbeat: function (data, options) {
-    logger.log('opbeat.transport.sendToOpbeat', data, options)
+  sendToOpbeat: function (data) {
+    logger.log('opbeat.transport.sendToOpbeat', data)
 
-    var url = 'https://intake.opbeat.com/api/v1/organizations/' + options.orgId + '/apps/' + options.appId + '/client-side/errors/'
+    var url = 'https://intake.opbeat.com/api/v1/organizations/' + config.get('orgId') + '/apps/' + config.get('appId') + '/client-side/errors/'
 
     var headers = {
-      'Authorization': 'Bearer ' + options.token,
-      'X-Opbeat-Client': 'opbeat-js/' + options.VERSION
+      'Authorization': 'Bearer ' + config.get('token'),
+      'X-Opbeat-Client': 'opbeat-js/' + config.get('VERSION')
     }
 
     this._makeRequest(url, data, headers)

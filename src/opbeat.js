@@ -5,11 +5,11 @@ var config = require('./lib/config')
 
 function Opbeat () {
   this.isInstalled = false
-  this.options = config.getConfig()
 
   if (config.isConfigValid(this.options)) {
     this.install()
   }
+  config.init()
 
 }
 
@@ -27,8 +27,9 @@ Opbeat.prototype.isPlatformSupport = function () {
  * @return {Opbeat}
  */
 
-Opbeat.prototype.config = function (options) {
-  this.options = utils.mergeObject(this.options, options)
+Opbeat.prototype.config = function (properties) {
+  config.setConfig(properties)
+
   return this
 }
 
@@ -106,7 +107,7 @@ Opbeat.prototype.captureException = function (ex, options) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setUserContext = function (user) {
-  this.options.context.user = user
+  config.set('context.user', user)
 
   return this
 }
@@ -118,7 +119,7 @@ Opbeat.prototype.setUserContext = function (user) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setExtraContext = function (extra) {
-  this.options.context.extra = user
+  config.set('context.extra', extra)
 
   return this
 }
