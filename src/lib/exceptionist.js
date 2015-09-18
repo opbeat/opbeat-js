@@ -41,11 +41,13 @@ module.exports = {
         'function': stack.functionName || '[anonymous]'
       }
 
-      // Contexts
-      this.getExceptionContexts(stack.fileName, stack.lineNumber).then(function (contexts) {
+      // Resolve contexts
+      var contextsResolver = this.getExceptionContexts(stack.fileName, stack.lineNumber);
+      contextsResolver.then(function (contexts) {
         frame.pre_context = contexts.preContext
         frame.context_line = contexts.contextLine
         frame.post_context = contexts.postContext
+      })
 
         resolve(frame)
       })
