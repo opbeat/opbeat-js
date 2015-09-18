@@ -49,8 +49,16 @@ module.exports = {
         frame.post_context = contexts.postContext
       })
 
+      // Detect Sourcemaps
+      var sourceMapResolver = this.getFileSourceMapUrl(stack.fileName);
+      sourceMapResolver.then(function(sourceMapUrl) {
+        frame.sourcemap_url = sourceMapUrl
+      }).catch(function() {})
+
+      // Resolve frame when everything is over
+      utils.promiseAny([sourceMapResolver, contextsResolver]).then(function() {
         resolve(frame)
-      })
+      });
 
     }.bind(this))
 
