@@ -15,7 +15,8 @@ Opbeat.prototype.VERSION = '0.0.1'
 
 Opbeat.prototype.isPlatformSupport = function () {
   return typeof Array.prototype.forEach === 'function' &&
-    typeof JSON.stringify === 'function'
+    typeof JSON.stringify === 'function' &&
+    typeof Function.bind === 'function'
 }
 
 /*
