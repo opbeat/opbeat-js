@@ -32,9 +32,6 @@ module.exports = {
     options = options || {}
 
     return new Promise(function (resolve, reject) {
-      if (!stack.fileName) {
-        resolve({})
-      }
 
       // normalize the frames data
       var frame = {
