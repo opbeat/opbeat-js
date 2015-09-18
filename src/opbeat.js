@@ -1,4 +1,4 @@
-var exceptionist = require('./lib/exceptionist')
+var exceptions = require('./lib/exceptions')
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 var config = require('./lib/config')
@@ -55,7 +55,7 @@ Opbeat.prototype.install = function () {
   }
 
   window.onerror = function (msg, file, line, col, error) {
-    exceptionist.processWindowError(msg, file, line, col, error, this.config)
+    exceptions.processWindowError(msg, file, line, col, error, this.config)
   }.bind(this)
 
   this.isInstalled = true
@@ -98,13 +98,7 @@ Opbeat.prototype.captureException = function (ex, options) {
   // raises an exception different from the one we asked to
   // report on.
 
-  // try {
-  //   window.TraceKit.report(ex, options)
-  // } catch(ex1) {
-  //   if (ex !== ex1) {
-  //     throw ex1
-  //   }
-  // }
+  exceptions.processError(ex, options)
 
   return this
 }
