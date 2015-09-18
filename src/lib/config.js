@@ -75,7 +75,7 @@ function _getDataAttributesFromNode (node) {
       if (dataRegex.test(attr.nodeName)) {
         var key = attr.nodeName.match(dataRegex)[1]
 
-        // Camel case key
+        // camelCase key
         key = key.split('-').map(function (group, index) {
           return index > 0 ? group.charAt(0).toUpperCase() + group.substring(1) : group
         }).join('')
