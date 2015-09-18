@@ -6,11 +6,9 @@ var config = require('./lib/config')
 function Opbeat () {
   this.isInstalled = false
 
-  if (config.isConfigValid(this.options)) {
-    this.install()
-  }
   config.init()
 
+  this.install()
 }
 
 Opbeat.prototype.VERSION = '0.0.1'
@@ -43,13 +41,23 @@ Opbeat.prototype.config = function (properties) {
  */
 
 Opbeat.prototype.install = function () {
-  if (this.isPlatformSupport() && !this.isInstalled) {
-    window.onerror = function (msg, file, line, col, error) {
-      exceptionist.processWindowError(msg, file, line, col, error, this.options)
-    }.bind(this)
-
-    this.isInstalled = true
+  if (!this.isPlatformSupport()) {
+    return this
   }
+
+  if (!config.isValid()) {
+    return this
+  }
+
+  if (this.isInstalled) {
+    return this
+  }
+
+  window.onerror = function (msg, file, line, col, error) {
+    exceptionist.processWindowError(msg, file, line, col, error, this.config)
+  }.bind(this)
+
+  this.isInstalled = true
 
   return this
 
