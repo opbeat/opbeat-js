@@ -193,7 +193,8 @@ module.exports = {
   getExceptionContexts: function (url, line) {
     return new Promise(function (resolve, reject ) {
       var gps = new stacktraceGps({
-      sourceCache})
+        sourceCache: sourceCache
+      })
 
       gps._get(url).then(function (source) {
         source = source.split('\n')
