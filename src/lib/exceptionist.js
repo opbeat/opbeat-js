@@ -244,7 +244,8 @@ module.exports = {
 
         logger.log('Opbeat.getExceptionContexts', contexts)
         resolve(contexts)
-      })
+
+      }).catch(reject)
 
     })
 
