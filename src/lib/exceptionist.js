@@ -155,6 +155,41 @@ module.exports = {
 
   },
 
+  getFileSourceMapUrl: function (fileUrl) {
+    function _findSourceMappingURL (source) {
+      var m = /\/\/[#@] ?sourceMappingURL=([^\s'"]+)$/.exec(source)
+      if (m && m[1]) {
+        return m[1]
+      }
+      return null
+    }
+
+    if(fileUrl.split('/').length >1) {
+      fileBasePath = fileUrl.split('/').slice(0, -1).join('/') + '/'
+    } else {
+      fileBasePath = '/'
+    }
+
+    return new Promise(function (resolve, reject) {
+      var gps = new stacktraceGps({
+        sourceCache: sourceCache
+      })
+
+      gps._get(fileUrl).then(function (source) {
+        var sourceMapUrl = _findSourceMappingURL(source)
+        if (sourceMapUrl) {
+          sourceMapUrl = fileBasePath + sourceMapUrl
+          resolve(sourceMapUrl)
+        } else {
+          reject(null)
+        }
+      }).catch(function(e) {
+        console.error('e', e);
+      })
+
+    })
+  },
+
   getExceptionContexts: function (url, line) {
     return new Promise(function (resolve, reject ) {
       var gps = new stacktraceGps({
