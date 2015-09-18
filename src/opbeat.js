@@ -1,32 +1,22 @@
-require('TraceKit')
-var exceptionist = require('./lib/exceptionist')
+var exceptions = require('./lib/exceptions')
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 var config = require('./lib/config')
 
 function Opbeat () {
   this.isInstalled = false
-  this.options = config.getConfig()
 
-  this.onTraceKitReport = function (stackInfo) {
-    logger.log('opbeat.onTraceKitReport', stackInfo)
+  config.init()
 
-    var exception = exceptionist.traceKitStackToOpbeatException(stackInfo, this.options)
-
-    exceptionist.processException(exception, this.options)
-  }
-
-  if (config.isConfigValid(this.options)) {
-    this.install()
-  }
-
+  this.install()
 }
 
 Opbeat.prototype.VERSION = '0.0.1'
 
 Opbeat.prototype.isPlatformSupport = function () {
   return typeof Array.prototype.forEach === 'function' &&
-    typeof JSON.stringify === 'function'
+    typeof JSON.stringify === 'function' &&
+    typeof Function.bind === 'function'
 }
 
 /*
@@ -36,8 +26,9 @@ Opbeat.prototype.isPlatformSupport = function () {
  * @return {Opbeat}
  */
 
-Opbeat.prototype.config = function (options) {
-  this.options = utils.mergeObject(this.options, options)
+Opbeat.prototype.config = function (properties) {
+  config.setConfig(properties)
+
   return this
 }
 
@@ -51,10 +42,23 @@ Opbeat.prototype.config = function (options) {
  */
 
 Opbeat.prototype.install = function () {
-  if (this.isPlatformSupport() && !this.isInstalled) {
-    window.TraceKit.report.subscribe(this.onTraceKitReport.bind(this))
-    this.isInstalled = true
+  if (!this.isPlatformSupport()) {
+    return this
   }
+
+  if (!config.isValid()) {
+    return this
+  }
+
+  if (this.isInstalled) {
+    return this
+  }
+
+  window.onerror = function (msg, file, line, col, error) {
+    exceptions.processWindowError(msg, file, line, col, error, this.config)
+  }.bind(this)
+
+  this.isInstalled = true
 
   return this
 
@@ -94,13 +98,7 @@ Opbeat.prototype.captureException = function (ex, options) {
   // raises an exception different from the one we asked to
   // report on.
 
-  try {
-    window.TraceKit.report(ex, options)
-  } catch(ex1) {
-    if (ex !== ex1) {
-      throw ex1
-    }
-  }
+  exceptions.processError(ex, options)
 
   return this
 }
@@ -112,7 +110,7 @@ Opbeat.prototype.captureException = function (ex, options) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setUserContext = function (user) {
-  this.options.context.user = user
+  config.set('context.user', user)
 
   return this
 }
@@ -124,7 +122,7 @@ Opbeat.prototype.setUserContext = function (user) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setExtraContext = function (extra) {
-  this.options.context.extra = user
+  config.set('context.extra', extra)
 
   return this
 }
