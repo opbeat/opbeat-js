@@ -68,6 +68,7 @@ module.exports = {
 
         Promise.all(framesPromises).then(function (frames) {
           stackInfo.frames = frames
+          stackInfo.stack = null
           resolve(stackInfo)
         })
       }
