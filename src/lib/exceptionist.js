@@ -33,7 +33,7 @@ module.exports = {
 
     return new Promise(function (resolve, reject) {
 
-      // normalize the frames data
+      // Build Opbeat frame data
       var frame = {
         'filename': this.cleanFileUrl(stack.fileName),
         'lineno': stack.lineNumber,
