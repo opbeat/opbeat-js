@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "browserify": "^11.1.0",
-    "stacktrace-gps": "^2.2.0",
+    "stacktrace-gps": "auchenberg/stacktrace-gps#sourcemaps",
     "stacktrace-js": "stacktracejs/stacktrace.js",
     "vinyl-source-stream": "^1.1.0"
   },
