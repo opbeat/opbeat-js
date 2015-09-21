@@ -5,6 +5,7 @@ function Config () {
   this.config = {}
   this.defaults = {
     VERSION: this.VERSION,
+    apiHost: 'intake.opbeat.com',
     orgId: null,
     appId: null,
     token: null,
