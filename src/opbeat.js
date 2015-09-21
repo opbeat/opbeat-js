@@ -54,9 +54,7 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  window.onerror = function (msg, file, line, col, error) {
-    exceptions.processWindowError(msg, file, line, col, error, this.config)
-  }.bind(this)
+  exceptions.install();
 
   this.isInstalled = true
 
@@ -70,7 +68,9 @@ Opbeat.prototype.install = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.uninstall = function () {
-  window.TraceKit.report.uninstall()
+
+  exceptions.uninstall();
+
   this.isInstalled = false
 
   return this
