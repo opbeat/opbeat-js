@@ -13,16 +13,19 @@ gulp.task('server', serve({
   port: 7000
 }))
 
-gulp.task('release', function () {
+gulp.task('build:release', function () {
+  var version = require('./package').version
+  var path = './dist/' + version
+
   return browserify('./src/opbeat.js', {
     standalone: 'Opbeat'
   }).bundle()
     .pipe(source('opbeat.js'))
-    .pipe(gulp.dest('./dist'))
+    .pipe(gulp.dest(path))
     .pipe(rename('opbeat.min.js'))
     .pipe(buffer())
     .pipe(uglify())
-    .pipe(gulp.dest('./dist'))
+    .pipe(gulp.dest(path))
 })
 
 gulp.task('build', function () {
