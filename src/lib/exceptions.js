@@ -4,7 +4,6 @@ var transport = require('./transport')
 var utils = require('./utils')
 
 var StackTrace = require('stacktrace-js')
-var StackTraceGPS = require('stacktrace-gps')
 var sourceCache = {}
 
 module.exports = {
@@ -187,11 +186,9 @@ module.exports = {
     }
 
     return new Promise(function (resolve, reject) {
-      var gps = new StackTraceGPS({
-        sourceCache: sourceCache
-      })
 
-      gps._get(fileUrl).then(function (source) {
+
+      transport.getFile(fileUrl).then(function (source) {
         var sourceMapUrl = _findSourceMappingURL(source)
         if (sourceMapUrl) {
           sourceMapUrl = fileBasePath + sourceMapUrl
@@ -206,11 +203,8 @@ module.exports = {
 
   getExceptionContexts: function (url, line) {
     return new Promise(function (resolve, reject ) {
-      var gps = new StackTraceGPS({
-        sourceCache: sourceCache
-      })
 
-      gps._get(url).then(function (source) {
+      transport.getFile(url).then(function (source) {
         source = source.split('\n')
         line -= 1; // convert line to 0-based index
 
