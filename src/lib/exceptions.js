@@ -23,7 +23,8 @@ module.exports = {
 
   processWindowError: function (msg, file, line, col, error) {
     StackTrace.fromError(error, {
-      sourceCache: sourceCache
+      sourceCache: sourceCache,
+      disableSourceMaps: true
     }).then(function (stackFrames) {
       var exception = {
         'message': error.message,
