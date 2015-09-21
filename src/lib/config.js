@@ -1,4 +1,5 @@
 var utils = require('./utils')
+var storage = require('./storage')
 
 function Config () {
   this.config = {}
@@ -8,7 +9,9 @@ function Config () {
     appId: null,
     token: null,
     context: {
-      user: null,
+      user: {
+        uuid: _generateUUID()
+      },
       extra: null
     }
   }
@@ -16,6 +19,7 @@ function Config () {
 
 Config.prototype.init = function () {
   var scriptData = _getConfigFromScript()
+
   this.setConfig(scriptData)
 }
 
@@ -56,6 +60,19 @@ Config.prototype.isValid = function () {
   }.bind(this))
 
   return values.indexOf(true) === -1
+}
+
+function _generateUUID() {
+
+  var key = 'opbeat-uuid';
+  var uuid = storage.get(key);
+
+  if(!uuid) {
+    uuid = utils.generateUuid();
+    storage.set(key, uuid)
+  }
+
+  return uuid;
 }
 
 var _getConfigFromScript = function () {

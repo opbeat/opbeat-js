@@ -8,6 +8,17 @@ var StackTraceGPS = require('stacktrace-gps')
 var sourceCache = {}
 
 module.exports = {
+
+  install: function() {
+    window.onerror = function (msg, file, line, col, error) {
+      this.processWindowError(msg, file, line, col, error, this.config)
+    }.bind(this)
+  },
+
+  uninstall: function() {
+    window.onerror = null
+  },
+
   processError: function () {},
 
   processWindowError: function (msg, file, line, col, error) {
