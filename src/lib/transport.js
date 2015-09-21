@@ -5,63 +5,80 @@ module.exports = {
   sendToOpbeat: function (data) {
     logger.log('opbeat.transport.sendToOpbeat', data)
 
-    var url = 'https://intake.opbeat.com/api/v1/organizations/' + config.get('orgId') + '/apps/' + config.get('appId') + '/client-side/errors/'
+    var url = 'https://' + config.get('apiHost') + '/api/v1/organizations/' + config.get('orgId') + '/apps/' + config.get('appId') + '/client-side/errors/'
 
     var headers = {
       'Authorization': 'Bearer ' + config.get('token'),
       'X-Opbeat-Client': 'opbeat-js/' + config.get('VERSION')
     }
 
-    _makeRequest(url, data, headers)
-  }
+    return _makeRequest(url, 'POST', 'JSON', data, headers)
+  },
 
+  getFile: function(fileUrl) {
+    return _makeRequest(fileUrl, 'GET', '', {})
+  }
 }
 
-function _makeRequest (url, data, headers) {
-  var xhr = _createCORSRequest('POST', url, data)
+function _makeRequest (url, method, type, data, headers) {
+  return new Promise(function(resolve, reject) {
 
-  if (!xhr) {
-    logger.log('opbeat.transport.error.cors-not-supported')
-    return
-  }
+    var xhr = _createCORSRequest(method, url, data)
 
-  xhr.setRequestHeader('Content-Type', 'application/json')
+    if (!xhr) {
+      logger.log('opbeat.transport.error.cors-not-supported')
+      return
+    }
 
-  if (headers) {
-    for (var header in headers) {
-      if (headers.hasOwnProperty(header)) {
-        xhr.setRequestHeader(header.toLowerCase(), headers[header])
+    if(type === 'JSON') {
+      xhr.setRequestHeader('Content-Type', 'application/json')
+    }
+
+    if (headers) {
+      for (var header in headers) {
+        if (headers.hasOwnProperty(header)) {
+          xhr.setRequestHeader(header.toLowerCase(), headers[header])
+        }
       }
     }
-  }
 
-  if (window.XDomainRequest) {
-    // Empty event handlers needs to be there, because IE9 is flawed: http://rudovsky.blogspot.dk/2012/09/microsoft-shit-xdomainrequest.html
-    xhr.ontimeout = function () {}
-    xhr.onprogress = function () {}
-  }
+    logger.log('opbeat.transport._makeRequest', url, data, headers)
 
-  xhr.onreadystatechange = function (evt) {
-    if (xhr.readyState === 4) {
-      var status = xhr.status
-      if (status > 399 && status < 600) {
-        // An http 4xx or 5xx error. Signal an error.
-        var err = new Error(url + ' HTTP status: ' + status)
-        err.xhr = xhr
-        logger.log('opbeat.transport.error', err)
-      } else {
-        logger.log('opbeat.transport.success')
+    if (window.XDomainRequest) {
+      // Empty event handlers needs to be there, because IE9 is flawed: http://rudovsky.blogspot.dk/2012/09/microsoft-shit-xdomainrequest.html
+      xhr.ontimeout = function () {}
+      xhr.onprogress = function () {}
+    }
+
+    xhr.onreadystatechange = function (evt) {
+      if (xhr.readyState === 4) {
+        var status = xhr.status
+        if (status > 399 && status < 600) {
+          // An http 4xx or 5xx error. Signal an error.
+          var err = new Error(url + ' HTTP status: ' + status)
+          err.xhr = xhr
+          reject(err)
+          logger.log('opbeat.transport.error', err)
+        } else {
+          resolve(xhr.responseText)
+          logger.log('opbeat.transport.success')
+        }
       }
     }
-  }
 
-  xhr.onerror = function (e) {
-    logger.log('opbeat.transport.error', e)
-  }
+    xhr.onerror = function (e) {
+      reject(e)
+      logger.log('opbeat.transport.error', e)
+    }
 
-  logger.log('opbeat.transport._makeRequest', url, data, headers)
+    if(type === 'JSON') {
+      xhr.send(JSON.stringify(data))
+    } else {
+      xhr.send(data)
+    }
 
-  xhr.send(JSON.stringify(data))
+  })
+
 
 }
 
