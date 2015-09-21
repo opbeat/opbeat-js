@@ -9,7 +9,7 @@ var taskListing = require('gulp-task-listing')
 
 // Static file server
 gulp.task('server', serve({
-  root: ['example', 'dist'],
+  root: ['examples', 'dist'],
   port: 7000
 }))
 
