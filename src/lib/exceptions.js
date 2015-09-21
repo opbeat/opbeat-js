@@ -5,6 +5,7 @@ var utils = require('./utils')
 
 var StackTrace = require('stacktrace-js')
 var sourceCache = {}
+var Promise = require('bluebird')
 
 module.exports = {
 

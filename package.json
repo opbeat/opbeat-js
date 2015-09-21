@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "stacktrace-js": "auchenberg/stacktrace.js#master"
+    "bluebird": "^2.10.0",
   },
   "devDependencies": {
     "browserify": "^11.1.0",
