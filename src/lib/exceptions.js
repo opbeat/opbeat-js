@@ -11,7 +11,7 @@ module.exports = {
 
   install: function() {
     window.onerror = function (msg, file, line, col, error) {
-      this.processWindowError(msg, file, line, col, error, this.config)
+      this.processWindowError(msg, file, line, col, error)
     }.bind(this)
   },
 
