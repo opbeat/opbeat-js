@@ -2,30 +2,24 @@ var logger = require('./logger')
 var config = require('./config')
 var transport = require('./transport')
 var utils = require('./utils')
-
-var StackTrace = require('stacktrace-js')
-var sourceCache = {}
 var Promise = require('bluebird')
+var stackTrace = require('./stacktrace')
 
 module.exports = {
-
-  install: function() {
+  install: function () {
     window.onerror = function (msg, file, line, col, error) {
       this.processWindowError(msg, file, line, col, error)
     }.bind(this)
   },
 
-  uninstall: function() {
+  uninstall: function () {
     window.onerror = null
   },
 
   processError: function () {},
 
   processWindowError: function (msg, file, line, col, error) {
-    StackTrace.fromError(error, {
-      sourceCache: sourceCache,
-      disableSourceMaps: true
-    }).then(function (stackFrames) {
+    stackTrace.fromError(error).then(function (stackFrames) {
       var exception = {
         'message': error.message,
         'type': error.name,
@@ -187,8 +181,6 @@ module.exports = {
     }
 
     return new Promise(function (resolve, reject) {
-
-
       transport.getFile(fileUrl).then(function (source) {
         var sourceMapUrl = _findSourceMappingURL(source)
         if (sourceMapUrl) {
@@ -204,7 +196,6 @@ module.exports = {
 
   getExceptionContexts: function (url, line) {
     return new Promise(function (resolve, reject ) {
-
       transport.getFile(url).then(function (source) {
         source = source.split('\n')
         line -= 1; // convert line to 0-based index

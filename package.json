@@ -14,8 +14,8 @@
     "url": ""
   },
   "dependencies": {
-    "stacktrace-js": "auchenberg/stacktrace.js#master"
     "bluebird": "^2.10.0",
+    "error-stack-parser": "^1.2.3"
   },
   "devDependencies": {
     "browserify": "^11.1.0",
