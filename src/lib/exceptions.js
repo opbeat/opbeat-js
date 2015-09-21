@@ -16,7 +16,21 @@ module.exports = {
     window.onerror = null
   },
 
-  processError: function () {},
+  processError: function (err) {
+    stackTrace.fromError(err).then(function (stackFrames) {
+      var exception = {
+        'message': err.message,
+        'type': err.name,
+        'stack': stackFrames
+      }
+
+      this.stackInfoToOpbeatException(exception).then(function (exception) {
+        this.processException(exception)
+      }.bind(this))
+
+    }.bind(this))
+
+  },
 
   processWindowError: function (msg, file, line, col, error) {
     stackTrace.fromError(error).then(function (stackFrames) {
