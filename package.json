@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "stacktrace-gps": "auchenberg/stacktrace-gps#sourcemaps",
-    "stacktrace-js": "stacktracejs/stacktrace.js"
+    "stacktrace-js": "auchenberg/stacktrace.js#master"
   },
   "devDependencies": {
     "browserify": "^11.1.0",
