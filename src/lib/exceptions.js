@@ -68,7 +68,7 @@ module.exports = {
       }).catch(function () {})
 
       // Resolve frame when everything is over
-      utils.promiseAny([sourceMapResolver, contextsResolver]).then(function () {
+      Promise.any([sourceMapResolver, contextsResolver]).then(function () {
         resolve(frame)
       })
 
