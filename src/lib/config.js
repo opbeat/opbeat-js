@@ -63,17 +63,16 @@ Config.prototype.isValid = function () {
   return values.indexOf(true) === -1
 }
 
-function _generateUUID() {
+function _generateUUID () {
+  var key = 'opbeat-uuid'
+  var uuid = storage.get(key)
 
-  var key = 'opbeat-uuid';
-  var uuid = storage.get(key);
-
-  if(!uuid) {
-    uuid = utils.generateUuid();
+  if (!uuid) {
+    uuid = utils.generateUuid()
     storage.set(key, uuid)
   }
 
-  return uuid;
+  return uuid
 }
 
 var _getConfigFromScript = function () {
