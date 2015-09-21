@@ -1,3 +1,4 @@
+var fs = require('fs')
 var gulp = require('gulp')
 var source = require('vinyl-source-stream')
 var serve = require('gulp-serve')
@@ -6,6 +7,7 @@ var browserify = require('browserify')
 var buffer = require('vinyl-buffer')
 var uglify = require('gulp-uglify')
 var taskListing = require('gulp-task-listing')
+var awspublish = require('gulp-awspublish')
 
 // Static file server
 gulp.task('server', serve({
@@ -46,6 +48,42 @@ gulp.task('watch', [], function (cb) {
   // Watch JS files
   gulp.watch(['libs/**', 'src/**'], ['build'])
   console.log('\nExample site running on http://localhost:7000/\n')
+})
+
+//
+// Deploy task
+//
+gulp.task('deploy', ['build'], function () {
+  // Load options from file
+  awsoptions = JSON.parse(fs.readFileSync('aws.json'))
+
+  // Hardcoded bucketname, to avoid mistakes
+  awsoptions.params = {
+    Bucket: 'opbeat-js-cdn'
+  }
+
+  // Create new publisher
+  var publisher = awspublish.create(awsoptions)
+
+  // Set headers
+  var headers = {
+    'Cache-Control': 'max-age=1800, public'
+  }
+
+  return gulp.src('dist/**')
+
+    // Gzip
+    .pipe(awspublish.gzip())
+
+    // Publish files with headers
+    .pipe(publisher.publish(headers))
+
+    // Create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+    // Print upload updates to console
+    .pipe(awspublish.reporter())
+
 })
 
 gulp.task('default', taskListing)
