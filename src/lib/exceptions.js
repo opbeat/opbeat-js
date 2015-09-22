@@ -17,6 +17,8 @@ module.exports = {
   },
 
   processError: function (err) {
+    var that = this
+
     stackTrace.fromError(err).then(function (stackFrames) {
       var exception = {
         'message': err.message,
@@ -24,15 +26,16 @@ module.exports = {
         'stack': stackFrames
       }
 
-      this.stackInfoToOpbeatException(exception).then(function (exception) {
-        this.processException(exception)
-      }.bind(this))
+      that.stackInfoToOpbeatException(exception).then(function (exception) {
+        that.processException(exception)
+      })
 
-    }.bind(this))
+    }).caught(function () {})
 
   },
 
   processWindowError: function (msg, file, line, col, error) {
+    var that = this
     var exception = {
       'message': error ? error.message : msg,
       'type': error ? error.name : '',
@@ -56,12 +59,10 @@ module.exports = {
 
     resolveStackFrames.then(function (stackFrames) {
       exception.stack = stackFrames || []
-
-      this.stackInfoToOpbeatException(exception).then(function (exception) {
-        this.processException(exception)
-      }.bind(this))
-
-    }.bind(this))
+      return that.stackInfoToOpbeatException(exception).then(function (exception) {
+        that.processException(exception)
+      })
+    }).caught(function () {})
 
   },
 
@@ -87,7 +88,7 @@ module.exports = {
       var sourceMapResolver = this.getFileSourceMapUrl(stack.fileName)
       sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
-      }).catch(function () {})
+      }).caught(function () {})
 
       // Resolve frame when everything is over
       Promise.any([sourceMapResolver, contextsResolver]).then(function () {
@@ -219,7 +220,7 @@ module.exports = {
         } else {
           reject(null)
         }
-      }).catch(reject)
+      }).caught(reject)
 
     })
   },
@@ -265,7 +266,7 @@ module.exports = {
         logger.log('Opbeat.getExceptionContexts', contexts)
         resolve(contexts)
 
-      }).catch(reject)
+      }).caught(reject)
 
     })
 
