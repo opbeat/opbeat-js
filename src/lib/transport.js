@@ -1,5 +1,6 @@
 var logger = require('./logger')
 var config = require('./config')
+var Promise = require('bluebird')
 
 module.exports = {
   sendToOpbeat: function (data) {
