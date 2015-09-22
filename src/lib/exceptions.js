@@ -41,12 +41,21 @@ module.exports = {
       'colno': col,
     }
 
-    var step1 = error ? stackTrace.fromError(error) : Promise.resolve()
+    var resolveStackFrames
+    if (error) {
+      resolveStackFrames = stackTrace.fromError(error)
+    } else {
+      resolveStackFrames = new Promise(function (resolve, reject) {
+        resolve([{
+          'fileName': file,
+          'lineNumber': line,
+          'columnNumber': col,
+        }])
+      })
+    }
 
-    step1.then(function (stackFrames) {
-      if (stackFrames) {
-        exception.stack = stackFrames
-      }
+    resolveStackFrames.then(function (stackFrames) {
+      exception.stack = stackFrames || []
 
       this.stackInfoToOpbeatException(exception).then(function (exception) {
         this.processException(exception)
