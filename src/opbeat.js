@@ -57,7 +57,7 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  exceptions.install();
+  exceptions.install()
 
   this.isInstalled = true
 
@@ -71,8 +71,7 @@ Opbeat.prototype.install = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.uninstall = function () {
-
-  exceptions.uninstall();
+  exceptions.uninstall()
 
   this.isInstalled = false
 
