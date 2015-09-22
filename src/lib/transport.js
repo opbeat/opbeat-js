@@ -16,14 +16,13 @@ module.exports = {
     return _makeRequest(url, 'POST', 'JSON', data, headers)
   },
 
-  getFile: function(fileUrl) {
+  getFile: function (fileUrl) {
     return _makeRequest(fileUrl, 'GET', '', {})
   }
 }
 
 function _makeRequest (url, method, type, data, headers) {
-  return new Promise(function(resolve, reject) {
-
+  return new Promise(function (resolve, reject) {
     var xhr = _createCORSRequest(method, url, data)
 
     if (!xhr) {
@@ -31,7 +30,7 @@ function _makeRequest (url, method, type, data, headers) {
       return
     }
 
-    if(type === 'JSON') {
+    if (type === 'JSON') {
       xhr.setRequestHeader('Content-Type', 'application/json')
     }
 
@@ -72,14 +71,13 @@ function _makeRequest (url, method, type, data, headers) {
       logger.log('opbeat.transport.error', e)
     }
 
-    if(type === 'JSON') {
+    if (type === 'JSON') {
       xhr.send(JSON.stringify(data))
     } else {
       xhr.send(data)
     }
 
   })
-
 
 }
 
