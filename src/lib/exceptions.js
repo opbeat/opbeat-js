@@ -33,14 +33,19 @@ module.exports = {
   },
 
   processWindowError: function (msg, file, line, col, error) {
-    stackTrace.fromError(error).then(function (stackFrames) {
-      var exception = {
-        'message': error.message,
-        'type': error.name,
-        'fileurl': file,
-        'lineno': line,
-        'colno': col,
-        'stack': stackFrames
+    var exception = {
+      'message': error ? error.message : msg,
+      'type': error ? error.name : '',
+      'fileurl': file,
+      'lineno': line,
+      'colno': col,
+    }
+
+    var step1 = error ? stackTrace.fromError(error) : Promise.resolve()
+
+    step1.then(function (stackFrames) {
+      if (stackFrames) {
+        exception.stack = stackFrames
       }
 
       this.stackInfoToOpbeatException(exception).then(function (exception) {
@@ -96,6 +101,8 @@ module.exports = {
           stackInfo.stack = null
           resolve(stackInfo)
         })
+      } else {
+        resolve(stackInfo)
       }
 
     }.bind(this))
