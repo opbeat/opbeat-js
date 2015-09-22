@@ -6,8 +6,11 @@ var config = require('./lib/config')
 function Opbeat () {
   this.isInstalled = false
 
-  config.init()
+  if (!this.isPlatformSupport()) {
+    return
+  }
 
+  config.init()
   this.install()
 }
 
