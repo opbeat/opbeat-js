@@ -103,9 +103,11 @@ module.exports = {
           frame.pre_context = contexts.preContext
           frame.context_line = contexts.contextLine
           frame.post_context = contexts.postContext
+
+          resolve(frame)
         })
 
-        Promise.any([contextsResolver], function () {
+        contextsResolver.caught(function () {
           resolve(frame)
         })
 
@@ -289,9 +291,9 @@ module.exports = {
 
     return new Promise(function (resolve, reject ) {
       transport.getFile(url).then(function (source) {
-        source = source.split('\n')
         line -= 1; // convert line to 0-based index
 
+        var sourceLines = source.split('\n')
         var linesBefore = 5
         var linesAfter = 5
 
@@ -301,13 +303,21 @@ module.exports = {
           postContext: []
         }
 
-        if (source.length) {
+        if (sourceLines.length) {
+          // Don't generate contexts if source is minified
+          var isMinified = this.isSourceMinified(source)
+          console.log('isMinified', isMinified)
+
+          if (isMinified) {
+            return reject()
+          }
+
           // Pre context
           var preStartIndex = Math.max(0, line - linesBefore - 1)
-          var preEndIndex = Math.min(source.length, line - 1)
+          var preEndIndex = Math.min(sourceLines.length, line - 1)
           for (var i = preStartIndex; i <= preEndIndex; ++i) {
-            if (!utils.isUndefined(source[i])) {
-              contexts.preContext.push(source[i])
+            if (!utils.isUndefined(sourceLines[i])) {
+              contexts.preContext.push(sourceLines[i])
             }
           }
 
@@ -315,11 +325,11 @@ module.exports = {
           contexts.contextLine = source[line]
 
           // Post context
-          var postStartIndex = Math.min(source.length, line + 1)
-          var postEndIndex = Math.min(source.length, line + linesAfter)
+          var postStartIndex = Math.min(sourceLines.length, line + 1)
+          var postEndIndex = Math.min(sourceLines.length, line + linesAfter)
           for (var i = postStartIndex; i <= postEndIndex; ++i) {
-            if (!utils.isUndefined(source[i])) {
-              contexts.postContext.push(source[i])
+            if (!utils.isUndefined(sourceLines[i])) {
+              contexts.postContext.push(sourceLines[i])
             }
           }
         }
@@ -327,9 +337,9 @@ module.exports = {
         logger.log('Opbeat.getExceptionContexts', contexts)
         resolve(contexts)
 
-      }).caught(reject)
+      }.bind(this)).caught(reject)
 
-    })
+    }.bind(this))
 
   },
 
