@@ -30,6 +30,11 @@ module.exports = {
     return (typeof obj) === 'undefined'
   },
 
+  isCORSSupported: function () {
+    var xhr = new window.XMLHttpRequest()
+    return 'withCredentials' in xhr
+  },
+
   getCurrentScript: function () {
     // Source http://www.2ality.com/2014/05/current-script.html
     return document.currentScript || (function () {
