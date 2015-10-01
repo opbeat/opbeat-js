@@ -23,12 +23,10 @@ module.exports = {
 
 function _makeRequest (url, method, type, data, headers) {
   return new Promise(function (resolve, reject) {
-    var xhr = _createCORSRequest(method, url, data)
+    var xhr = new window.XMLHttpRequest()
 
-    if (!xhr) {
-      logger.log('opbeat.transport.error.cors-not-supported')
-      return
-    }
+    xhr.open(method, url, true)
+    xhr.timeout = 10000
 
     if (type === 'JSON') {
       xhr.setRequestHeader('Content-Type', 'application/json')
@@ -43,12 +41,6 @@ function _makeRequest (url, method, type, data, headers) {
     }
 
     logger.log('opbeat.transport._makeRequest', url, data, headers)
-
-    if (window.XDomainRequest) {
-      // Empty event handlers needs to be there, because IE9 is flawed: http://rudovsky.blogspot.dk/2012/09/microsoft-shit-xdomainrequest.html
-      xhr.ontimeout = function () {}
-      xhr.onprogress = function () {}
-    }
 
     xhr.onreadystatechange = function (evt) {
       if (xhr.readyState === 4) {
@@ -79,19 +71,4 @@ function _makeRequest (url, method, type, data, headers) {
 
   })
 
-}
-
-function _createCORSRequest (method, url) {
-  var xhr = new window.XMLHttpRequest()
-
-  if ('withCredentials' in xhr) {
-    xhr.open(method, url, true)
-  } else if (window.XDomainRequest) {
-    xhr = new window.XDomainRequest()
-    xhr.open(method, url, true)
-  }
-
-  xhr.timeout = 10000
-
-  return xhr
 }
