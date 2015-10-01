@@ -75,6 +75,11 @@ module.exports = {
 
   buildOpbeatFrame: function buildOpbeatFrame (stack) {
     return new Promise(function (resolve, reject) {
+      if (!stack.fileName && !stack.lineNumber) {
+        // Probably an stack from IE, return empty frame as we can't use it.
+        return resolve({})
+      }
+
       // Build Opbeat frame data
       var frame = {
         'filename': this.cleanFileUrl(stack.fileName),
@@ -204,6 +209,10 @@ module.exports = {
   },
 
   getFileSourceMapUrl: function (fileUrl) {
+    if (!fileUrl) {
+      Promise.reject()
+    }
+
     function _findSourceMappingURL (source) {
       var m = /\/\/[#@] ?sourceMappingURL=([^\s'"]+)$/.exec(source)
       if (m && m[1]) {
@@ -233,6 +242,10 @@ module.exports = {
   },
 
   getExceptionContexts: function (url, line) {
+    if (!url || !line) {
+      Promise.reject()
+    }
+
     return new Promise(function (resolve, reject ) {
       transport.getFile(url).then(function (source) {
         source = source.split('\n')
