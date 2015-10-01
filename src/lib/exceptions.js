@@ -245,6 +245,43 @@ module.exports = {
     })
   },
 
+  isSourceMinified: function (source) {
+    // Source: https://dxr.mozilla.org/mozilla-central/source/devtools/client/debugger/utils.js#62
+    var SAMPLE_SIZE = 50 // no of lines
+    var INDENT_COUNT_THRESHOLD = 5 // percentage
+    var CHARACTER_LIMIT = 250 // line character limit
+
+    var isMinified
+    var lineEndIndex = 0
+    var lineStartIndex = 0
+    var lines = 0
+    var indentCount = 0
+    var overCharLimit = false
+
+    // Strip comments.
+    source = source.replace(/\/\*[\S\s]*?\*\/|\/\/(.+|\n)/g, '')
+
+    while (lines++ < SAMPLE_SIZE) {
+      lineEndIndex = source.indexOf('\n', lineStartIndex)
+      if (lineEndIndex == -1) {
+        break
+      }
+      if (/^\s+/.test(source.slice(lineStartIndex, lineEndIndex))) {
+        indentCount++
+      }
+      // For files with no indents but are not minified.
+      if ((lineEndIndex - lineStartIndex) > CHARACTER_LIMIT) {
+        overCharLimit = true
+        break
+      }
+      lineStartIndex = lineEndIndex + 1
+    }
+
+    isMinified = ((indentCount / lines) * 100) < INDENT_COUNT_THRESHOLD || overCharLimit
+
+    return isMinified
+  },
+
   getExceptionContexts: function (url, line) {
     if (!url || !line) {
       Promise.reject()
