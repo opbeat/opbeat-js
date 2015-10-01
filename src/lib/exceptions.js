@@ -85,7 +85,8 @@ module.exports = {
         'filename': this.cleanFileUrl(stack.fileName),
         'lineno': stack.lineNumber,
         'colno': stack.columnNumber,
-        'function': stack.functionName || '[anonymous]'
+        'function': stack.functionName || '[anonymous]',
+        'abs_path': stack.fileName
       }
 
       // Detect Sourcemaps
