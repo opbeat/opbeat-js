@@ -88,24 +88,28 @@ module.exports = {
         'function': stack.functionName || '[anonymous]'
       }
 
-      // Resolve contexts
-      var contextsResolver = this.getExceptionContexts(stack.fileName, stack.lineNumber)
-      contextsResolver.then(function (contexts) {
-        frame.pre_context = contexts.preContext
-        frame.context_line = contexts.contextLine
-        frame.post_context = contexts.postContext
-      })
-
       // Detect Sourcemaps
       var sourceMapResolver = this.getFileSourceMapUrl(stack.fileName)
       sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
+        resolve(frame)
       }).caught(function () {})
 
-      // Resolve frame when everything is over
-      Promise.any([sourceMapResolver, contextsResolver]).then(function () {
-        resolve(frame)
-      })
+      // Resolve contexts if no source map
+      sourceMapResolver.caught(function () {
+        var contextsResolver = this.getExceptionContexts(stack.fileName, stack.lineNumber)
+
+        contextsResolver.then(function (contexts) {
+          frame.pre_context = contexts.preContext
+          frame.context_line = contexts.contextLine
+          frame.post_context = contexts.postContext
+        })
+
+        Promise.any([contextsResolver], function () {
+          resolve(frame)
+        })
+
+      }.bind(this))
 
     }.bind(this))
 
