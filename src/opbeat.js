@@ -118,6 +118,9 @@ Opbeat.prototype.captureException = function (ex, options) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setUserContext = function (user) {
+  // Get existing user UUID
+  user.uuid = config.get('context.user.uuid')
+
   config.set('context.user', user)
 
   return this
