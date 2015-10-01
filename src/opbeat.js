@@ -6,6 +6,13 @@ var config = require('./lib/config')
 function Opbeat () {
   this.isInstalled = false
 
+  config.init()
+
+  if (!config.isValid()) {
+    logger.log('opbeat.install.config.invalid')
+    return this
+  }
+
   this.install()
 }
 
@@ -45,8 +52,6 @@ Opbeat.prototype.install = function () {
     logger.log('opbeat.install.platform.unsupported')
     return this
   }
-
-  config.init()
 
   if (!config.isValid()) {
     logger.log('opbeat.install.config.invalid')

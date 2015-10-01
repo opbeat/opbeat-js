@@ -22,7 +22,9 @@ function Config () {
 Config.prototype.init = function () {
   var scriptData = _getConfigFromScript()
 
-  this.setConfig(scriptData)
+  if (Object.keys(scriptData).length) {
+    this.setConfig(scriptData)
+  }
 }
 
 Config.prototype.get = function (key) {
@@ -58,7 +60,7 @@ Config.prototype.setConfig = function (properties) {
 Config.prototype.isValid = function () {
   var requiredKeys = ['appId', 'orgId', 'token']
   var values = requiredKeys.map(function (key) {
-    return this.config[key] === undefined
+    return (this.config[key] === null) || (this.config[key] === undefined)
   }.bind(this))
 
   return values.indexOf(true) === -1
