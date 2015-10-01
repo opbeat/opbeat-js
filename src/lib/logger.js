@@ -8,7 +8,7 @@ module.exports = {
   },
 
   log: function (message, data) {
-    var isDebugMode = config.get('debug') == 'true'
+    var isDebugMode = config.get('debug') === true || config.get('debug') === 'true'
     var hasConsole = window.console
 
     logStack.push({
