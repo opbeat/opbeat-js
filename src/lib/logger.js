@@ -1,7 +1,14 @@
+var config = require('./config')
+
 module.exports = {
   log: function (message, data) {
-    if (window.console && window.console.log) {
+    var isDebugMode = config.get('debug') == 'true'
+    var hasConsole = window.console
+
+
+    if (isDebugMode && hasConsole) {
       window.console.log(message, data)
     }
+
   }
 }
