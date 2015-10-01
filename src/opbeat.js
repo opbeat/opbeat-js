@@ -42,16 +42,19 @@ Opbeat.prototype.config = function (properties) {
 
 Opbeat.prototype.install = function () {
   if (!this.isPlatformSupport()) {
+    logger.log('opbeat.install.platform.unsupported')
     return this
   }
 
   config.init()
 
   if (!config.isValid()) {
+    logger.log('opbeat.install.config.invalid')
     return this
   }
 
   if (this.isInstalled) {
+    logger.log('opbeat.install.already.installed')
     return this
   }
 
