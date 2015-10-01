@@ -18,8 +18,15 @@ module.exports = {
 
   processError: function (err) {
     var that = this
+    var resolveStackFrames
 
-    stackTrace.fromError(err).then(function (stackFrames) {
+    if (err.stack) {
+      resolveStackFrames = stackTrace.fromError(err)
+    } else {
+      resolveStackFrames = Promise.resolve()
+    }
+
+    resolveStackFrames.then(function (stackFrames) {
       var exception = {
         'message': err.message,
         'type': err.name,
