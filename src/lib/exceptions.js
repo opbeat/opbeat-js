@@ -100,7 +100,8 @@ module.exports = {
 
       // Resolve contexts if no source map
       sourceMapResolver.caught(function () {
-        var contextsResolver = this.getExceptionContexts(stack.fileName, stack.lineNumber)
+        var cleanedFileName = this.cleanFileName(stack.fileName)
+        var contextsResolver = this.getExceptionContexts(cleanedFileName, stack.lineNumber)
 
         contextsResolver.then(function (contexts) {
           frame.pre_context = contexts.preContext
