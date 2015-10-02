@@ -148,6 +148,9 @@ module.exports = {
     if (!fileName) {
       fileName = ''
     }
+
+    if(fileName === '<anonymous>') {
+      fileName = ''
     }
 
     return fileName
