@@ -322,7 +322,7 @@ module.exports = {
           }
 
           // Line context
-          contexts.contextLine = source[line]
+          contexts.contextLine = sourceLines[line]
 
           // Post context
           var postStartIndex = Math.min(sourceLines.length, line + 1)
