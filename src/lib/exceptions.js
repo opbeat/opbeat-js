@@ -227,7 +227,7 @@ module.exports = {
 
   getFileSourceMapUrl: function (fileUrl) {
     if (!fileUrl) {
-      Promise.reject()
+      return Promise.reject()
     }
 
     function _findSourceMappingURL (source) {
