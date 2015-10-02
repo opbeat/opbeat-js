@@ -80,9 +80,11 @@ module.exports = {
         return resolve({})
       }
 
+      var cleanedFileName = this.cleanFileName(stack.fileName)
+
       // Build Opbeat frame data
       var frame = {
-        'filename': this.cleanFileUrl(stack.fileName),
+        'filename': this.fileUrlToFileName(cleanedFileName),
         'lineno': stack.lineNumber,
         'colno': stack.columnNumber,
         'function': stack.functionName || '[anonymous]',
@@ -90,7 +92,7 @@ module.exports = {
       }
 
       // Detect Sourcemaps
-      var sourceMapResolver = this.getFileSourceMapUrl(stack.fileName)
+      var sourceMapResolver = this.getFileSourceMapUrl(cleanedFileName)
       sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
         resolve(frame)
@@ -142,11 +144,16 @@ module.exports = {
 
   },
 
-  cleanFileUrl: function (fileUrl) {
-    if (!fileUrl) {
-      fileUrl = ''
+  cleanFileName: function (fileName) {
+    if (!fileName) {
+      fileName = ''
+    }
     }
 
+    return fileName
+  },
+
+  fileUrlToFileName: function(fileUrl) {
     var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port: '')
 
     if (fileUrl.indexOf(origin) > -1) {
@@ -154,12 +161,12 @@ module.exports = {
     }
 
     return fileUrl
-  },
+  }
 
   processException: function processException (exception) {
     var type = exception.type
     var message = String(exception.message) || 'Script error'
-    var fileUrl = this.cleanFileUrl(exception.fileurl)
+    var fileUrl = this.fileUrlToFileName(this.cleanFileName(exception.fileurl))
     var frames = exception.frames || []
 
     if (frames && frames.length) {
