@@ -297,7 +297,7 @@ module.exports = {
 
   getExceptionContexts: function (url, line) {
     if (!url || !line) {
-      Promise.reject()
+      return Promise.reject()
     }
 
     return new Promise(function (resolve, reject ) {
