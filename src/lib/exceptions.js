@@ -149,14 +149,14 @@ module.exports = {
       fileName = ''
     }
 
-    if(fileName === '<anonymous>') {
+    if (fileName === '<anonymous>') {
       fileName = ''
     }
 
     return fileName
   },
 
-  fileUrlToFileName: function(fileUrl) {
+  fileUrlToFileName: function (fileUrl) {
     var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port: '')
 
     if (fileUrl.indexOf(origin) > -1) {
@@ -164,7 +164,7 @@ module.exports = {
     }
 
     return fileUrl
-  }
+  },
 
   processException: function processException (exception) {
     var type = exception.type
