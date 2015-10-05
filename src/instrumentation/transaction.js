@@ -22,12 +22,12 @@ var Transaction = function (queue, name, type) {
 }
 
 Transaction.prototype.end = function () {
-  this._rootTrace.end()
   this.ended = true
+
+  this._rootTrace.end()
   this._queue.add(this)
 
-  console.log('opbeat.instrumentation.transaction.end', this.name, this._queue.length)
-
+  console.log('opbeat.instrumentation.transaction.end', this.name, this.activetraces.length)
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
@@ -38,13 +38,7 @@ Transaction.prototype.startTrace = function (signature, type) {
   return trace
 }
 
-Transaction.prototype._endTrace = function (trace) {
-  if (this.ended) {
-    // TODO: Use the opbeat logger
-    console.error("Can't end trace after parent transaction have ended - ignoring!")
-    return
-  }
-
+Transaction.prototype._onTraceEnd = function (trace) {
   this.traces.push(trace)
 
   var index = this.activetraces.indexOf(trace)

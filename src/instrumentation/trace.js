@@ -15,7 +15,8 @@ var Trace = module.exports = function (transaction, signature, type) {
 Trace.prototype.end = function () {
   this._diff = performance.now() - this._start
   this.ended = true
-  this.transaction._endTrace(this)
+
+  this.transaction._onTraceEnd(this)
 
   console.log('opbeat.instrumentation.trace.end', this.signature, this._diff)
 }
