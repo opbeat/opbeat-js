@@ -2,9 +2,11 @@ var exceptions = require('./lib/exceptions')
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 var config = require('./lib/config')
+var Instrumentation = require('./instrumentation')
 
 function Opbeat () {
   this.isInstalled = false
+  this._instrumentation = new Instrumentation()
 
   config.init()
 
@@ -136,6 +138,10 @@ Opbeat.prototype.setExtraContext = function (extra) {
   config.set('context.extra', extra)
 
   return this
+}
+
+Opbeat.prototype.startTransaction = function (name, type) {
+  return this._instrumentation.startTransaction(name, type)
 }
 
 module.exports = new Opbeat()
