@@ -3,22 +3,31 @@ var config = require('./config')
 var Promise = require('bluebird')
 
 module.exports = {
-  sendToOpbeat: function (data) {
-    logger.log('opbeat.transport.sendToOpbeat', data)
+  sendError: function (data) {
+    return _sendToOpbeat('errors', data)
+  },
 
-    var url = 'https://' + config.get('apiHost') + '/api/v1/organizations/' + config.get('orgId') + '/apps/' + config.get('appId') + '/client-side/errors/'
-
-    var headers = {
-      'Authorization': 'Bearer ' + config.get('token'),
-      'X-Opbeat-Client': 'opbeat-js/' + config.get('VERSION')
-    }
-
-    return _makeRequest(url, 'POST', 'JSON', data, headers)
+  sendTransaction: function (data) {
+    return _sendToOpbeat('transactions', data)
   },
 
   getFile: function (fileUrl) {
     return _makeRequest(fileUrl, 'GET', '', {})
+  },
+
+}
+
+function _sendToOpbeat (endpoint, data) {
+  logger.log('opbeat.transport.sendToOpbeat', data)
+
+  var url = 'https://' + config.get('apiHost') + '/api/v1/organizations/' + config.get('orgId') + '/apps/' + config.get('appId') + '/client-side/' + endpoint + '/'
+
+  var headers = {
+    'Authorization': 'Bearer ' + config.get('token'),
+    'X-Opbeat-Client': 'opbeat-js/' + config.get('VERSION')
   }
+
+  return _makeRequest(url, 'POST', 'JSON', data, headers)
 }
 
 function _makeRequest (url, method, type, data, headers) {
@@ -40,8 +49,6 @@ function _makeRequest (url, method, type, data, headers) {
       }
     }
 
-    logger.log('opbeat.transport._makeRequest', url, data, headers)
-
     xhr.onreadystatechange = function (evt) {
       if (xhr.readyState === 4) {
         var status = xhr.status
@@ -50,24 +57,26 @@ function _makeRequest (url, method, type, data, headers) {
           var err = new Error(url + ' HTTP status: ' + status)
           err.xhr = xhr
           reject(err)
-          logger.log('opbeat.transport.error', err)
+          logger.log('opbeat.transport.makeRequest.error', err)
         } else {
           resolve(xhr.responseText)
-          logger.log('opbeat.transport.success')
+          logger.log('opbeat.transport.makeRequest.success')
         }
       }
     }
 
-    xhr.onerror = function (e) {
-      reject(e)
-      logger.log('opbeat.transport.error', e)
+    xhr.onerror = function (err) {
+      reject(err)
+      logger.log('opbeat.transport.makeRequest.error', err)
     }
 
     if (type === 'JSON') {
-      xhr.send(JSON.stringify(data))
-    } else {
-      xhr.send(data)
+      data = JSON.stringify(data)
     }
+
+    logger.log('opbeat.transport.makeRequest', url, headers, data)
+
+    xhr.send(data)
 
   })
 

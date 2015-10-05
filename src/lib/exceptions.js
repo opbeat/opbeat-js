@@ -222,7 +222,7 @@ module.exports = {
     }
 
     logger.log('opbeat.exceptionst.processException', data)
-    transport.sendToOpbeat(data)
+    transport.sendError(data)
 
   },
 
