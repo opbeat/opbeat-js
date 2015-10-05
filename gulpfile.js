@@ -8,6 +8,12 @@ var buffer = require('vinyl-buffer')
 var uglify = require('gulp-uglify')
 var taskListing = require('gulp-task-listing')
 var awspublish = require('gulp-awspublish')
+var es = require('event-stream')
+
+var sourceTargets = [
+  './src/opbeat.js',
+  './src/angular-opbeat.js'
+]
 
 // Static file server
 gulp.task('server', serve({
@@ -19,23 +25,42 @@ gulp.task('build:release', function () {
   var version = require('./package').version
   var path = './dist/' + version
 
-  return browserify('./src/opbeat.js', {
-    standalone: 'Opbeat'
-  }).bundle()
-    .pipe(source('opbeat.js'))
-    .pipe(gulp.dest(path))
-    .pipe(rename('opbeat.min.js'))
-    .pipe(buffer())
-    .pipe(uglify())
-    .pipe(gulp.dest(path))
+  var tasks = sourceTargets.map(function (entry) {
+    console.log('entry', entry)
+    return browserify({
+      entries: [entry],
+      standalone: entry === './src/opbeat.js' ? 'Opbeat' : ''
+    })
+      .bundle()
+      .pipe(source(entry))
+      .pipe(rename({dirname: ''}))
+      .pipe(gulp.dest(path))
+      .pipe(rename({
+        extname: '.min.js'
+      }))
+      .pipe(buffer())
+      .pipe(uglify())
+      .pipe(gulp.dest(path))
+  })
+
+  return es.merge.apply(null, tasks)
+
 })
 
 gulp.task('build', function () {
-  return browserify('./src/opbeat.js', {
-    standalone: 'Opbeat'
-  }).bundle()
-    .pipe(source('opbeat.js'))
-    .pipe(gulp.dest('./dist'))
+  var tasks = sourceTargets.map(function (entry) {
+    console.log('entry', entry)
+    return browserify({
+      entries: [entry],
+      standalone: entry === './src/opbeat.js' ? 'Opbeat' : ''
+    })
+      .bundle()
+      .pipe(source(entry))
+      .pipe(rename({dirname: ''}))
+      .pipe(gulp.dest('./dist/'))
+  })
+
+  return es.merge.apply(null, tasks)
 })
 
 // Development mode
