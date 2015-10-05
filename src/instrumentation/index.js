@@ -25,7 +25,7 @@ Instrumentation.prototype._send = function () {
 }
 
 Instrumentation.prototype._flush = function () {
-  this._queue = [[]]
+  this._queue = []
 }
 
 Instrumentation.prototype._formatTransactions = function () {
