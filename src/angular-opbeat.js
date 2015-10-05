@@ -139,6 +139,8 @@ function $opbeatHandlerProvider ($provide ) {
       if (className) {
         if (transaction) {
           transaction.end()
+          $rootScope._opbeatTransactions[$location.absUrl()] = null
+        // TODO: Unwrap methods
         }
 
         console.log('opbeat.decorator.controller.end')
