@@ -137,6 +137,8 @@ function $opbeatHandlerProvider ($provide ) {
       var result = $delegate.apply(this, args)
 
       if (className) {
+        // TODO: Only end the transaction if the controller name is the same as the originator
+
         if (transaction) {
           transaction.end()
           $rootScope._opbeatTransactions[$location.absUrl()] = null
