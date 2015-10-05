@@ -12,18 +12,17 @@ var wrap = function (fn, before, after) {
   }
 }
 
-var instrumentMethod = function (module, fn, transaction) {
+var instrumentMethod = function (module, fn, transaction, type, prefix) {
   var ref = module[fn]
-  var name = fn
+  var name = prefix ? prefix + fn : fn
 
   return module[fn] = wrap(module[fn], function () {
-    ref.trace = transaction.startTrace(name)
+    ref.trace = transaction.startTrace(name, type)
   }, function () {
     if (ref.trace) {
       ref.trace.end()
     }
   })
-
 }
 
 function ngOpbeatProvider () {
@@ -60,8 +59,41 @@ function $opbeatHandlerProvider ($provide ) {
   //   }
   // }])
 
-  $provide.decorator('$controller', function ($delegate, $location, $routeParams) {
+  $provide.decorator('$http', function ($delegate, $rootScope, $location) {
+    var wrapper = function () {
+      return $delegate.apply($delegate, arguments)
+    }
+
+    Object.keys($delegate).filter(function (key) {
+      return (typeof $delegate[key] === 'function')
+    }).forEach(function (key) {
+      wrapper[key] = function () {
+        var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+        var fn = instrumentMethod($delegate, key, transaction, 'http', '$http.')
+        return fn.apply($delegate, arguments)
+      }
+    })
+
+    return wrapper
+  })
+
+  $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
+    $rootScope._opbeatTransactions = {}
+
+    console.log('$rootScope._opbeatTransactions', $rootScope._opbeatTransactions)
+
+    $rootScope.$on('$routeChangeStart', function (e, current, previous, rejection) {
+      var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
+      if (!transaction) {
+        transaction = $rootScope._opbeatTransactions[$location.absUrl()] = Opbeat.startTransaction($location.absUrl(), 'ext.controller')
+      }
+
+      console.log('scope', $rootScope._opbeatTransactions[$location.absUrl()])
+    })
+
     return function () {
+      var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
+
       var args = Array.prototype.slice.call(arguments)
       var className
 
@@ -80,13 +112,11 @@ function $opbeatHandlerProvider ($provide ) {
         console.log('opbeat.angular.controller', className, $location.absUrl(), controllerScope)
 
         if (controllerScope) {
-          controllerScope._opbeatTransaction = Opbeat.startTransaction(className, 'ext.controller')
-
           // Instrument scope functions
           Object.keys(controllerScope).forEach(function (property) {
             var ref = controllerScope[property]
             if (typeof ref === 'function') {
-              instrumentMethod(controllerScope, property, controllerScope._opbeatTransaction)
+              instrumentMethod(controllerScope, property, 'ext.controller', transaction)
             }
           })
 
@@ -98,18 +128,23 @@ function $opbeatHandlerProvider ($provide ) {
             console.log('opbeat.angular.controller.$viewContentLoaded')
 
             if (controllerScope._opbeatTransaction) {
-              controllerScope._opbeatTransaction.end()
             }
           })
 
         }
       }
 
-      return $delegate.apply(this, args)
+      var result = $delegate.apply(this, args)
 
       if (className) {
+        if (transaction) {
+          transaction.end()
+        }
+
         console.log('opbeat.decorator.controller.end')
       }
+
+      return result
 
     }
   })
