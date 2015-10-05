@@ -116,7 +116,7 @@ function $opbeatHandlerProvider ($provide ) {
           Object.keys(controllerScope).forEach(function (property) {
             var ref = controllerScope[property]
             if (typeof ref === 'function') {
-              instrumentMethod(controllerScope, property, 'ext.controller', transaction)
+              instrumentMethod(controllerScope, property, transaction, 'scope')
             }
           })
 
