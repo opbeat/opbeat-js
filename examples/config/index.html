@@ -30,7 +30,7 @@
       <div class="row marketing">
         <div class="col-lg-6">
           <h4>Test 1</h4>
-          <p>Opbeat.captureException</p>
+          <p>Sourcemap breakage</p>
           <p><button class="btn btn-danger" onclick="divide(1, 0)">Execute</button></p>
 
 
@@ -38,19 +38,19 @@
         <div class="col-lg-6">
 
           <h4>Test 2</h4>
-          <p>window.onerror handing</p>
+          <p>window.onerror</p>
           <p><button class="btn btn-danger" onclick="derp()">Execute</button></p>
 
         </div>
         <div class="col-lg-6">
           <h4>Test 3</h4>
-          <p>Opbeat.captureException</p>
+          <p>Test options</p>
           <button class="btn btn-danger" onclick="testOptions()">Execute</button>
         </div>
 
         <div class="col-lg-6">
           <h4>Test 4</h4>
-          <p>window.onError: addEventListener event handler binding</p>
+          <p>addEventListener event handler binding</p>
           <button class="btn btn-danger btn-test4">Execute</button>
         </div>
       </div>
@@ -61,8 +61,9 @@
 
     </div> <!-- /container -->
 
-    <script src="opbeat.js" data-token="6451721d51b6d95cf6c6b09498feafd865f1f976" data-app-id="e9797db8c7" data-org-id="b3eba3d11f6e4c3a9db52f477caa4fa2" data-debug="true"></script>
-    <script src="no-config.js"></script>
+    <script src="opbeat.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
 
   </body>
 </html>
