@@ -182,11 +182,14 @@ function $opbeatInstrumentationProvider ($provide) {
         controllerName = args[0].name
       }
 
-      if (typeof args[1] === 'object') {
-        controllerScope = args[1].$scope
-      }
+      var isRouteController = controllerName && transaction && transaction.metadata.controllerName === controllerName
 
-      if (controllerName && transaction && transaction.metadata.controllerName === controllerName) {
+      if (isRouteController) {
+
+        if (typeof args[1] === 'object') {
+          controllerScope = args[1].$scope
+        }
+
         console.log('opbeat.angular.controller', controllerName, controllerScope)
 
         if (controllerScope) {
@@ -209,7 +212,7 @@ function $opbeatInstrumentationProvider ($provide) {
 
       var result = $delegate.apply(this, args)
 
-      if (controllerName && transaction && transaction.metadata.controllerName === controllerName) {
+      if (isRouteController) {
 
         // Transaction clean up
         transaction.end()
