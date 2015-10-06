@@ -1,7 +1,7 @@
 var Opbeat = require('./opbeat')
 
 var wrap = function (fn, before, after) {
-  return function () {
+  return function opbeatInstrumentationWrapper () {
     var args = Array.prototype.slice.call(arguments)
 
     before.apply(this, args)
