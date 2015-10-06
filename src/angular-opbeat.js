@@ -172,10 +172,11 @@ function $opbeatInstrumentationProvider ($provide ) {
         transaction.end()
         $rootScope._opbeatTransactions[$location.absUrl()] = null
 
-        if (transaction) {
-          transaction.end()
-          $rootScope._opbeatTransactions[$location.absUrl()] = null
-        // TODO: Unwrap methods
+        if (controllerScope) {
+          // Uninstrument scope functions
+          getScopeFunctions(controllerScope).forEach(function (funcScope) {
+            uninstrumentMethod(funcScope.scope, funcScope.property)
+          })
         }
 
         console.log('opbeat.decorator.controller.end')
