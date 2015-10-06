@@ -80,14 +80,16 @@ function ngOpbeatProvider () {
   }]
 }
 
-function $opbeatHandlerProvider ($provide ) {
-  // $provide.decorator('$exceptionHandler', ['$delegate', '$opbeat', function $ExceptionHandlerDecorator ($delegate, $opbeat) {
-  //   return function $ExceptionHandler (exception, cause) {
-  //     $opbeat.captureException(exception)
-  //     return $delegate(exception, cause)
-  //   }
-  // }])
+function $opbeatErrorProvider ($provide ) {
+  $provide.decorator('$exceptionHandler', ['$delegate', '$opbeat', function $ExceptionHandlerDecorator ($delegate, $opbeat) {
+    return function $ExceptionHandler (exception, cause) {
+      $opbeat.captureException(exception)
+      return $delegate(exception, cause)
+    }
+  }])
+}
 
+function $opbeatInstrumentationProvider ($provide ) {
   $provide.decorator('$http', function ($delegate, $rootScope, $location) {
     var wrapper = function () {
       return $delegate.apply($delegate, arguments)
@@ -184,6 +186,7 @@ function $opbeatHandlerProvider ($provide ) {
 
 angular.module('ngOpbeat', [])
   .provider('$opbeat', ngOpbeatProvider)
-  .config(['$provide', $opbeatHandlerProvider])
+  .config(['$provide', $opbeatErrorProvider])
+  .config(['$provide', $opbeatInstrumentationProvider])
 
 angular.module('angular-opbeat', ['ngOpbeat'])
