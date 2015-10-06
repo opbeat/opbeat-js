@@ -135,7 +135,7 @@ function $opbeatInstrumentationProvider ($provide) {
     }).forEach(function (key) {
       wrapper[key] = function () {
 
-        var fn = $delegate
+        var fn = $delegate[key]
         var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
 
         if (transaction) {
