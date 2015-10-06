@@ -114,10 +114,12 @@ function $opbeatInstrumentationProvider ($provide ) {
     console.log('$rootScope._opbeatTransactions', $rootScope._opbeatTransactions)
 
     $rootScope.$on('$routeChangeStart', function (e, current, previous, rejection) {
+      var routeControllerTarget = current.controller;
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       if (!transaction) {
         transaction = $rootScope._opbeatTransactions[$location.absUrl()] = Opbeat.startTransaction($location.absUrl(), 'ext.controller')
       }
+        transaction.metadata.controllerName = routeControllerTarget
 
       console.log('scope', $rootScope._opbeatTransactions[$location.absUrl()])
     })
