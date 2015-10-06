@@ -127,7 +127,17 @@ function $opbeatInstrumentationProvider ($provide) {
 
   $provide.decorator('$http', function ($delegate, $rootScope, $location) {
     var wrapper = function () {
-      return $delegate.apply($delegate, arguments)
+      var fn = $delegate
+      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+      if (fn) {
+        fn = instrumentMethod($delegate, 'http', transaction, 'http.request', {
+           prefix: '$http.',
+          override: false,
+          instrumentModule: true
+        })
+      }
+
+      return fn.apply($delegate, arguments)
     }
 
     Object.keys($delegate).filter(function (key) {
