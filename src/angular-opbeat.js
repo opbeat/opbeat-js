@@ -12,25 +12,39 @@ var wrap = function (fn, before, after) {
   }
 }
 
-var instrumentMethod = function (module, fn, transaction, type, prefix) {
-  var ref = module[fn]
-  var name = prefix ? prefix + fn : fn
-  ref.original = module[fn]
+var instrumentMethod = function (module, fn, transaction, type, options) {
+  options = options || {}
+  var ref
+  var name = options.prefix ? options.prefix + fn : fn
 
-  return module[fn] = wrap(module[fn], function () {
+  if (options.instrumentModule) {
+    ref = module
+  } else {
+    ref = module[fn]
+  }
+
+  ref.original = ref
+
+  var wrappedMethod = wrap(ref, function () {
     ref.trace = transaction.startTrace(name, type)
-
   }, function () {
     if (ref.trace) {
       ref.trace.end()
     }
   })
+
+  if (options.overrride) {
+    module[fn] = wrappedMethod
+  }
+
+  return wrappedMethod
+
 }
 
-var uninstrumentMethod =  function(module, fn) {
+var uninstrumentMethod = function (module, fn) {
 
   var ref = module[fn]
-  if(ref.original) {
+  if (ref.original) {
     module[fn] = ref.original
   }
 
@@ -91,6 +105,25 @@ function $opbeatErrorProvider ($provide ) {
 }
 
 function $opbeatInstrumentationProvider ($provide ) {
+  $provide.decorator('$compile', function ($delegate, $rootScope, $location) {
+    var wrapper = function () {
+
+      var fn = $delegate
+      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+
+      if (transaction) {
+        fn = instrumentMethod($delegate, 'compile', transaction, 'template.$compile', {
+          override: false,
+          instrumentModule: true
+        })
+      }
+
+      return fn.apply($delegate, arguments)
+    }
+
+    return wrapper
+  })
+
   $provide.decorator('$http', function ($delegate, $rootScope, $location) {
     var wrapper = function () {
       return $delegate.apply($delegate, arguments)
@@ -100,8 +133,17 @@ function $opbeatInstrumentationProvider ($provide ) {
       return (typeof $delegate[key] === 'function')
     }).forEach(function (key) {
       wrapper[key] = function () {
+
+        var fn = $delegate
         var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
-        var fn = instrumentMethod($delegate, key, transaction, 'http', '$http.')
+
+        if (transaction) {
+          fn = instrumentMethod($delegate, key, transaction, 'http.request', {
+            prefix: '$http.',
+            override: true
+          })
+        }
+
         return fn.apply($delegate, arguments)
       }
     })
