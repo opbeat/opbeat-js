@@ -50,7 +50,7 @@ var uninstrumentMethod = function (module, fn) {
 
 }
 
-var getScopeFunctions = function(scope) {
+var getScopeFunctions = function (scope) {
 
   return Object.keys(scope).map(function (property) {
     var ref = scope[property]
@@ -61,9 +61,9 @@ var getScopeFunctions = function(scope) {
         ref: ref
       }
     } else {
-      return null;
+      return null
     }
-  }).filter(function(item) {
+  }).filter(function (item) {
     return item !== null
   })
 
@@ -95,7 +95,7 @@ function ngOpbeatProvider () {
   }]
 }
 
-function $opbeatErrorProvider ($provide ) {
+function $opbeatErrorProvider ($provide) {
   $provide.decorator('$exceptionHandler', ['$delegate', '$opbeat', function $ExceptionHandlerDecorator ($delegate, $opbeat) {
     return function $ExceptionHandler (exception, cause) {
       $opbeat.captureException(exception)
@@ -104,7 +104,8 @@ function $opbeatErrorProvider ($provide ) {
   }])
 }
 
-function $opbeatInstrumentationProvider ($provide ) {
+function $opbeatInstrumentationProvider ($provide) {
+
   $provide.decorator('$compile', function ($delegate, $rootScope, $location) {
     var wrapper = function () {
 
@@ -155,10 +156,10 @@ function $opbeatInstrumentationProvider ($provide ) {
     $rootScope._opbeatTransactions = {}
 
     $rootScope.$on('$routeChangeStart', function (e, current, previous, rejection) {
-      var routeControllerTarget = current.controller;
+      var routeControllerTarget = current.controller
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       if (!transaction) {
-        transaction = Opbeat.startTransaction('angular.controller.'+routeControllerTarget, 'ext.controller')
+        transaction = Opbeat.startTransaction('angular.controller.' + routeControllerTarget, 'ext.controller')
         transaction.metadata.controllerName = routeControllerTarget
 
         $rootScope._opbeatTransactions[$location.absUrl()] = transaction
@@ -169,8 +170,7 @@ function $opbeatInstrumentationProvider ($provide ) {
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
 
       var args = Array.prototype.slice.call(arguments)
-      var controllerName
-      var controllerScope
+      var controllerName, controllerScope
 
       if (typeof args[0] === 'string') {
         controllerName = args[0]
@@ -227,9 +227,9 @@ function $opbeatInstrumentationProvider ($provide ) {
 
 }
 
-angular.module('ngOpbeat', [])
+window.angular.module('ngOpbeat', [])
   .provider('$opbeat', ngOpbeatProvider)
   .config(['$provide', $opbeatErrorProvider])
   .config(['$provide', $opbeatInstrumentationProvider])
 
-angular.module('angular-opbeat', ['ngOpbeat'])
+window.angular.module('angular-opbeat', ['ngOpbeat'])
