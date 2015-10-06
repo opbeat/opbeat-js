@@ -3,6 +3,7 @@
 var Trace = require('./trace')
 
 var Transaction = function (queue, name, type) {
+  this.metadata = {}
   this.name = name
   this.type = type
   this.ended = false
