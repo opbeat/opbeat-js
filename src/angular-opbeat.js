@@ -156,9 +156,6 @@ function $opbeatInstrumentationProvider ($provide ) {
 
           controllerScope.$on('$viewContentLoaded', function (event) {
             console.log('opbeat.angular.controller.$viewContentLoaded')
-
-            if (controllerScope._opbeatTransaction) {
-            }
           })
 
         }
@@ -183,7 +180,6 @@ function $opbeatInstrumentationProvider ($provide ) {
       }
 
       return result
-
     }
   })
 
