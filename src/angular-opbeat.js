@@ -34,6 +34,26 @@ var uninstrumentMethod =  function(module, fn) {
   }
 
 }
+
+var getScopeFunctions = function(scope) {
+
+  return Object.keys(scope).map(function (property) {
+    var ref = scope[property]
+    if (typeof ref === 'function') {
+      return {
+        scope: scope,
+        property: property,
+        ref: ref
+      }
+    } else {
+      return null;
+    }
+  }).filter(function(item) {
+    return item !== null
+  })
+
+}
+
 function ngOpbeatProvider () {
   this.config = function config (properties) {
     Opbeat.config(properties)
