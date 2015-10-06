@@ -19,6 +19,7 @@ var instrumentMethod = function (module, fn, transaction, type, prefix) {
 
   return module[fn] = wrap(module[fn], function () {
     ref.trace = transaction.startTrace(name, type)
+
   }, function () {
     if (ref.trace) {
       ref.trace.end()
@@ -111,38 +112,36 @@ function $opbeatInstrumentationProvider ($provide ) {
   $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
     $rootScope._opbeatTransactions = {}
 
-    console.log('$rootScope._opbeatTransactions', $rootScope._opbeatTransactions)
-
     $rootScope.$on('$routeChangeStart', function (e, current, previous, rejection) {
       var routeControllerTarget = current.controller;
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       if (!transaction) {
-        transaction = $rootScope._opbeatTransactions[$location.absUrl()] = Opbeat.startTransaction($location.absUrl(), 'ext.controller')
-      }
+        transaction = Opbeat.startTransaction('angular.controller.'+routeControllerTarget, 'ext.controller')
         transaction.metadata.controllerName = routeControllerTarget
 
-      console.log('scope', $rootScope._opbeatTransactions[$location.absUrl()])
+        $rootScope._opbeatTransactions[$location.absUrl()] = transaction
+      }
     })
 
     return function () {
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
 
       var args = Array.prototype.slice.call(arguments)
-      var className
+      var controllerName
+      var controllerScope
 
       if (typeof args[0] === 'string') {
-        className = args[0]
+        controllerName = args[0]
       } else if (typeof args[0] === 'function') {
-        className = args[0].name
+        controllerName = args[0].name
       }
-      var controllerScope
 
       if (typeof args[1] === 'object') {
         controllerScope = args[1].$scope
       }
 
-      if (className) {
-        console.log('opbeat.angular.controller', className, $location.absUrl(), controllerScope)
+      if (controllerName && transaction && transaction.metadata.controllerName === controllerName) {
+        console.log('opbeat.angular.controller', controllerName, controllerScope)
 
         if (controllerScope) {
 
@@ -167,8 +166,11 @@ function $opbeatInstrumentationProvider ($provide ) {
 
       var result = $delegate.apply(this, args)
 
-      if (className) {
-        // TODO: Only end the transaction if the controller name is the same as the originator
+      if (controllerName && transaction && transaction.metadata.controllerName === controllerName) {
+
+        // Transaction clean up
+        transaction.end()
+        $rootScope._opbeatTransactions[$location.absUrl()] = null
 
         if (transaction) {
           transaction.end()
