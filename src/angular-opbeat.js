@@ -26,6 +26,14 @@ var instrumentMethod = function (module, fn, transaction, type, prefix) {
   })
 }
 
+var uninstrumentMethod =  function(module, fn) {
+
+  var ref = module[fn]
+  if(ref.original) {
+    module[fn] = ref.original
+  }
+
+}
 function ngOpbeatProvider () {
   this.config = function config (properties) {
     Opbeat.config(properties)
