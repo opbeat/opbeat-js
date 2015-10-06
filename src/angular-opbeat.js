@@ -141,12 +141,10 @@ function $opbeatHandlerProvider ($provide ) {
         console.log('opbeat.angular.controller', className, $location.absUrl(), controllerScope)
 
         if (controllerScope) {
+
           // Instrument scope functions
-          Object.keys(controllerScope).forEach(function (property) {
-            var ref = controllerScope[property]
-            if (typeof ref === 'function') {
-              instrumentMethod(controllerScope, property, transaction, 'app.controller.scope')
-            }
+          getScopeFunctions(controllerScope).forEach(function (funcScope) {
+            instrumentMethod(funcScope.scope, funcScope.property, transaction, 'app.controller')
           })
 
           controllerScope.$on('$destroy', function () {
