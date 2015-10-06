@@ -15,6 +15,7 @@ var wrap = function (fn, before, after) {
 var instrumentMethod = function (module, fn, transaction, type, prefix) {
   var ref = module[fn]
   var name = prefix ? prefix + fn : fn
+  ref.original = module[fn]
 
   return module[fn] = wrap(module[fn], function () {
     ref.trace = transaction.startTrace(name, type)
