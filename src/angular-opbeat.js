@@ -35,9 +35,9 @@ var instrumentMethod = function (module, fn, transaction, type, options) {
 
   ref.original = ref
 
-  var wrappedMethod = wrap(ref, function () {
+  var wrappedMethod = wrap(ref, function instrumentMethodBefore() {
     ref.trace = transaction.startTrace(name, type)
-  }, function () {
+  }, function instrumentMethodAfter() {
     if (ref.trace) {
       ref.trace.end()
     }
