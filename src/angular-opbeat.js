@@ -152,6 +152,7 @@ function $opbeatInstrumentationProvider ($provide) {
 
   // Controller Instrumentation
   $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
+    $rootScope._opbeatTransactions = {}
 
     $rootScope.$on('$routeChangeStart', function (e, current, previous, rejection) {
       var routeControllerTarget = current.controller
