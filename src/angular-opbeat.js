@@ -113,6 +113,25 @@ var getScopeFunctions = function (scope) {
   })
 }
 
+function getControllerInfoFromArgs(args) {
+  var scope, name
+
+  if (typeof args[0] === 'string') {
+    name = args[0]
+  } else if (typeof args[0] === 'function') {
+    name = args[0].name
+  }
+
+  if (typeof args[1] === 'object') {
+    scope = args[1].$scope
+  }
+
+  return {
+    scope: scope,
+    name: name
+  }
+}
+
 function ngOpbeatProvider () {
   this.config = function config (properties) {
     Opbeat.config(properties)
@@ -150,7 +169,7 @@ function $opbeatErrorProvider ($provide) {
 
 function $opbeatInstrumentationProvider ($provide) {
 
-  // Controller Instrumentation
+  // Route controller Instrumentation
   $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
     $rootScope._opbeatTransactions = {}
 
@@ -169,26 +188,19 @@ function $opbeatInstrumentationProvider ($provide) {
     return function () {
       console.log('opbeat.decorator.controller.ctor')
 
-      var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
-
       var args = Array.prototype.slice.call(arguments)
-      var controllerName, controllerScope
 
-      if (typeof args[0] === 'string') {
-        controllerName = args[0]
-      } else if (typeof args[0] === 'function') {
-        controllerName = args[0].name
-      }
+      var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
+      var controllerInfo = getControllerInfoFromArgs(args)
+
+      controllerName = controllerInfo.name
+      controllerScope = controllerInfo.scope
 
       var isRouteController = controllerName && transaction && transaction.metadata.controllerName === controllerName
 
       var result = $delegate.apply(this, args)
 
       if (isRouteController) {
-
-        if (typeof args[1] === 'object') {
-          controllerScope = args[1].$scope
-        }
 
         console.log('opbeat.angular.controller', controllerName,args,  controllerScope)
 
