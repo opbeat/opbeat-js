@@ -236,6 +236,14 @@ function $opbeatInstrumentationProvider ($provide) {
     })
   })
 
+  // Template Request Instrumentation
+  $provide.decorator('$templateRequest', function ($delegate, $injector) {
+    return instrumentModule($delegate, $injector, {
+      type: 'template.request',
+      prefix: '$templateRequest.'
+    })
+  })
+
   // HTTP Instrumentation
   $provide.decorator('$http', function ($delegate, $injector) {
     return instrumentModule($delegate, $injector, {
