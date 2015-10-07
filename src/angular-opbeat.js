@@ -8,7 +8,14 @@ var wrap = function (fn, before, after) {
 
     var result = fn.apply(this, args)
 
-    after.apply(this, args)
+    // Promise handling
+    if (result && typeof result.then === 'function') {
+      result.then(function() {
+        after.apply(this, args)
+      }.bind(this))
+    } else {
+      after.apply(this, args)
+    }
 
     return result
   }
