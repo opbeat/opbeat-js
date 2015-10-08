@@ -10,7 +10,7 @@ var wrap = function (fn, before, after) {
 
     // Promise handling
     if (result && typeof result.then === 'function') {
-      result.then(function () {
+      result.finally(function () {
         after.apply(this, args)
       }.bind(this))
     } else {
