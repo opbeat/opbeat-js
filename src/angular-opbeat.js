@@ -25,7 +25,7 @@ var instrumentMethod = function (module, fn, transaction, type, options) {
 
   options = options || {}
   var ref
-  var name = options.prefix ? options.prefix + fn : fn
+  var name = options.prefix ? options.prefix + '.' + fn : fn
 
   if (options.instrumentModule) {
     ref = module
@@ -245,7 +245,7 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$compile', function ($delegate, $injector) {
     return instrumentModule($delegate, $injector, {
       type: 'template.$compile',
-      prefix: '$compile.'
+      prefix: '$compile'
     })
   })
 
@@ -253,7 +253,7 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$templateRequest', function ($delegate, $injector) {
     return instrumentModule($delegate, $injector, {
       type: 'template.request',
-      prefix: '$templateRequest.'
+      prefix: '$templateRequest'
     })
   })
 
@@ -261,7 +261,7 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$http', function ($delegate, $injector) {
     return instrumentModule($delegate, $injector, {
       type: 'http.request',
-      prefix: '$http.'
+      prefix: '$http'
     })
   })
 
