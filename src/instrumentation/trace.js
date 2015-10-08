@@ -40,7 +40,7 @@ Trace.prototype.startTime = function () {
 }
 
 Trace.prototype.ancestors = function () {
-  return []
+  return ['transaction']
 }
 
 Trace.prototype._parent = function () {
