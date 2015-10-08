@@ -23,7 +23,6 @@ function _sendToOpbeat (endpoint, data) {
   var url = 'https://' + config.get('apiHost') + '/api/v1/organizations/' + config.get('orgId') + '/apps/' + config.get('appId') + '/client-side/' + endpoint + '/'
 
   var headers = {
-    'Authorization': 'Bearer ' + config.get('token'),
     'X-Opbeat-Client': 'opbeat-js/' + config.get('VERSION')
   }
 

@@ -9,7 +9,6 @@ function Config () {
     apiHost: 'intake.opbeat.com',
     orgId: null,
     appId: null,
-    token: null,
     context: {
       user: {
         uuid: _generateUUID()
@@ -58,7 +57,7 @@ Config.prototype.setConfig = function (properties) {
 }
 
 Config.prototype.isValid = function () {
-  var requiredKeys = ['appId', 'orgId', 'token']
+  var requiredKeys = ['appId', 'orgId']
   var values = requiredKeys.map(function (key) {
     return (this.config[key] === null) || (this.config[key] === undefined)
   }.bind(this))
