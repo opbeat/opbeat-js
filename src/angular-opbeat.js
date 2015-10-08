@@ -57,6 +57,7 @@ var instrumentModule = function (module, $injector, options) {
   $rootScope = $injector.get('$rootScope');
   $location = $injector.get('$location');
 
+console.log('instrumentModule', module.name)
   var wrapper = function () {
     var fn = module
     var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
@@ -73,6 +74,7 @@ var instrumentModule = function (module, $injector, options) {
 
   // Instrument static functions
   getScopeFunctions(module).forEach(function (funcScope) {
+    console.log('funcScope', funcScope)
     wrapper[funcScope.property] = function () {
       var fn = funcScope.ref
       var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
@@ -239,6 +241,31 @@ function $opbeatInstrumentationProvider ($provide) {
       console.log('opbeat.decorator.controller.end')
       return result
     }
+  })
+
+  // Controller Instrumentation
+  $provide.decorator('$controller', function ($delegate, $injector) {
+
+    return function() {
+      var $rootScope = $injector.get('$rootScope')
+      var $location = $injector.get('$location')
+
+      var args = Array.prototype.slice.call(arguments)
+      var controllerInfo = getControllerInfoFromArgs(args)
+      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+
+      if(controllerInfo.name) {
+        if (transaction && transaction.metadata.controllerName !== controllerInfo.name) {
+          return instrumentModule($delegate, $injector, {
+            type: 'ext.controller',
+            prefix: 'angular.controller.' + controllerInfo.name,
+          }).apply(this, arguments)
+        }
+      }
+
+      return $delegate.apply(this, arguments)
+    }
+
   })
 
   // Template Compile Instrumentation
