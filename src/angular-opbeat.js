@@ -10,7 +10,7 @@ var wrap = function (fn, before, after) {
 
     // Promise handling
     if (result && typeof result.then === 'function') {
-      result.then(function() {
+      result.then(function () {
         after.apply(this, args)
       }.bind(this))
     } else {
@@ -35,9 +35,9 @@ var instrumentMethod = function (module, fn, transaction, type, options) {
 
   ref.original = ref
 
-  var wrappedMethod = wrap(ref, function instrumentMethodBefore() {
+  var wrappedMethod = wrap(ref, function instrumentMethodBefore () {
     ref.trace = transaction.startTrace(name, type)
-  }, function instrumentMethodAfter() {
+  }, function instrumentMethodAfter () {
     if (ref.trace) {
       ref.trace.end()
     }
@@ -54,10 +54,10 @@ var instrumentMethod = function (module, fn, transaction, type, options) {
 var instrumentModule = function (module, $injector, options) {
   options = options || {}
 
-  $rootScope = $injector.get('$rootScope');
-  $location = $injector.get('$location');
+  var $rootScope = $injector.get('$rootScope')
+  var $location = $injector.get('$location')
 
-console.log('instrumentModule', module.name)
+  console.log('instrumentModule', module.name)
   var wrapper = function () {
     var fn = module
     var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
@@ -96,7 +96,7 @@ var uninstrumentMethod = function (module, fn) {
   var ref = module[fn]
   if (ref.original) {
     module[fn] = ref.original
-    if(module[fn].trace) {
+    if (module[fn].trace) {
       module[fn].trace = null
     }
   }
@@ -104,8 +104,8 @@ var uninstrumentMethod = function (module, fn) {
 
 var getScopeFunctions = function (scope) {
   return Object.keys(scope).filter(function (key) {
-    return typeof scope[key] == 'function'
-  }).map(function(property) {
+    return typeof scope[key] === 'function'
+  }).map(function (property) {
     var ref = scope[property]
     return {
       scope: scope,
@@ -115,7 +115,7 @@ var getScopeFunctions = function (scope) {
   })
 }
 
-function getControllerInfoFromArgs(args) {
+function getControllerInfoFromArgs (args) {
   var scope, name
 
   if (typeof args[0] === 'string') {
@@ -194,9 +194,8 @@ function $opbeatInstrumentationProvider ($provide) {
 
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       var controllerInfo = getControllerInfoFromArgs(args)
-
-      controllerName = controllerInfo.name
-      controllerScope = controllerInfo.scope
+      var controllerName = controllerInfo.name
+      var controllerScope = controllerInfo.scope
 
       var isRouteController = controllerName && transaction && transaction.metadata.controllerName === controllerName
 
@@ -204,7 +203,7 @@ function $opbeatInstrumentationProvider ($provide) {
 
       if (isRouteController) {
 
-        console.log('opbeat.angular.controller', controllerName,args,  controllerScope)
+        console.log('opbeat.angular.controller', controllerName)
 
         if (controllerScope) {
 
@@ -246,7 +245,7 @@ function $opbeatInstrumentationProvider ($provide) {
   // Controller Instrumentation
   $provide.decorator('$controller', function ($delegate, $injector) {
 
-    return function() {
+    return function () {
       var $rootScope = $injector.get('$rootScope')
       var $location = $injector.get('$location')
 
@@ -254,11 +253,11 @@ function $opbeatInstrumentationProvider ($provide) {
       var controllerInfo = getControllerInfoFromArgs(args)
       var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
 
-      if(controllerInfo.name) {
+      if (controllerInfo.name) {
         if (transaction && transaction.metadata.controllerName !== controllerInfo.name) {
           return instrumentModule($delegate, $injector, {
             type: 'ext.controller',
-            prefix: 'angular.controller.' + controllerInfo.name,
+            prefix: 'angular.controller.' + controllerInfo.name
           }).apply(this, arguments)
         }
       }
