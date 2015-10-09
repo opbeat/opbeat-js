@@ -8,6 +8,7 @@ var Trace = module.exports = function (transaction, signature, type) {
 
   this._start = performance.now()
   this._startStamp = new Date()
+  this._parent = null;
 
   console.log('opbeat.instrumentation.trace.ctor', this.signature, this._startStamp)
 }
@@ -40,11 +41,19 @@ Trace.prototype.startTime = function () {
 }
 
 Trace.prototype.ancestors = function () {
-  return ['transaction']
+  var parent = this.parent()
+  if (!parent) {
+    return []
+  } else {
+    return [parent.signature]
+  }
 }
 
-Trace.prototype._parent = function () {
-  return null
+Trace.prototype.parent = function () {
+  return this._parent
 }
 
+Trace.prototype.setParent = function (val) {
+  this._parent = val
+}
 module.exports = Trace

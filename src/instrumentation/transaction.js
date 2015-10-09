@@ -34,6 +34,7 @@ Transaction.prototype.end = function () {
 Transaction.prototype.startTrace = function (signature, type) {
   console.log('opbeat.instrumentation.transaction.startTrace', this.name)
   var trace = new Trace(this, signature, type)
+  trace.setParent(this._rootTrace)
   this.activetraces.push(trace)
 
   return trace
