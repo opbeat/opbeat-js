@@ -47,7 +47,7 @@ function $opbeatInstrumentationProvider ($provide) {
       console.log('opbeat.decorator.controller.routeChangeStart')
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       if (!transaction) {
-        transaction = Opbeat.startTransaction('angular.controller.' + routeControllerTarget, 'ext.controller')
+        transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction')
         transaction.metadata.controllerName = routeControllerTarget
 
         $rootScope._opbeatTransactions[$location.absUrl()] = transaction
@@ -71,7 +71,7 @@ function $opbeatInstrumentationProvider ($provide) {
 
         // Instrument controller scope functions
         utils.getObjectFunctions(controllerScope).forEach(function (funcScope) {
-          utils.instrumentMethod(funcScope.scope, funcScope.property, transaction, 'app.controller', {
+          utils.instrumentMethod(funcScope.scope, funcScope.property, transaction, 'app.angular.controller', {
             override: true
           })
         })
@@ -117,7 +117,7 @@ function $opbeatInstrumentationProvider ($provide) {
       if (controllerInfo.name) {
         if (transaction && transaction.metadata.controllerName !== controllerInfo.name) {
           return utils.instrumentModule($delegate, $injector, {
-            type: 'ext.controller',
+            type: 'template.angular.controller',
             prefix: 'angular.controller.' + controllerInfo.name
           }).apply(this, arguments)
         }
@@ -131,24 +131,24 @@ function $opbeatInstrumentationProvider ($provide) {
   // Template Compile Instrumentation
   $provide.decorator('$compile', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
-      type: 'template.$compile',
-      prefix: '$compile'
+      type: 'template.angular.$compile',
+      prefix: 'angular.$compile'
     })
   })
 
   // Template Request Instrumentation
   $provide.decorator('$templateRequest', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
-      type: 'template.request',
-      prefix: '$templateRequest'
+      type: 'template.angular.request',
+      prefix: 'angular.$templateRequest'
     })
   })
 
   // HTTP Instrumentation
   $provide.decorator('$http', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
-      type: 'http.request',
-      prefix: '$http'
+      type: 'ext.http.request',
+      prefix: 'angular.$http',
     })
   })
 
