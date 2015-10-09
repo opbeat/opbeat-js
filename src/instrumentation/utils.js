@@ -34,6 +34,10 @@ module.exports = {
 
     ref.original = ref
 
+    if(options.signatureFormatter && options.args) {
+      name = options.signatureFormatter(fn, options.args)
+    }
+
     var wrappedMethod = this.wrap(ref, function instrumentMethodBefore () {
       ref.trace = transaction.startTrace(name, type)
     }, function instrumentMethodAfter () {
@@ -57,33 +61,39 @@ module.exports = {
     var $location = $injector.get('$location')
 
     var wrapper = function () {
+      var args = Array.prototype.slice.call(arguments)
       var fn = module
       var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
       if (transaction) {
         fn = that.instrumentMethod(module, 'root', transaction, options.type, {
           prefix: options.prefix,
           override: false,
-          instrumentModule: true
+          instrumentModule: true,
+          signatureFormatter: options.signatureFormatter,
+          args: args
         })
       }
 
-      return fn.apply(module, arguments)
+      return fn.apply(module, args)
     }
 
     // Instrument static functions
     this.getObjectFunctions(module).forEach(function (funcScope) {
       console.log('funcScope', funcScope)
       wrapper[funcScope.property] = function () {
+        var args = Array.prototype.slice.call(arguments)
         var fn = funcScope.ref
         var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
         if (transaction) {
           fn = that.instrumentMethod(module, funcScope.property, transaction, options.type, {
             prefix: options.prefix,
-            override: true
+            override: true,
+            signatureFormatter: options.signatureFormatter,
+            args: args
           })
         }
 
-        return fn.apply(module, arguments)
+        return fn.apply(module, args)
       }
     })
 
