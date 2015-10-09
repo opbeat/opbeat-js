@@ -149,6 +149,9 @@ function $opbeatInstrumentationProvider ($provide) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'ext.http.request',
       prefix: 'angular.$http',
+      signatureFormatter: function(key, args) {
+        return key.toUpperCase() + ' ' + args[0]
+      }
     })
   })
 
