@@ -12,11 +12,12 @@ var Transaction = function (queue, name, type) {
   this.activetraces = []
   this._queue = queue
 
-  console.log('opbeat.instrumentation.transaction.ctor', this.name)
+  console.log('- %c opbeat.instrumentation.transaction.ctor', 'color: #3360A3', this.name)
 
   // A transaction should always have a root trace spanning the entire
   // transaction.
   this._rootTrace = this.startTrace('transaction', 'transaction')
+
 
   this._startStamp = this._rootTrace._startStamp
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
@@ -28,13 +29,13 @@ Transaction.prototype.end = function () {
   this._rootTrace.end()
   this._queue.add(this)
 
-  console.log('opbeat.instrumentation.transaction.end', this.name, this.activetraces.length)
+  console.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, this.activetraces.length)
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
-  console.log('opbeat.instrumentation.transaction.startTrace', this.name)
   var trace = new Trace(this, signature, type)
   trace.setParent(this._rootTrace)
+
   this.activetraces.push(trace)
 
   return trace

@@ -10,7 +10,7 @@ var Trace = module.exports = function (transaction, signature, type) {
   this._startStamp = new Date()
   this._parent = null;
 
-  console.log('opbeat.instrumentation.trace.ctor', this.signature, this._startStamp)
+  console.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }
 
 Trace.prototype.end = function () {
@@ -19,7 +19,7 @@ Trace.prototype.end = function () {
 
   this.transaction._onTraceEnd(this)
 
-  console.log('opbeat.instrumentation.trace.end', this.signature, this._diff)
+  console.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._diff)
 }
 
 Trace.prototype.duration = function () {
