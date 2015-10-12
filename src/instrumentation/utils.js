@@ -115,6 +115,7 @@ module.exports = {
     if (ref.original) {
       module[fn] = ref.original
       if (module[fn].trace) {
+        module[fn].trace.end();
         module[fn].trace = null
       }
     }
