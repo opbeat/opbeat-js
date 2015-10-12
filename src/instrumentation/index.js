@@ -63,16 +63,22 @@ function groupTraces (traces) {
 
   return Object.keys(groups).map(function (key) {
     var trace = groups[key][0]
-    var startTimeSum = 0
     var durations = groups[key].map(function (trace) {
-      startTimeSum += trace.startTime()
       return [trace.duration(), trace.transaction.duration()]
     })
+
+    var startTime = trace._start
+    if(trace.transaction) {
+      startTime = startTime - trace.transaction._start
+    } else {
+      startTime = 0;
+    }
+
     return {
       transaction: trace.transaction.name,
       signature: trace.signature,
       durations: durations,
-      start_time: startTimeSum / groups[key].length,
+      start_time: startTime,
       kind: trace.type,
       timestamp: groupingTs(trace._startStamp).toISOString(),
       frames: [], // TODO
