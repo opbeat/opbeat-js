@@ -8,16 +8,14 @@ module.exports = {
       var trace = before.apply(this, [context].concat(args))
 
       var result = fn.apply(this, args)
-      result.original = fn
-      result.trace = trace
 
       // After + Promise handling
       if (result && typeof result.then === 'function') {
         result.finally(function () {
-          after.apply(this, [result].concat(args))
+          after.apply(this, [trace].concat(args))
         }.bind(this))
       } else {
-        after.apply(this, [result].concat(args))
+        after.apply(this, [trace].concat(args))
       }
 
       return result
@@ -51,13 +49,15 @@ module.exports = {
       }
 
       return transaction.startTrace(name, context.traceType)
-    }, function instrumentMethodAfter (result) {
+    }, function instrumentMethodAfter (trace) {
       var args = Array.prototype.slice.call(arguments).slice(1)
 
-      if (result.trace) {
-        result.trace.end()
+      if (trace) {
+        trace.end()
       }
     }, context)
+
+    wrappedMethod.original = ref
 
     if (options.override) {
       module[fn] = wrappedMethod
@@ -114,10 +114,6 @@ module.exports = {
     var ref = module[fn]
     if (ref.original) {
       module[fn] = ref.original
-      if (module[fn].trace) {
-        module[fn].trace.end();
-        module[fn].trace = null
-      }
     }
   },
 
