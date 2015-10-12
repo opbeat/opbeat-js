@@ -1,4 +1,4 @@
-'use strict'
+var logger = require('../lib/logger')
 
 var Trace = module.exports = function (transaction, signature, type) {
   this.transaction = transaction
@@ -10,7 +10,7 @@ var Trace = module.exports = function (transaction, signature, type) {
   this._startStamp = new Date()
   this._parent = null;
 
-  console.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
+  logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }
 
 Trace.prototype.end = function () {
@@ -19,7 +19,7 @@ Trace.prototype.end = function () {
 
   this.transaction._onTraceEnd(this)
 
-  console.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._diff)
+  logger.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._diff)
 }
 
 Trace.prototype.duration = function () {
@@ -28,12 +28,12 @@ Trace.prototype.duration = function () {
     return null
   }
 
-  return this._diff
+  return parseFloat(this._diff)
 }
 
 Trace.prototype.startTime = function () {
   if (!this.ended || !this.transaction.ended) {
-    console.error('Trying to call trace.startTime() for un-ended Trace/Transaction!')
+    logger.error('Trying to call trace.startTime() for un-ended Trace/Transaction!')
     return null
   }
 

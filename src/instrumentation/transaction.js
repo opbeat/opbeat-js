@@ -1,4 +1,4 @@
-'use strict'
+var logger = require('../lib/logger')
 
 var Trace = require('./trace')
 
@@ -12,7 +12,7 @@ var Transaction = function (queue, name, type) {
   this.activetraces = []
   this._queue = queue
 
-  console.log('- %c opbeat.instrumentation.transaction.ctor', 'color: #3360A3', this.name)
+  logger.log('- %c opbeat.instrumentation.transaction.ctor', 'color: #3360A3', this.name)
 
   // A transaction should always have a root trace spanning the entire
   // transaction.
@@ -30,7 +30,7 @@ Transaction.prototype.end = function () {
   this._rootTrace.end()
   this._queue.add(this)
 
-  console.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, this.activetraces.length)
+  logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, this.activetraces.length)
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
@@ -50,7 +50,7 @@ Transaction.prototype._onTraceEnd = function (trace) {
     this.activetraces.splice(index, 1)
   }
 
-  console.log('opbeat.instrumentation.transaction._endTrace', this.name, this.activetraces.length)
+  logger.log('opbeat.instrumentation.transaction._endTrace', this.name, this.activetraces.length)
 
 }
 

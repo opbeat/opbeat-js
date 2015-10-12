@@ -1,5 +1,6 @@
 var Opbeat = require('./opbeat')
 var utils = require('./instrumentation/utils')
+var logger = require('./lib/logger')
 
 function ngOpbeatProvider () {
   this.config = function config (properties) {
@@ -44,7 +45,7 @@ function $opbeatInstrumentationProvider ($provide) {
 
     var onRouteChange = function(e, current) {
       var routeControllerTarget = current.controller
-      console.log('opbeat.decorator.controller.onRouteChange')
+      logger.log('opbeat.decorator.controller.onRouteChange')
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       if (!transaction) {
         transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction')
@@ -59,7 +60,7 @@ function $opbeatInstrumentationProvider ($provide) {
     $rootScope.$on('$stateChangeSuccess', onRouteChange) // ui-router
 
     return function () {
-      console.log('opbeat.decorator.controller.ctor')
+      logger.log('opbeat.decorator.controller.ctor')
 
       var args = Array.prototype.slice.call(arguments)
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
@@ -71,7 +72,7 @@ function $opbeatInstrumentationProvider ($provide) {
       var result = $delegate.apply(this, args)
 
       if (isRouteController && controllerScope) {
-        console.log('opbeat.angular.controller', controllerName)
+        logger.log('opbeat.angular.controller', controllerName)
 
         // Instrument controller scope functions
         utils.getObjectFunctions(controllerScope).forEach(function (funcScope) {
@@ -81,12 +82,12 @@ function $opbeatInstrumentationProvider ($provide) {
         })
 
         controllerScope.$on('$destroy', function () {
-          console.log('opbeat.angular.controller.destroy')
+          logger.log('opbeat.angular.controller.destroy')
         })
 
         controllerScope.$on('$viewContentLoaded', function (event) {
 
-          console.log('opbeat.angular.controller.$viewContentLoaded')
+          logger.log('opbeat.angular.controller.$viewContentLoaded')
 
           // Transaction clean up
           transaction.end()
@@ -102,7 +103,7 @@ function $opbeatInstrumentationProvider ($provide) {
         })
       }
 
-      console.log('opbeat.decorator.controller.end')
+      logger.log('opbeat.decorator.controller.end')
       return result
     }
   })
