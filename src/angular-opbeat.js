@@ -160,6 +160,19 @@ function $opbeatInstrumentationProvider ($provide) {
     })
   })
 
+  // // CacheFactory Instrumentation
+  // $provide.decorator('$cacheFactory', function ($delegate, $injector) {
+  //   return function() {
+  //     logger.log('$cacheFactory')
+  //     return $delegate.apply(this, arguments)
+  //   }
+  // })
+
+  // $provide.decorator('$templateCache', function ($delegate, $injector) {
+  //   logger.log('$templateCache')
+  //   return $delegate
+  // })
+
 }
 
 window.angular.module('ngOpbeat', [])
