@@ -42,9 +42,9 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
     $rootScope._opbeatTransactions = {}
 
-    $rootScope.$on('$routeChangeStart', function (e, current, previous, rejection) {
+    var onRouteChange = function(e, current) {
       var routeControllerTarget = current.controller
-      console.log('opbeat.decorator.controller.routeChangeStart')
+      console.log('opbeat.decorator.controller.onRouteChange')
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       if (!transaction) {
         transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction')
@@ -52,7 +52,11 @@ function $opbeatInstrumentationProvider ($provide) {
 
         $rootScope._opbeatTransactions[$location.absUrl()] = transaction
       }
-    })
+
+    }
+
+    $rootScope.$on('$routeChangeStart', onRouteChange) // ng-router
+    $rootScope.$on('$stateChangeSuccess', onRouteChange) // ui-router
 
     return function () {
       console.log('opbeat.decorator.controller.ctor')
