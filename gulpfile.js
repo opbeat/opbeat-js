@@ -22,8 +22,10 @@ gulp.task('server', serve({
 }))
 
 gulp.task('build:release', function () {
-  var version = require('./package').version
-  var path = './dist/' + version
+  var version = require('./package').version;
+  var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
+
+  var path = './dist/' + majorVersion
 
   var tasks = sourceTargets.map(function (entry) {
     console.log('entry', entry)
