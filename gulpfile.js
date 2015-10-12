@@ -80,7 +80,7 @@ gulp.task('watch', [], function (cb) {
 //
 // Deploy task
 //
-gulp.task('deploy', ['build'], function () {
+gulp.task('deploy', ['build:release'], function () {
   // Load options from file
   awsoptions = JSON.parse(fs.readFileSync('aws.json'))
 
