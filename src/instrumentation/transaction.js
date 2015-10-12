@@ -20,6 +20,7 @@ var Transaction = function (queue, name, type) {
 
 
   this._startStamp = this._rootTrace._startStamp
+  this._start = this._rootTrace._start
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
 }
 
