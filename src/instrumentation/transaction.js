@@ -7,6 +7,7 @@ var Transaction = function (queue, name, type) {
   this.name = name
   this.type = type
   this.ended = false
+  this._endAfterActiveTraces = false
 
   this.traces = []
   this.activetraces = []
@@ -25,12 +26,19 @@ var Transaction = function (queue, name, type) {
 }
 
 Transaction.prototype.end = function () {
-  this.ended = true
 
-  this._rootTrace.end()
-  this._queue.add(this)
+  if(this.activetraces.length > 1) {
+    this._endAfterActiveTraces = true;
+  } else {
+    this.ended = true
+    this._endAfterActiveTraces = false
 
-  logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, this.activetraces.length)
+    this._rootTrace.end()
+    this._queue.add(this)
+
+    logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, this.activetraces.length)
+  }
+
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
@@ -48,6 +56,10 @@ Transaction.prototype._onTraceEnd = function (trace) {
   var index = this.activetraces.indexOf(trace)
   if (index > -1) {
     this.activetraces.splice(index, 1)
+  }
+
+  if(this._endAfterActiveTraces) {
+    this.end();
   }
 
   logger.log('opbeat.instrumentation.transaction._endTrace', this.name, this.activetraces.length)
