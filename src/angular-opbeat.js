@@ -160,18 +160,18 @@ function $opbeatInstrumentationProvider ($provide) {
     })
   })
 
-  // // CacheFactory Instrumentation
-  // $provide.decorator('$cacheFactory', function ($delegate, $injector) {
-  //   return function() {
-  //     logger.log('$cacheFactory')
-  //     return $delegate.apply(this, arguments)
-  //   }
-  // })
-
-  // $provide.decorator('$templateCache', function ($delegate, $injector) {
-  //   logger.log('$templateCache')
-  //   return $delegate
-  // })
+  // Core directive instrumentation
+  var coreDirectives = ['ngBind', 'ngClass', 'ngModel', 'ngIf', 'ngInclude', 'ngRepeat', 'ngSrc', 'ngStyle', 'ngSwitch', 'ngTransclude']
+  coreDirectives.forEach(function(name) {
+    var directiveName = name + 'Directive'
+    $provide.decorator(directiveName, function ($delegate, $injector) {
+      utils.instrumentObject($delegate[0], $injector, {
+        type: 'template.angular.directive',
+        prefix: 'angular.$directive.' + directiveName
+      })
+      return $delegate
+    })
+  })
 
 }
 
