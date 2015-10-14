@@ -123,7 +123,7 @@ function $opbeatInstrumentationProvider ($provide) {
         if (transaction && transaction.metadata.controllerName !== controllerInfo.name) {
           return utils.instrumentModule($delegate, $injector, {
             type: 'template.angular.controller',
-            prefix: 'angular.controller.' + controllerInfo.name
+            prefix: 'controller.' + controllerInfo.name
           }).apply(this, arguments)
         }
       }
@@ -137,7 +137,7 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$compile', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'template.angular.$compile',
-      prefix: 'angular.$compile'
+      prefix: '$compile'
     })
   })
 
@@ -145,7 +145,7 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$templateRequest', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'template.angular.request',
-      prefix: 'angular.$templateRequest'
+      prefix: '$templateRequest'
     })
   })
 
@@ -167,7 +167,7 @@ function $opbeatInstrumentationProvider ($provide) {
     $provide.decorator(directiveName, function ($delegate, $injector) {
       utils.instrumentObject($delegate[0], $injector, {
         type: 'template.angular.directive',
-        prefix: 'angular.$directive.' + directiveName
+        prefix: directiveName
       })
       return $delegate
     })
