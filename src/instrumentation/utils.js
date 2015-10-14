@@ -25,7 +25,16 @@ module.exports = {
   instrumentMethod : function (module, fn, transaction, type, options) {
     options = options || {}
     var ref
-    var name = options.prefix ? options.prefix + '.' + fn : fn
+    var nameParts = []
+
+    if(options.prefix) {
+      nameParts.push(options.prefix)
+    }
+    if(fn) {
+      nameParts.push(fn)
+    }
+
+    var name = nameParts.join('.')
 
     if (options.instrumentModule) {
       ref = module
@@ -78,7 +87,7 @@ module.exports = {
       var args = Array.prototype.slice.call(arguments)
       var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
       if (transaction) {
-        fn = that.instrumentMethod(module, 'root', transaction, options.type, {
+        fn = that.instrumentMethod(module, '', transaction, options.type, {
           prefix: options.prefix,
           override: false,
           instrumentModule: true,
