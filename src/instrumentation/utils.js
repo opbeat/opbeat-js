@@ -110,6 +110,27 @@ module.exports = {
     return wrapper
   },
 
+  instrumentObject : function (object, $injector, options) {
+    options = options || {}
+    var that = this;
+    var $rootScope = $injector.get('$rootScope')
+    var $location = $injector.get('$location')
+
+    // Instrument static functions
+    this.getObjectFunctions(object).forEach(function (funcScope) {
+      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+      if (transaction) {
+        that.instrumentMethod(object, funcScope.property, transaction, options.type, {
+          prefix: options.prefix,
+          override: true,
+          signatureFormatter: options.signatureFormatter
+        })
+      }
+    })
+
+    return object
+  },
+
   uninstrumentMethod: function (module, fn) {
     var ref = module[fn]
     if (ref.original) {
