@@ -204,6 +204,9 @@ module.exports = {
         type: type,
         value: message
       },
+      http: {
+        url: window.location.href
+      },
       stacktrace: stacktrace,
       user: config.get('context.user'),
       level: null,
