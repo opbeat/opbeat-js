@@ -155,7 +155,17 @@ function $opbeatInstrumentationProvider ($provide) {
       type: 'ext.http.request',
       prefix: 'angular.$http',
       signatureFormatter: function(key, args) {
-        return key.toUpperCase() + ' ' + args[0]
+        var text = []
+        // $http used directly
+        if(key && args) {
+          text = [key.toUpperCase(), args]
+        } else if(!key && typeof args === 'object') {
+          // $http used from $resource
+          var req = args
+          text = [req.method, req.url]
+        }
+
+        return text.join(' ')
       }
     })
   })

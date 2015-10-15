@@ -54,7 +54,7 @@ module.exports = {
 
       var name = context.traceName;
       if(options.signatureFormatter) {
-        name = options.signatureFormatter(fn, args)
+        name = options.signatureFormatter.apply(this, [fn].concat(args))
       }
 
       return transaction.startTrace(name, context.traceType)
