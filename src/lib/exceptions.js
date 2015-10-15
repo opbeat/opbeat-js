@@ -209,7 +209,6 @@ module.exports = {
       },
       stacktrace: stacktrace,
       user: config.get('context.user'),
-      timestamp: parseInt((new Date).getTime() / 1000, 10),
       level: null,
       logger: null,
       machine: null
