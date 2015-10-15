@@ -49,7 +49,7 @@ In order to provide code instrumentation we have chosen a framework-specific app
 ### angular-opbeat
 
 
-```
+```javascript 
 /*global angular */
 
 /**
@@ -71,5 +71,7 @@ angular.module('app', ['ngOpbeat'])
     $opbeatProvider.install()
   })
 ```
+
+
 ## License
 MIT
