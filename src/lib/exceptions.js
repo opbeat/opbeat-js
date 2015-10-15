@@ -93,13 +93,12 @@ module.exports = {
 
       // Detect Sourcemaps
       var sourceMapResolver = this.getFileSourceMapUrl(cleanedFileName)
+
       sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
         resolve(frame)
-      }).caught(function () {})
-
-      // Resolve contexts if no source map
-      sourceMapResolver.caught(function () {
+      }).caught(function () {
+        // // Resolve contexts if no source map
         var cleanedFileName = this.cleanFileName(stack.fileName)
         var contextsResolver = this.getExceptionContexts(cleanedFileName, stack.lineNumber)
 
@@ -109,9 +108,7 @@ module.exports = {
           frame.post_context = contexts.postContext
 
           resolve(frame)
-        })
-
-        contextsResolver.caught(function () {
+        }).caught(function () {
           resolve(frame)
         })
 
@@ -251,10 +248,9 @@ module.exports = {
           sourceMapUrl = fileBasePath + sourceMapUrl
           resolve(sourceMapUrl)
         } else {
-          reject(null)
+          reject('no sourceMapUrl')
         }
       }).caught(reject)
-
     })
   },
 
@@ -300,7 +296,7 @@ module.exports = {
       return Promise.reject()
     }
 
-    return new Promise(function (resolve, reject ) {
+    return new Promise(function (resolve, reject) {
       transport.getFile(url).then(function (source) {
         line -= 1; // convert line to 0-based index
 
