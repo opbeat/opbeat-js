@@ -4,6 +4,8 @@ var utils = require('./lib/utils')
 var config = require('./lib/config')
 var Instrumentation = require('./instrumentation')
 
+var _opbeat = window.Opbeat
+
 function Opbeat () {
   this.isInstalled = false
   this._instrumentation = new Instrumentation()
@@ -25,6 +27,17 @@ Opbeat.prototype.isPlatformSupport = function () {
     typeof JSON.stringify === 'function' &&
     typeof Function.bind === 'function' &&
     utils.isCORSSupported()
+}
+
+/*
+ * Allow multiple versions of Opbeat to be installed.
+ * Strip Opbeat from the global context and returns the instance.
+ *
+ * @return {Opbeat}
+ */
+Opbeat.prototype.noConflict = function () {
+  window.Opbeat = _opbeat
+  return this
 }
 
 /*
