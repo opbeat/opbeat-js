@@ -190,8 +190,8 @@ module.exports = {
       if (lastFrame.filename) {
         fileUrl = lastFrame.filename
       } else {
-        // If filename empty, use location path and assume inline script
-        fileUrl = window.location.pathname + ' (inline script)'
+        // If filename empty, assume inline script
+        fileUrl = '(inline script)'
       }
     }
 
