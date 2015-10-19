@@ -183,6 +183,19 @@ function $opbeatInstrumentationProvider ($provide) {
     })
   })
 
+  // ngResource Instrumentation
+  $provide.decorator('$resource', function ($delegate, $injector) {
+    return function () {
+      var args = Array.prototype.slice.call(arguments)
+      var result = $delegate.apply(this, args)
+      utils.instrumentObject(result, $injector, {
+        type: 'http.$resource',
+        prefix: '$resource'
+      })
+      return result
+    };
+  })
+
 }
 
 window.angular.module('ngOpbeat', [])
