@@ -73,8 +73,6 @@ function _makeRequest (url, method, type, data, headers) {
       data = JSON.stringify(data)
     }
 
-    logger.log('opbeat.transport.makeRequest', url, headers, data)
-
     xhr.send(data)
 
   })
