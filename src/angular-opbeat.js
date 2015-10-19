@@ -189,7 +189,7 @@ function $opbeatInstrumentationProvider ($provide) {
       var args = Array.prototype.slice.call(arguments)
       var result = $delegate.apply(this, args)
       utils.instrumentObject(result, $injector, {
-        type: 'http.$resource',
+        type: 'ext.$resource',
         prefix: '$resource'
       })
       return result
