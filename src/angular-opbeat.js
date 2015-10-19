@@ -183,7 +183,7 @@ function $opbeatInstrumentationProvider ($provide) {
     })
   })
 
-  // ngResource Instrumentation
+  // ngResource instrumentation
   $provide.decorator('$resource', function ($delegate, $injector) {
     return function () {
       var args = Array.prototype.slice.call(arguments)
