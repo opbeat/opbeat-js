@@ -314,9 +314,16 @@ module.exports = {
         }
 
         if (sourceLines.length) {
-          // Don't generate contexts if source is minified
-          var isMinified = this.isSourceMinified(source)
 
+          var isMinified
+
+          if(source.indexOf('<html') > -1) {
+            isMinified = false
+          } else {
+            isMinified = this.isSourceMinified(source)
+          }
+
+          // Don't generate contexts if source is minified
           if (isMinified) {
             return reject()
           }
