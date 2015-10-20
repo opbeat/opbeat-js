@@ -43,6 +43,12 @@ module.exports = {
 
   processWindowError: function (msg, file, line, col, error) {
     var that = this
+
+    if(msg === "Script error." && !file) {
+      // ignoring script errors: See https://github.com/getsentry/raven-js/issues/41
+      return
+    }
+
     var exception = {
       'message': error ? error.message : msg,
       'type': error ? error.name : '',
