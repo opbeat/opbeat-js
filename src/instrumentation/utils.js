@@ -1,6 +1,6 @@
 module.exports = {
 
-  wrap : function (fn, before, after, context) {
+  wrapMethod: function (fn, before, after, context) {
     return function opbeatInstrumentationWrapper () {
       var args = Array.prototype.slice.call(arguments)
 
@@ -48,7 +48,7 @@ module.exports = {
       options: options
     }
 
-    var wrappedMethod = this.wrap(ref, function instrumentMethodBefore (context) {
+    var wrappedMethod = this.wrapMethod(ref, function instrumentMethodBefore (context) {
 
       var args = Array.prototype.slice.call(arguments).slice(1)
 
