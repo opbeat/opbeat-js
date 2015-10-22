@@ -152,7 +152,11 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$templateRequest', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'template.angular.request',
-      prefix: '$templateRequest'
+      prefix: '$templateRequest',
+      signatureFormatter: function(key, args) {
+        var text = ['$templateRequest', args]
+        return text.join(' ')
+      }
     })
   })
 
