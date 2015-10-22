@@ -2,14 +2,14 @@ var logger = require('../lib/logger')
 
 var Trace = require('./trace')
 
-var TraceHolder = function (name) {
+var TraceBuffer = function (name) {
   this.traces = []
   this.activetraces = []
   this.traceTransactionRef = this
   this._setTraceParent = false
 }
 
-TraceHolder.prototype.startTrace = function (signature, type) {
+TraceBuffer.prototype.startTrace = function (signature, type) {
   var trace = new Trace(this.traceTransactionRef, signature, type)
 
   if(this._setTraceParent) {
@@ -23,7 +23,7 @@ TraceHolder.prototype.startTrace = function (signature, type) {
   return trace
 }
 
-TraceHolder.prototype._onTraceEnd = function (trace) {
+TraceBuffer.prototype._onTraceEnd = function (trace) {
   this.traces.push(trace)
 
   var index = this.activetraces.indexOf(trace)
@@ -34,7 +34,7 @@ TraceHolder.prototype._onTraceEnd = function (trace) {
   logger.log('opbeat.instrumentation.traceHolder._endTrace', this.name, trace.signature)
 }
 
-TraceHolder.prototype.setTransactionRef = function (transaction) {
+TraceBuffer.prototype.setTransactionRef = function (transaction) {
 
   this.traceTransactionRef = transaction
   this._setTraceParent = true
@@ -49,12 +49,12 @@ TraceHolder.prototype.setTransactionRef = function (transaction) {
 
 }
 
-TraceHolder.prototype.getTraces = function () {
+TraceBuffer.prototype.getTraces = function () {
   return this.traces
 }
 
-TraceHolder.prototype.getActiveTraces = function () {
+TraceBuffer.prototype.getActiveTraces = function () {
   return this.activetraces
 }
 
-module.exports = TraceHolder
+module.exports = TraceBuffer
