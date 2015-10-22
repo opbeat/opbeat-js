@@ -60,7 +60,6 @@ function $opbeatInstrumentationProvider ($provide) {
         // Update transaction reference in traceBuffer
         traceBuffer.setTransactionRef(transaction);
       }
-
     }
 
     $rootScope.$on('$routeChangeStart', onRouteChange) // ng-router
@@ -117,7 +116,6 @@ function $opbeatInstrumentationProvider ($provide) {
 
   // Controller Instrumentation
   $provide.decorator('$controller', function ($delegate, $injector) {
-
     return function () {
       var $rootScope = $injector.get('$rootScope')
       var $location = $injector.get('$location')
@@ -137,7 +135,6 @@ function $opbeatInstrumentationProvider ($provide) {
 
       return $delegate.apply(this, args)
     }
-
   })
 
   // Template Compile Instrumentation
@@ -234,7 +231,7 @@ function $opbeatInstrumentationProvider ($provide) {
     };
   })
 
-  // $cacheFactory instrumentation
+  // $cacheFactory instrumentation (this happens before routeChange -> using traceBuffer)
   $provide.decorator('$cacheFactory', function ($delegate, $injector) {
     return function () {
       var args = Array.prototype.slice.call(arguments)

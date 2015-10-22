@@ -1,5 +1,3 @@
-'use strict'
-
 var Transaction = require('./transaction')
 var request = require('../lib/transport')
 

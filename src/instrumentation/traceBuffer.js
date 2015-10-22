@@ -1,5 +1,4 @@
 var logger = require('../lib/logger')
-
 var Trace = require('./trace')
 
 var TraceBuffer = function (name) {
