@@ -27,6 +27,52 @@ module.exports = {
     }
   },
 
+  instrumentMethodWithCallback: function (fn, fnName, transaction, type, options) {
+    options = options || {}
+    var nameParts = []
+
+    if(options.prefix) {
+      nameParts.push(options.prefix)
+    }
+
+    if(fnName) {
+      nameParts.push(fnName)
+    }
+
+    var name = nameParts.join('.')
+    var ref = fn
+    var context = {
+      traceName: name,
+      traceType: type,
+      options: options,
+      fn: fn,
+      transaction: transaction
+    }
+
+    var wrappedMethod = this.wrapMethod(ref, function instrumentMethodWithCallbackBefore (context) {
+
+      var args = Array.prototype.slice.call(arguments).slice(1)
+      var callback = args[options.callbackIndex]
+
+      // Wrap callback
+      var wrappedCallback = this.wrapMethod(callback, function instrumentMethodWithCallbackBeforeCallback() {
+        instrumentMethodAfter.apply(this, [context])
+        return {}
+      }, null)
+
+      // Override callback with wrapped one
+      args[context.options.callbackIndex] = wrappedCallback
+
+      // Call base
+      return instrumentMethodBefore.apply(this, [context].concat(args))
+
+    }.bind(this), null, context)
+
+    wrappedMethod.original = ref
+
+    return wrappedMethod
+  },
+
   instrumentMethod: function (module, fn, transaction, type, options) {
     options = options || {}
     var ref
