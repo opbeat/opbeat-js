@@ -165,11 +165,11 @@ function $opbeatInstrumentationProvider ($provide) {
         var text = []
         // $http used directly
         if(key && args) {
-          text = [key.toUpperCase(), args]
+          text = ['$http', key.toUpperCase(), args]
         } else if(!key && typeof args === 'object') {
           // $http used from $resource
           var req = args
-          text = [req.method, req.url]
+          text = ['$http', req.method, req.url]
         }
 
         return text.join(' ')
