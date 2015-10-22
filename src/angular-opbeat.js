@@ -1,6 +1,7 @@
 var Opbeat = require('./opbeat')
 var utils = require('./instrumentation/utils')
 var logger = require('./lib/logger')
+var TraceHolder = require('./instrumentation/traceHolder')
 
 function ngOpbeatProvider () {
   this.config = function config (properties) {
@@ -39,6 +40,9 @@ function $opbeatErrorProvider ($provide) {
 
 function $opbeatInstrumentationProvider ($provide) {
 
+  // Before controller intialize transcation
+  var traceHolder = new TraceHolder('beforeControllerTransaction')
+
   // Route controller Instrumentation
   $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
     $rootScope._opbeatTransactions = {}
@@ -52,6 +56,9 @@ function $opbeatInstrumentationProvider ($provide) {
         transaction.metadata.controllerName = routeControllerTarget
 
         $rootScope._opbeatTransactions[$location.absUrl()] = transaction
+
+        // Update traces in traceHolder
+        traceHolder.setTransactionRef(transaction);
       }
 
     }
@@ -191,6 +198,25 @@ function $opbeatInstrumentationProvider ($provide) {
       utils.instrumentObject(result, $injector, {
         type: 'ext.$resource',
         prefix: '$resource'
+      })
+      return result
+    };
+  })
+
+  // $cacheFactory instrumentation
+  $provide.decorator('$cacheFactory', function ($delegate, $injector) {
+    return function () {
+      var args = Array.prototype.slice.call(arguments)
+      var cacheName = args[0] + 'Cache'
+      var result = $delegate.apply(this, args)
+      utils.instrumentObject(result, $injector, {
+        type: 'cache.' + cacheName,
+        prefix: cacheName,
+        transaction: traceHolder,
+        signatureFormatter: function(key, args) {
+          var text = ['CACHE', key.toUpperCase(), args]
+          return text.join(' ')
+        }
       })
       return result
     };
