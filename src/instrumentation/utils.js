@@ -1,3 +1,5 @@
+var logger = require('../lib/logger')
+
 module.exports = {
 
   wrapMethod: function (fn, before, after, context) {
@@ -133,6 +135,8 @@ module.exports = {
           instrumentModule: true,
           signatureFormatter: options.signatureFormatter,
         })
+      } else {
+        logger.log('%c instrumentModule.error.transaction.missing', 'background-color: #ffff00', module)
       }
 
       return fn.apply(module, args)
@@ -150,6 +154,8 @@ module.exports = {
             override: true,
             signatureFormatter: options.signatureFormatter
           })
+        } else {
+          logger.log('%c instrumentModule.error.transaction.missing', 'background-color: #ffff00', module)
         }
 
         return fn.apply(module, args)
@@ -180,7 +186,10 @@ module.exports = {
           override: true,
           signatureFormatter: options.signatureFormatter
         })
+      } else {
+        logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
       }
+
     }.bind(this))
 
     return object
