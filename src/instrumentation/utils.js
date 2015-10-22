@@ -5,17 +5,22 @@ module.exports = {
       var args = Array.prototype.slice.call(arguments)
 
       // Before
-      var trace = before.apply(this, [context].concat(args))
+      var beforeData = before.apply(this, [context].concat(args))
 
+      if(beforeData.args) {
+        args = beforeData.args
+      }
+
+      // Middle
       var result = fn.apply(this, args)
 
       // After + Promise handling
       if (result && typeof result.then === 'function') {
         result.finally(function () {
-          after.apply(this, [trace].concat(args))
+          after.apply(this, [context].concat(args))
         }.bind(this))
       } else {
-        after.apply(this, [trace].concat(args))
+        after.apply(this, [context].concat(args))
       }
 
       return result
@@ -45,27 +50,12 @@ module.exports = {
     var context = {
       traceName: name,
       traceType: type,
-      options: options
+      options: options,
+      fn: fn,
+      transaction: transaction
     }
 
-    var wrappedMethod = this.wrapMethod(ref, function instrumentMethodBefore (context) {
-
-      var args = Array.prototype.slice.call(arguments).slice(1)
-
-      var name = context.traceName;
-      if(options.signatureFormatter) {
-        name = options.signatureFormatter.apply(this, [fn].concat(args))
-      }
-
-      return transaction.startTrace(name, context.traceType)
-    }, function instrumentMethodAfter (trace) {
-      var args = Array.prototype.slice.call(arguments).slice(1)
-
-      if (trace) {
-        trace.end()
-      }
-    }, context)
-
+    var wrappedMethod = this.wrapMethod(ref, instrumentMethodBefore, instrumentMethodAfter, context)
     wrappedMethod.original = ref
 
     if (options.override) {
@@ -186,3 +176,31 @@ module.exports = {
   }
 
 }
+
+
+function instrumentMethodBefore (context) {
+
+  var args = Array.prototype.slice.call(arguments).slice(1)
+  var name = context.traceName;
+  var transaction = context.transaction
+
+  if(context.options.signatureFormatter) {
+    name = context.options.signatureFormatter.apply(this, [context.fn].concat(args))
+  }
+
+  var trace = transaction.startTrace(name, context.traceType)
+  context.trace = trace
+
+  return {
+    args: args
+  }
+
+}
+
+function instrumentMethodAfter (context) {
+  if (context.trace) {
+    context.trace.end()
+  }
+}
+
+
