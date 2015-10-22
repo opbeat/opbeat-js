@@ -154,7 +154,7 @@ function $opbeatInstrumentationProvider ($provide) {
       type: 'template.angular.request',
       prefix: '$templateRequest',
       signatureFormatter: function(key, args) {
-        var text = ['$templateRequest', args]
+        var text = ['$templateRequest', args[0]]
         return text.join(' ')
       }
     })
@@ -169,10 +169,10 @@ function $opbeatInstrumentationProvider ($provide) {
         var text = []
         // $http used directly
         if(key && args) {
-          text = ['$http', key.toUpperCase(), args]
+          text = ['$http', key.toUpperCase(), args[0]]
         } else if(!key && typeof args === 'object') {
           // $http used from $resource
-          var req = args
+          var req = args[0]
           text = ['$http', req.method, req.url]
         }
 
@@ -203,7 +203,7 @@ function $opbeatInstrumentationProvider ($provide) {
         type: 'ext.$resource',
         prefix: '$resource',
         signatureFormatter: function(key, args) {
-          var text = ['$resource', key.toUpperCase(), args]
+          var text = ['$resource', key.toUpperCase(), args[0]]
           return text.join(' ')
         }
       })
@@ -222,7 +222,7 @@ function $opbeatInstrumentationProvider ($provide) {
         prefix: cacheName,
         transaction: traceBuffer,
         signatureFormatter: function(key, args) {
-          var text = ['$cacheFactory', key.toUpperCase(), args]
+          var text = ['$cacheFactory', key.toUpperCase(), args[0]]
           return text.join(' ')
         }
       })

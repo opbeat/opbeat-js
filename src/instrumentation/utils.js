@@ -185,7 +185,7 @@ function instrumentMethodBefore (context) {
   var transaction = context.transaction
 
   if(context.options.signatureFormatter) {
-    name = context.options.signatureFormatter.apply(this, [context.fn].concat(args))
+    name = context.options.signatureFormatter.apply(this, [context.fn, args])
   }
 
   var trace = transaction.startTrace(name, context.traceType)
