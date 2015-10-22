@@ -197,7 +197,11 @@ function $opbeatInstrumentationProvider ($provide) {
       var result = $delegate.apply(this, args)
       utils.instrumentObject(result, $injector, {
         type: 'ext.$resource',
-        prefix: '$resource'
+        prefix: '$resource',
+        signatureFormatter: function(key, args) {
+          var text = ['$resource', key.toUpperCase(), args]
+          return text.join(' ')
+        }
       })
       return result
     };
