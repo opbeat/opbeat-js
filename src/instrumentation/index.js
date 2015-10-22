@@ -30,7 +30,9 @@ Instrumentation.prototype._formatTransactions = function () {
   var transactions = groupTransactions(this._queue)
   var traces = groupTraces([].concat.apply([], this._queue.map(function (trans) {
     return trans.traces
-  })))
+  }))).sort(function(a, b) {
+    return a.start_time - b.start_time
+  })
 
   return {
     transactions: transactions,
