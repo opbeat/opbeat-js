@@ -4,23 +4,27 @@ module.exports = {
     return function opbeatInstrumentationWrapper () {
       var args = Array.prototype.slice.call(arguments)
 
-      // Before
-      var beforeData = before.apply(this, [context].concat(args))
-
-      if(beforeData.args) {
-        args = beforeData.args
+      // Before callback
+      if(typeof before === 'function' ) {
+        var beforeData = before.apply(this, [context].concat(args))
+        if(beforeData.args) {
+          args = beforeData.args
+        }
       }
 
-      // Middle
+      // Execute original function
       var result = fn.apply(this, args)
 
-      // After + Promise handling
-      if (result && typeof result.then === 'function') {
-        result.finally(function () {
+      // After callback
+      if(typeof after === 'function' ) {
+        // After + Promise handling
+        if (result && typeof result.then === 'function') {
+          result.finally(function () {
+            after.apply(this, [context].concat(args))
+          }.bind(this))
+        } else {
           after.apply(this, [context].concat(args))
-        }.bind(this))
-      } else {
-        after.apply(this, [context].concat(args))
+        }
       }
 
       return result
