@@ -218,7 +218,7 @@ function $opbeatInstrumentationProvider ($provide) {
         prefix: cacheName,
         transaction: traceHolder,
         signatureFormatter: function(key, args) {
-          var text = ['CACHE', key.toUpperCase(), args]
+          var text = ['$cacheFactory', key.toUpperCase(), args]
           return text.join(' ')
         }
       })
