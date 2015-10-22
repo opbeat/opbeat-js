@@ -27,7 +27,7 @@ module.exports = {
     }
   },
 
-  instrumentMethod : function (module, fn, transaction, type, options) {
+  instrumentMethod: function (module, fn, transaction, type, options) {
     options = options || {}
     var ref
     var nameParts = []
@@ -65,7 +65,7 @@ module.exports = {
     return wrappedMethod
   },
 
-  instrumentModule : function (module, $injector, options) {
+  instrumentModule: function (module, $injector, options) {
     options = options || {}
     var that = this;
 
@@ -109,7 +109,7 @@ module.exports = {
     return wrapper
   },
 
-  instrumentObject : function (object, $injector, options) {
+  instrumentObject: function (object, $injector, options) {
     options = options || {}
     var $rootScope = $injector.get('$rootScope')
     var $location = $injector.get('$location')
