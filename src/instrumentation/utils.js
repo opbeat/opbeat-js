@@ -126,7 +126,14 @@ module.exports = {
 
     // Instrument static functions
     this.getObjectFunctions(object).forEach(function (funcScope) {
-      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+      var transaction
+
+      if(options.transaction) {
+        transaction = options.transaction
+      } else {
+        transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+      }
+
       if (transaction) {
         this.instrumentMethod(object, funcScope.property, transaction, options.type, {
           prefix: options.prefix,
