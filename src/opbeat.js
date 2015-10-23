@@ -33,17 +33,6 @@ Opbeat.prototype.isPlatformSupport = function () {
 }
 
 /*
- * Allow multiple versions of Opbeat to be installed.
- * Strip Opbeat from the global context and returns the instance.
- *
- * @return {Opbeat}
- */
-Opbeat.prototype.noConflict = function () {
-  window.Opbeat = _opbeat
-  return this
-}
-
-/*
  * Configure Opbeat with Opbeat.com credentials and other options
  *
  * @param {object} options Optional set of of global options
