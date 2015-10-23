@@ -109,7 +109,10 @@ function transactionGroupingKey (trans) {
 }
 
 function traceGroupingKey (trace) {
-  var ancestors = trace.ancestors().map(function (trace) { return trace.signature }).join(',')
+  var ancestors = trace.ancestors().map(function (trace) {
+    return trace.signature
+  }).join(',')
+
   return groupingTs(trace._startStamp).getTime() + '|' + trace.transaction.name + '|' + ancestors + '|' + trace.signature + '|' + trace.type
 }
 
