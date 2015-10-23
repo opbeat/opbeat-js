@@ -42,6 +42,8 @@ Opbeat.prototype.isPlatformSupport = function () {
 Opbeat.prototype.config = function (properties) {
   config.setConfig(properties)
 
+  this.install()
+
   return this
 }
 
