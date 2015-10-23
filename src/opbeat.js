@@ -3,8 +3,7 @@ var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 var config = require('./lib/config')
 var Instrumentation = require('./instrumentation')
-
-var _opbeat = window.Opbeat
+var APIQueue = require('./lib/apiQueue')
 
 function Opbeat () {
   this.isInstalled = false
@@ -12,10 +11,14 @@ function Opbeat () {
 
   config.init()
 
-  if (!config.isValid()) {
-    logger.log('opbeat.install.config.invalid')
-    return this
+  var queuedCommands = [];
+  if(window._opbeat) {
+    queuedCommands = _opbeat.q
   }
+  this.apiQueue = new APIQueue(this, queuedCommands)
+
+  _opbeat = this.apiQueue.push
+  window._opbeat = _opbeat
 
   this.install()
 }
