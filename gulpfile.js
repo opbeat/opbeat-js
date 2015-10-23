@@ -31,7 +31,7 @@ gulp.task('build:release', function () {
     console.log('entry', entry)
     return browserify({
       entries: [entry],
-      standalone: entry === './src/opbeat.js' ? 'Opbeat' : ''
+      standalone: ''
     })
       .bundle()
       .pipe(source(entry))
@@ -54,7 +54,7 @@ gulp.task('build', function () {
     console.log('entry', entry)
     return browserify({
       entries: [entry],
-      standalone: entry === './src/opbeat.js' ? 'Opbeat' : ''
+      standalone: ''
     })
       .bundle()
       .pipe(source(entry))
