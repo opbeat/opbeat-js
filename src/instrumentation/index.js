@@ -28,15 +28,17 @@ Instrumentation.prototype._flush = function () {
 
 Instrumentation.prototype._formatTransactions = function () {
   var transactions = groupTransactions(this._queue)
-  var traces = groupTraces([].concat.apply([], this._queue.map(function (trans) {
+
+  var groupedTraces = groupTraces([].concat.apply([], this._queue.map(function (trans) {
     return trans.traces
-  }))).sort(function(a, b) {
-    return a.start_time - b.start_time
-  })
+  })))
 
   return {
     transactions: transactions,
-    traces: traces
+    traces: {
+      groups: groupedTraces.groups,
+      raw: groupedTraces.raw
+    }
   }
 }
 
@@ -59,13 +61,38 @@ function groupTransactions (transactions) {
 }
 
 function groupTraces (traces) {
-  var groups = groupByMinute(traces, traceGroupingKey)
+  var groupedByMinute = groupByMinute(traces, traceGroupingKey)
 
-  return Object.keys(groups).map(function (key) {
-    var trace = groups[key][0]
-    var durations = groups[key].map(function (trace) {
-      return [trace.duration(), trace.transaction.duration()]
+
+  var getGroupIndex = function (key) {
+
+    Object.keys(groupedByMinute).map(function (k, i) {
+      if(k === key) {
+        return i
+      }
     })
+
+    return 0;
+
+  }
+
+  var raw = Object.keys(groupedByMinute).map(function (key) {
+    var trace = groupedByMinute[key][0]
+    var transaction = trace.transaction
+
+    var data = [transaction.duration()]
+
+    groupedByMinute[key].map(function (trace) {
+      var groupIndex = getGroupIndex(trace._traceGroup)
+      data.push([groupIndex, trace._start, trace.duration()])
+    })
+
+    return data
+
+  });
+
+  var groups = Object.keys(groupedByMinute).map(function (key) {
+    var trace = groupedByMinute[key][0]
 
     var startTime = trace._start
     if(trace.transaction) {
@@ -77,15 +104,20 @@ function groupTraces (traces) {
     return {
       transaction: trace.transaction.name,
       signature: trace.signature,
-      durations: durations,
-      start_time: startTime,
       kind: trace.type,
-      timestamp: groupingTs(trace._startStamp).toISOString(),
       frames: [], // TODO
+      timestamp: trace._startStamp.toISOString(),
       parents: trace.ancestors(),
       extra: trace.extra || {}
     }
+  }).sort(function(a, b) {
+    return a.start_time - b.start_time
   })
+
+  return {
+    groups: groups,
+    raw: raw
+  }
 }
 
 function groupByMinute (arr, grouper) {
@@ -93,8 +125,13 @@ function groupByMinute (arr, grouper) {
 
   arr.forEach(function (obj) {
     var key = grouper(obj)
-    if (key in groups) groups[key].push(obj)
-    else groups[key] = [obj]
+    if (key in groups){
+      groups[key].push(obj)
+    } else {
+      groups[key] = [obj]
+    }
+
+    obj._traceGroup = key
   })
 
   return groups
