@@ -8,7 +8,7 @@ var Exceptions = function () {
 
 Exceptions.prototype.install =function () {
   window.onerror = function (msg, file, line, col, error) {
-    processWindowError.call(this, msg, file, line, col, error)
+    processError.call(this, error, msg, file, line, col)
   }.bind(this)
 }
 
@@ -17,30 +17,10 @@ Exceptions.prototype.uninstall = function () {
 }
 
 Exceptions.prototype.processError = function(err) {
-  var resolveStackFrames
-
-  if (err.stack) {
-    resolveStackFrames = stackTrace.fromError(err)
-  } else {
-    resolveStackFrames = Promise.resolve()
-  }
-
-  resolveStackFrames.then(function (stackFrames) {
-    var exception = {
-      'message': err.message,
-      'type': err.name,
-      'stack': stackFrames
-    }
-
-    frames.stackInfoToOpbeatException(exception).then(function (exception) {
-      frames.processOpbeatException(exception)
-    }.bind(this))
-
-  }.bind(this)).caught(function () {})
-
+  processError(err)
 }
 
-function processWindowError(msg, file, line, col, error) {
+function processError(error, msg, file, line, col) {
 
   if(msg === "Script error." && !file) {
     // ignoring script errors: See https://github.com/getsentry/raven-js/issues/41
@@ -49,13 +29,14 @@ function processWindowError(msg, file, line, col, error) {
 
   var exception = {
     'message': error ? error.message : msg,
-    'type': error ? error.name : '',
-    'fileurl': file,
-    'lineno': line,
-    'colno': col,
+    'type': error ? error.name : null,
+    'fileurl': file ? file : null,
+    'lineno': line ? line : null,
+    'colno': col ? col : null,
   }
 
   var resolveStackFrames
+
   if (error) {
     resolveStackFrames = stackTrace.fromError(error)
   } else {
@@ -73,7 +54,6 @@ function processWindowError(msg, file, line, col, error) {
     return frames.stackInfoToOpbeatException(exception).then(function (exception) {
       frames.processOpbeatException(exception)
     })
-
   }).caught(function () {})
 
 }
