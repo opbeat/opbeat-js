@@ -1,8 +1,7 @@
 var Transaction = require('./transaction')
 var request = require('../lib/transport')
 
-var Instrumentation = function (client) {
-  this._client = client
+var Instrumentation = function () {
   this._queue = []
 }
 
