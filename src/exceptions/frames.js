@@ -77,7 +77,7 @@ module.exports = {
 
   },
 
-  processException: function processException (exception) {
+  processOpbeatException: function (exception) {
     var type = exception.type
     var message = String(exception.message) || 'Script error'
     var fileUrl = this.fileUrlToFileName(this.cleanFileName(exception.fileurl))
@@ -133,7 +133,7 @@ module.exports = {
       data.extra = utils.mergeObject(data.extra, config.get('context.extra'))
     }
 
-    logger.log('opbeat.exceptionst.processException', data)
+    logger.log('opbeat.exceptions.processOpbeatException', data)
     transport.sendError(data)
 
   },

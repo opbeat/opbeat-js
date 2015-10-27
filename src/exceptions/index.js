@@ -33,7 +33,7 @@ Exceptions.prototype.processError = function(err) {
     }
 
     frames.stackInfoToOpbeatException(exception).then(function (exception) {
-      frames.processException(exception)
+      frames.processOpbeatException(exception)
     }.bind(this))
 
   }.bind(this)).caught(function () {})
@@ -71,7 +71,7 @@ function processWindowError(msg, file, line, col, error) {
   resolveStackFrames.then(function (stackFrames) {
     exception.stack = stackFrames || []
     return frames.stackInfoToOpbeatException(exception).then(function (exception) {
-      frames.processException(exception)
+      frames.processOpbeatException(exception)
     })
 
   }).caught(function () {})
