@@ -1,13 +1,14 @@
-var exceptions = require('./lib/exceptions')
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 var config = require('./lib/config')
 var Instrumentation = require('./instrumentation')
+var Exceptions = require('./exceptions')
 var APIQueue = require('./lib/apiQueue')
 
 function Opbeat () {
   this.isInstalled = false
   this._instrumentation = new Instrumentation()
+  this._exceptions = new Exceptions()
 
   config.init()
 
@@ -72,7 +73,7 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  exceptions.install()
+  this._exceptions.install();
 
   this.isInstalled = true
 
@@ -86,8 +87,8 @@ Opbeat.prototype.install = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.uninstall = function () {
-  exceptions.uninstall()
 
+  this._exceptions.uninstall()
   this.isInstalled = false
 
   return this
@@ -115,7 +116,7 @@ Opbeat.prototype.captureException = function (ex, options) {
   // raises an exception different from the one we asked to
   // report on.
 
-  exceptions.processError(ex, options)
+  this._exceptions.processError(ex, options)
 
   return this
 }
