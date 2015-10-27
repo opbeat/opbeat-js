@@ -1,6 +1,6 @@
 var ErrorStackParser = require('error-stack-parser')
 var Promise = require('bluebird')
-var utils = require('./utils')
+var utils = require('../lib/utils')
 
 var defaultOptions = {
   filter: function (stackframe) {
