@@ -83,7 +83,7 @@ function groupTraces (traces) {
 
     groupedByMinute[key].map(function (trace) {
       var groupIndex = getGroupIndex(trace._traceGroup)
-      data.push([groupIndex, trace._start, trace.duration()])
+      data.push([groupIndex, trace._start - transaction._start, trace.duration()])
     })
 
     return data
