@@ -9,7 +9,7 @@ function divide (a, b) {
   try {
     return multiply(add(a, b), a, b) / c
   } catch (e) {
-    Opbeat.captureException(e)
+    _opbeat('captureException', e)
   }
 }
 
