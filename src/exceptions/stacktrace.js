@@ -1,4 +1,5 @@
 var ErrorStackParser = require('error-stack-parser')
+var StackGenerator = require('stack-generator')
 var Promise = require('bluebird')
 var utils = require('../lib/utils')
 
@@ -12,6 +13,30 @@ var defaultOptions = {
 }
 
 module.exports = {
+
+  get: function StackTrace$$generate(opts) {
+    try {
+      // Error must be thrown to get stack in IE
+      throw new Error();
+    } catch (err) {
+      if (_isShapedLikeParsableError(err)) {
+        return this.fromError(err, opts);
+      } else {
+        return this.generateArtificially(opts);
+      }
+    }
+  },
+
+  generateArtificially: function StackTrace$$generateArtificially(opts) {
+    opts = utils.mergeObject(defaultOptions, opts)
+
+    var stackFrames = StackGenerator.backtrace(opts);
+    if (typeof opts.filter === 'function') {
+        stackFrames = stackFrames.filter(opts.filter);
+    }
+    return Promise.resolve(stackFrames);
+  },
+
   fromError: function StackTrace$$fromError (error, opts) {
     opts = utils.mergeObject(defaultOptions, opts)
 
@@ -28,4 +53,8 @@ module.exports = {
     }.bind(this))
   }
 
+}
+
+function _isShapedLikeParsableError(err) {
+    return err.stack || err['opera#sourceloc'];
 }
