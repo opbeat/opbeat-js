@@ -64,15 +64,15 @@ function groupTraces (traces) {
 
 
   var getGroupIndex = function (key) {
+    var index = 0
 
-    Object.keys(groupedByMinute).map(function (k, i) {
+    Object.keys(groupedByMinute).forEach(function (k, i) {
       if(k === key) {
-        return i
+        index = i
       }
     })
 
-    return 0;
-
+    return index
   }
 
   var raw = Object.keys(groupedByMinute).map(function (key) {
