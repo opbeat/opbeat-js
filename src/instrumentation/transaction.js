@@ -32,9 +32,15 @@ Transaction.prototype.end = function () {
     this.ended = true
     this._endAfterActiveTraces = false
 
-    this._rootTrace.end()
-    this._queue.add(this)
 
+
+    var that = this;
+
+    setTimeout(function() {
+      that._rootTrace.end()
+      that._queue.add(that)  
+    }, 8000)
+  
     logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, this.activetraces.length)
   }
 
