@@ -5,8 +5,26 @@ var config = require('../lib/config')
 var transport = require('../lib/transport')
 var utils = require('../lib/utils')
 var context = require('./context')
+var stackTrace = require('./stacktrace')
+
 
 module.exports = {
+
+  getFramesForCurrent: function(){
+
+    return new Promise(function (resolve, reject) {
+      stackTrace.get().then(function(frames) {
+        var framesPromises = frames.map(function (stack, i) {
+          return this.buildOpbeatFrame(stack)
+        }.bind(this))
+
+        Promise.all(framesPromises).then(function (frames) {
+          resolve(frames)
+        })
+      }.bind(this))
+    }.bind(this))
+
+  },
 
   buildOpbeatFrame: function buildOpbeatFrame (stack) {
     return new Promise(function (resolve, reject) {
