@@ -115,7 +115,7 @@ function groupTraces (traces) {
       transaction: trace.transaction.name,
       signature: trace.signature,
       kind: trace.type,
-      frames: [], // TODO
+      frames: trace.frames,
       timestamp: trace._startStamp.toISOString(),
       parents: trace.ancestors(),
       extra: trace.extra || {},

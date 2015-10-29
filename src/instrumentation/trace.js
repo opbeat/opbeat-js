@@ -1,4 +1,5 @@
 var logger = require('../lib/logger')
+var frames = require('../exceptions/frames')
 
 var Trace = module.exports = function (transaction, signature, type) {
   this.transaction = transaction
@@ -9,6 +10,10 @@ var Trace = module.exports = function (transaction, signature, type) {
   this._start = performance.now()
   this._startStamp = new Date()
   this._parent = null;
+
+  frames.getFramesForCurrent().then(function(frames) {
+    this.frames = frames
+  }.bind(this))
 
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }
