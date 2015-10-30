@@ -30,10 +30,19 @@ Transaction.prototype.end = function () {
     this.ended = true
     this._endAfterActiveTraces = false
     this._rootTrace.end()
-    this._queue.add(this)  
 
     logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, this.activetraces.length)
   }
+
+  // When all traces are finished, the transaction can be added to the queue
+  var whenAllTracesFinished = this.traces.map(function(trace) {
+    return trace._isFinish
+  })
+
+  Promise.all(whenAllTracesFinished).then(function() {
+    logger.log('- %c opbeat.instrumentation.transaction.whenAllTracesFinished', 'color: #3360A3', this.name)
+    this._queue.add(this)
+  }.bind(this))
 
 }
 

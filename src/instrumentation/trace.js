@@ -13,7 +13,7 @@ var Trace = module.exports = function (transaction, signature, type) {
   this._start = performance.now()
   this._startStamp = new Date()
 
-  this._isBusy = new Promise(function(resolve, reject) {
+  this._isFinish = new Promise(function(resolve, reject) {
     this._endTraceFunc = resolve
   }.bind(this))
 
