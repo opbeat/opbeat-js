@@ -1,6 +1,30 @@
 var Promise = require('bluebird')
+var SimpleCache = require('simple-lru-cache')
+
 var logger = require('../lib/logger')
 var transport = require('../lib/transport')
+
+var cache = new SimpleCache({
+  'maxSize': 1000
+})
+
+var _getFile = function(url) {
+
+  return new Promise(function(resolve, reject) {
+    var cachedSource = cache.get(url)
+
+    if(cachedSource) {
+      resolve(source)
+    } else {
+      transport.getFile(url).then(function (source) {
+        cache.set(url, source)
+        resolve(source)
+      }).catch(function() {
+        reject()
+      })
+    }
+  })
+}
 
 module.exports = {
 
@@ -24,7 +48,7 @@ module.exports = {
     }
 
     return new Promise(function (resolve, reject) {
-      transport.getFile(fileUrl).then(function (source) {
+      _getFile(fileUrl).then(function (source) {
         var sourceMapUrl = _findSourceMappingURL(source)
         if (sourceMapUrl) {
           sourceMapUrl = fileBasePath + sourceMapUrl
@@ -43,7 +67,8 @@ module.exports = {
     }
 
     return new Promise(function (resolve, reject) {
-      transport.getFile(url).then(function (source) {
+
+      _getFile(url).then(function (source) {
         line -= 1; // convert line to 0-based index
 
         var sourceLines = source.split('\n')
