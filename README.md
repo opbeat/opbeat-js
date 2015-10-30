@@ -1,44 +1,42 @@
-# Opbeat.js
+# opbeat.js
 
-Opbeat.js is the official JavaScript/frontend agent for Opbeat. This agent enables automatic exception collection and framework-specific code instrumentation of your front-end code.
+opbeat.js is the official JavaScript agent for Opbeat. This agent enables automatic exception collection and framework-specific code instrumentation of your front-end code.
 
 ## Installation 
 
 Include this `<script>` before your main application. Typically in your <head>
 
 ```html
-<script src="https://cdn.opbeat.com/0.0.1/opbeat.min.js"></script>
+<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>" async></script>
 ```
 
 ## Configuration
 
-We support a minimal configuration-mode by using data-attributes, and a Javascritp API:
-
-#### Minimal configuration
-
-```html
-<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
-```
+Our default configuration is declarative by using data-attributes. For more advanced configurations we also have a JavaScript API:
 
 #### Configuration via JavaScript API
 
 
 ```html
-<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"></script>
+<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js" async></script>
 <script>
-// Configure client
-Opbeat.config({
-  debug: true,
-  orgId: '<orgid>',
-  appId: '<appid>'
-}).install()
 
-// Set optional user data
-Opbeat.setUserContext({
-  email: '<email>'
-  id: '<id>',
-  userProp1: true
-})
+_opbeat = window._opbeat || function() {
+  (window._opbeat.q = window._opbeat.q || []).push(arguments)
+};
+
+_opbeat('config', {
+  debug: true/false,
+  orgId: '<org id>',
+  appId: '<app id>'
+});
+
+_opbeat('setUserContext', {
+  email: 'vanja@opbeat.com',
+  id: 1,
+  isSuperDuperAwesome: true
+});
+
 </script>
 ```
 
