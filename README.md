@@ -54,17 +54,7 @@ In order to provide code instrumentation we have chosen a framework-specific app
 ```
 
 ```javascript 
-/*global angular */
-
-/**
- * The main TodoMVC app module
- *
- * @type {angular.Module}
- */
 angular.module('app', ['ngOpbeat'])
-  
-  ...
-  
   .config(function ($opbeatProvider) {
     $opbeatProvider.config({
       debug: true/false,
