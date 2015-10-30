@@ -12,19 +12,29 @@ var cache = new SimpleCache({
 var _getFile = function(url) {
 
   return new Promise(function(resolve, reject) {
-    var cachedSource = cache.get(url)
 
-    if(cachedSource) {
-      resolve(source)
-    } else {
+    var getFileFromCache = function (callback) {
+      var cachedSource = cache.get(url)
+      if(cachedSource) {
+        resolve(cachedSource)
+      } else {
+        callback()
+      }   
+    } 
+
+    getFileFromCache(function() {
       transport.getFile(url).then(function (source) {
         cache.set(url, source)
         resolve(source)
       }).catch(function() {
-        reject()
+        getFileFromCache(function() {
+          reject()
+        })
       })
-    }
+    })
+
   })
+
 }
 
 module.exports = {
