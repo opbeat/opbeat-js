@@ -7,19 +7,30 @@ var utils = require('../lib/utils')
 var context = require('./context')
 var stackTrace = require('./stacktrace')
 
+function mapSeries(things, fn) {
+ var results = [];
+ return Promise.each(things, function(value, index, length) {
+     var ret = fn(value, index, length);
+     results.push(ret);
+     return ret;
+ }).thenReturn(results).all();
+}
+
 module.exports = {
 
   getFramesForCurrent: function(){
 
     return new Promise(function (resolve, reject) {
       stackTrace.get().then(function(frames) {
-        var framesPromises = frames.map(function (stack, i) {
+        
+        var framesPromises = mapSeries(frames, function(stack, index) {
           return this.buildOpbeatFrame(stack)
         }.bind(this))
 
-        Promise.all(framesPromises).then(function (frames) {
+        framesPromises.then(function (frames) {
           resolve(frames)
         })
+
       }.bind(this))
     }.bind(this))
 
@@ -73,11 +84,12 @@ module.exports = {
   stackInfoToOpbeatException: function (stackInfo) {
     return new Promise(function (resolve, reject) {
       if (stackInfo.stack && stackInfo.stack.length) {
-        var framesPromises = stackInfo.stack.map(function (stack, i) {
+
+        var framesPromises = mapSeries(stackInfo.stack, function(stack, index) {
           return this.buildOpbeatFrame(stack)
         }.bind(this))
 
-        Promise.all(framesPromises).then(function (frames) {
+        framesPromises.then(function (frames) {
           stackInfo.frames = frames
           stackInfo.stack = null
           resolve(stackInfo)
