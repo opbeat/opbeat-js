@@ -51,7 +51,7 @@ function _makeRequest (url, method, type, data, headers) {
     xhr.onreadystatechange = function (evt) {
       if (xhr.readyState === 4) {
         var status = xhr.status
-        if (status > 399 && status < 600) {
+        if (status === 0 || status > 399 && status < 600) {
           // An http 4xx or 5xx error. Signal an error.
           var err = new Error(url + ' HTTP status: ' + status)
           err.xhr = xhr
