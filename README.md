@@ -67,9 +67,9 @@ angular.module('app', ['ngOpbeat'])
   
   .config(function ($opbeatProvider) {
     $opbeatProvider.config({
-      debug: true,
-      orgId: 'b3eba3d11f6e4c3a9db52f477caa4fa2',
-      appId: 'a7971dbd71'
+      debug: true/false,
+      orgId: '<org id>',
+      appId: '<app id>'
     })
 
     $opbeatProvider.install()
