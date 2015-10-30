@@ -193,7 +193,7 @@ module.exports = {
   isFileInApp: function(filename) {
     // TODO: Improve this logic, probably by making a setting
     return filename.indexOf('node_modules/') === -1
-  }
+  },
 
   getBrowserSpecificMetadata: function () {
     var viewportInfo = utils.getViewPortInfo()
