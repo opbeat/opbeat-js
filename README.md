@@ -17,14 +17,14 @@ We support a minimal configuration-mode by using data-attributes, and a Javascri
 #### Minimal configuration
 
 ```html
-<script src="https://cdn.opbeat.com/0.0.1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
+<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
 ```
 
 #### Configuration via JavaScript API
 
 
 ```html
-<script src="https://cdn.opbeat.com/0.0.1/opbeat.min.js"></script>
+<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"></script>
 <script>
 // Configure client
 Opbeat.config({
@@ -48,6 +48,10 @@ In order to provide code instrumentation we have chosen a framework-specific app
 
 ### angular-opbeat
 
+
+```html
+<script src="https://d3tvtfb6518e3e.cloudfront.net/1/angular-opbeat.min.js"></script>
+```
 
 ```javascript 
 /*global angular */
