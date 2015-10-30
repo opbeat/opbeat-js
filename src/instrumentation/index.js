@@ -115,10 +115,11 @@ function groupTraces (traces) {
       transaction: trace.transaction.name,
       signature: trace.signature,
       kind: trace.type,
-      frames: trace.frames,
       timestamp: trace._startStamp.toISOString(),
       parents: trace.ancestors(),
-      extra: trace.extra || {},
+      extra: {
+        _frames: trace.frames
+      },
       _group: key
     }
   }).sort(function(a, b) {
