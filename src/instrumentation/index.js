@@ -1,28 +1,36 @@
 var Transaction = require('./transaction')
 var request = require('../lib/transport')
+var logger = require('../lib/logger')
 
 var Instrumentation = function () {
   this._queue = []
+  this.scheduler = setInterval(this._dispatch.bind(this), 10000)
 }
 
 Instrumentation.prototype.add = function (transaction) {
   this._queue.push(transaction)
-  this._send()
 }
 
 Instrumentation.prototype.startTransaction = function (name, type) {
   return new Transaction(this, name, type)
 }
 
-Instrumentation.prototype._send = function () {
-  var formattedTransactions = this._formatTransactions()
-
-  request.sendTransaction(formattedTransactions)
-    .then(this._flush.bind(this))
-}
-
 Instrumentation.prototype._flush = function () {
   this._queue = []
+}
+
+Instrumentation.prototype._dispatch = function() {
+
+  logger.log('Instrumentation.scheduler._dispatch', this._queue.length)
+
+  if(!this._queue.length) {
+    return 
+  }
+
+  var transactions = this._formatTransactions()
+  var flush = this._flush.bind(this)
+
+  request.sendTransaction(transactions).then(flush)
 }
 
 Instrumentation.prototype._formatTransactions = function () {
@@ -82,17 +90,17 @@ function getRawGroupedTracesTimings (traces, groupedTraces) {
   })
 
   return Object.keys(groupedByTransaction).map(function (key) {
-      var traces = groupedByTransaction[key]
-      var transaction = traces[0].transaction
+    var traces = groupedByTransaction[key]
+    var transaction = traces[0].transaction
 
-      var data = [transaction.duration()]
+    var data = [transaction.duration()]
 
-      traces.forEach(function(trace) {
-        var groupIndex = getTraceGroupIndex(groupedTraces, trace)
-        data.push([groupIndex, trace._start - transaction._start, trace.duration()])
-      })
+    traces.forEach(function(trace) {
+      var groupIndex = getTraceGroupIndex(groupedTraces, trace)
+      data.push([groupIndex, trace._start - transaction._start, trace.duration()])
+    })
 
-      return data;
+    return data;
   });
 
 }
