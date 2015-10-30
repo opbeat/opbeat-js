@@ -3,6 +3,7 @@ var SimpleCache = require('simple-lru-cache')
 
 var logger = require('../lib/logger')
 var transport = require('../lib/transport')
+var utils = require('../lib/utils')
 
 var cache = new SimpleCache({
   'maxSize': 1000
