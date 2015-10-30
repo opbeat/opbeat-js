@@ -51,7 +51,8 @@ module.exports = {
         'lineno': stack.lineNumber,
         'colno': stack.columnNumber,
         'function': stack.functionName || '[anonymous]',
-        'abs_path': stack.fileName
+        'abs_path': stack.fileName,
+        'in_app': this.isFileInApp(cleanedFileName)
       }
 
       // Detect Sourcemaps
@@ -189,7 +190,12 @@ module.exports = {
     return fileUrl
   },
 
-	getBrowserSpecificMetadata: function () {
+  isFileInApp: function(filename) {
+    // TODO: Improve this logic, probably by making a setting
+    return filename.indexOf('node_modules/') === -1
+  }
+
+  getBrowserSpecificMetadata: function () {
     var viewportInfo = utils.getViewPortInfo()
     var extra = {
       'environment': {
