@@ -14,10 +14,8 @@ var Transaction = function (queue, name, type) {
 
   logger.log('- %c opbeat.instrumentation.transaction.ctor', 'color: #3360A3', this.name)
 
-  // A transaction should always have a root trace spanning the entire
-  // transaction.
+  // A transaction should always have a root trace spanning the entire transaction.
   this._rootTrace = this.startTrace('transaction', 'transaction')
-
 
   this._startStamp = this._rootTrace._startStamp
   this._start = this._rootTrace._start
