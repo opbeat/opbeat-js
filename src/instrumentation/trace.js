@@ -1,3 +1,4 @@
+var Promise = require('bluebird')
 var logger = require('../lib/logger')
 var frames = require('../exceptions/frames')
 
@@ -6,14 +7,26 @@ var Trace = module.exports = function (transaction, signature, type) {
   this.signature = signature
   this.type = type
   this.ended = false
+  this._parent = null
 
+  // Start timers
   this._start = performance.now()
   this._startStamp = new Date()
-  this._parent = null;
 
-  frames.getFramesForCurrent().then(function(frames) {
-    this.frames = frames
+  this._isBusy = new Promise(function(resolve, reject) {
+    this._endTraceFunc = resolve
   }.bind(this))
+
+  this.whenEnding
+
+  // Generate frames
+  frames.getFramesForCurrent()
+    .then(function(frames) {
+      this.frames = frames
+    }.bind(this))
+    .finally(function() {
+      this._endTraceFunc();
+    }.bind(this))
 
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }
@@ -22,7 +35,9 @@ Trace.prototype.end = function () {
   this._diff = performance.now() - this._start
   this.ended = true
 
-  this.transaction._onTraceEnd(this)
+  this._isBusy.then(function() {
+    this.transaction._onTraceEnd(this)
+  }.bind(this))
 
   logger.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._diff)
 }
@@ -61,4 +76,5 @@ Trace.prototype.parent = function () {
 Trace.prototype.setParent = function (val) {
   this._parent = val
 }
+
 module.exports = Trace
