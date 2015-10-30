@@ -8,6 +8,8 @@ var buffer = require('vinyl-buffer')
 var uglify = require('gulp-uglify')
 var taskListing = require('gulp-task-listing')
 var awspublish = require('gulp-awspublish')
+var injectVersion = require('gulp-inject-version')
+
 var es = require('event-stream')
 
 var sourceTargets = [
@@ -36,11 +38,12 @@ gulp.task('build:release', function () {
       .bundle()
       .pipe(source(entry))
       .pipe(rename({dirname: ''}))
+      .pipe(buffer())
+      .pipe(injectVersion())
       .pipe(gulp.dest(path))
       .pipe(rename({
         extname: '.min.js'
       }))
-      .pipe(buffer())
       .pipe(uglify())
       .pipe(gulp.dest(path))
   })
@@ -59,6 +62,7 @@ gulp.task('build', function () {
       .bundle()
       .pipe(source(entry))
       .pipe(rename({dirname: ''}))
+      .pipe(injectVersion())
       .pipe(gulp.dest('./dist/'))
   })
 

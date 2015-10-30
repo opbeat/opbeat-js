@@ -2,7 +2,6 @@ var utils = require('./utils')
 var storage = require('./storage')
 
 function Config () {
-  this.VERSION = '0.0.1' // TODO: extract this on build from package.json
   this.config = {}
   this.defaults = {
     VERSION: this.VERSION,
