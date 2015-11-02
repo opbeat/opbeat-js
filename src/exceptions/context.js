@@ -9,37 +9,35 @@ var cache = new SimpleCache({
   'maxSize': 1000
 })
 
-var _getFile = function(url) {
-
-  return new Promise(function(resolve, reject) {
-
+var _getFile = function (url) {
+  return new Promise(function (resolve, reject) {
     var getFileFromCache = function (callback) {
       var cachedSource = cache.get(url)
-      if(cachedSource) {
+      if (cachedSource) {
         resolve(cachedSource)
       } else {
         callback()
-      }   
-    } 
+      }
+    }
 
-    getFileFromCache(function() {
+    getFileFromCache(function () {
       transport.getFile(url).then(function (source) {
         cache.set(url, source)
         resolve(source)
-      }).catch(function() {
-        getFileFromCache(function() {
+      }).catch(function () {
+        getFileFromCache(function () {
           reject()
         })
       })
     })
-
   })
-
 }
 
 module.exports = {
 
   getFileSourceMapUrl: function (fileUrl) {
+    var fileBasePath
+
     if (!fileUrl) {
       return Promise.reject()
     }
@@ -72,15 +70,13 @@ module.exports = {
   },
 
   getExceptionContexts: function (url, line) {
-
     if (!url || !line) {
       return Promise.reject()
     }
 
     return new Promise(function (resolve, reject) {
-
       _getFile(url).then(function (source) {
-        line -= 1; // convert line to 0-based index
+        line -= 1 // convert line to 0-based index
 
         var sourceLines = source.split('\n')
         var linesBefore = 5
@@ -93,11 +89,10 @@ module.exports = {
         }
 
         if (sourceLines.length) {
-
           var isMinified
 
           // Treat HTML files as non-minified
-          if(source.indexOf('<html') > -1) {
+          if (source.indexOf('<html') > -1) {
             isMinified = false
           } else {
             isMinified = this.isSourceMinified(source)
@@ -123,20 +118,17 @@ module.exports = {
           // Post context
           var postStartIndex = Math.min(sourceLines.length, line + 1)
           var postEndIndex = Math.min(sourceLines.length, line + linesAfter)
-          for (var i = postStartIndex; i <= postEndIndex; ++i) {
-            if (!utils.isUndefined(sourceLines[i])) {
-              contexts.postContext.push(sourceLines[i])
+          for (var j = postStartIndex; j <= postEndIndex; ++j) {
+            if (!utils.isUndefined(sourceLines[j])) {
+              contexts.postContext.push(sourceLines[j])
             }
           }
         }
 
         logger.log('Opbeat.getExceptionContexts', contexts)
         resolve(contexts)
-
       }.bind(this)).caught(reject)
-
     }.bind(this))
-
   },
 
   isSourceMinified: function (source) {
@@ -157,7 +149,7 @@ module.exports = {
 
     while (lines++ < SAMPLE_SIZE) {
       lineEndIndex = source.indexOf('\n', lineStartIndex)
-      if (lineEndIndex == -1) {
+      if (lineEndIndex === -1) {
         break
       }
       if (/^\s+/.test(source.slice(lineStartIndex, lineEndIndex))) {

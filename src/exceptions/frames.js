@@ -7,33 +7,29 @@ var utils = require('../lib/utils')
 var context = require('./context')
 var stackTrace = require('./stacktrace')
 
-function mapSeries(things, fn) {
- var results = [];
- return Promise.each(things, function(value, index, length) {
-     var ret = fn(value, index, length);
-     results.push(ret);
-     return ret;
- }).thenReturn(results).all();
+function mapSeries (things, fn) {
+  var results = []
+  return Promise.each(things, function (value, index, length) {
+    var ret = fn(value, index, length)
+    results.push(ret)
+    return ret
+  }).thenReturn(results).all()
 }
 
 module.exports = {
 
-  getFramesForCurrent: function(){
-
+  getFramesForCurrent: function () {
     return new Promise(function (resolve, reject) {
-      stackTrace.get().then(function(frames) {
-        
-        var framesPromises = mapSeries(frames, function(stack, index) {
+      stackTrace.get().then(function (frames) {
+        var framesPromises = mapSeries(frames, function (stack, index) {
           return this.buildOpbeatFrame(stack)
         }.bind(this))
 
         framesPromises.then(function (frames) {
           resolve(frames)
         })
-
       }.bind(this))
     }.bind(this))
-
   },
 
   buildOpbeatFrame: function buildOpbeatFrame (stack) {
@@ -75,18 +71,14 @@ module.exports = {
         }).caught(function () {
           resolve(frame)
         })
-
       }.bind(this))
-
     }.bind(this))
-
   },
 
   stackInfoToOpbeatException: function (stackInfo) {
     return new Promise(function (resolve, reject) {
       if (stackInfo.stack && stackInfo.stack.length) {
-
-        var framesPromises = mapSeries(stackInfo.stack, function(stack, index) {
+        var framesPromises = mapSeries(stackInfo.stack, function (stack, index) {
           return this.buildOpbeatFrame(stack)
         }.bind(this))
 
@@ -98,13 +90,7 @@ module.exports = {
       } else {
         resolve(stackInfo)
       }
-
     }.bind(this))
-
-    stackInfo.frames = []
-
-    return stackInfo
-
   },
 
   processOpbeatException: function (exception) {
@@ -165,7 +151,6 @@ module.exports = {
 
     logger.log('opbeat.exceptions.processOpbeatException', data)
     transport.sendError(data)
-
   },
 
   cleanFileName: function (fileName) {
@@ -181,7 +166,7 @@ module.exports = {
   },
 
   fileUrlToFileName: function (fileUrl) {
-    var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port: '')
+    var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname + (window.location.port ? (':' + window.location.port) : '')
 
     if (fileUrl.indexOf(origin) > -1) {
       fileUrl = fileUrl.replace(origin + '/', '')
@@ -190,7 +175,7 @@ module.exports = {
     return fileUrl
   },
 
-  isFileInApp: function(filename) {
+  isFileInApp: function (filename) {
     // TODO: Improve this logic, probably by making a setting
     return filename.indexOf('node_modules/') === -1
   },

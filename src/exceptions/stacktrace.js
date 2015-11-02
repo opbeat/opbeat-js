@@ -17,28 +17,27 @@ var defaultOptions = {
 }
 
 module.exports = {
-
-  get: function StackTrace$$generate(opts) {
+  get: function StackTrace$$generate (opts) {
     try {
       // Error must be thrown to get stack in IE
-      throw new Error();
+      throw new Error()
     } catch (err) {
       if (_isShapedLikeParsableError(err)) {
-        return this.fromError(err, opts);
+        return this.fromError(err, opts)
       } else {
-        return this.generateArtificially(opts);
+        return this.generateArtificially(opts)
       }
     }
   },
 
-  generateArtificially: function StackTrace$$generateArtificially(opts) {
+  generateArtificially: function StackTrace$$generateArtificially (opts) {
     opts = utils.mergeObject(defaultOptions, opts)
 
-    var stackFrames = StackGenerator.backtrace(opts);
+    var stackFrames = StackGenerator.backtrace(opts)
     if (typeof opts.filter === 'function') {
-        stackFrames = stackFrames.filter(opts.filter);
+      stackFrames = stackFrames.filter(opts.filter)
     }
-    return Promise.resolve(stackFrames);
+    return Promise.resolve(stackFrames)
   },
 
   fromError: function StackTrace$$fromError (error, opts) {
@@ -54,11 +53,10 @@ module.exports = {
           resolve(sf)
         })
       })))
-    }.bind(this))
+    })
   }
-
 }
 
-function _isShapedLikeParsableError(err) {
-    return err.stack || err['opera#sourceloc'];
+function _isShapedLikeParsableError (err) {
+  return err.stack || err['opera#sourceloc']
 }
