@@ -176,8 +176,8 @@ module.exports = {
   },
 
   isFileInApp: function (filename) {
-    // TODO: Improve this logic, probably by making a setting
-    return filename.indexOf('node_modules/') === -1
+    var pattern = config.get('libraryPathPattern')
+    return !RegExp(pattern).test(filename)
   },
 
   getBrowserSpecificMetadata: function () {

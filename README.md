@@ -28,7 +28,8 @@ _opbeat = window._opbeat || function() {
 _opbeat('config', {
   debug: true/false,
   orgId: '<org id>',
-  appId: '<app id>'
+  appId: '<app id>',
+  libraryPathPattern: 'node_modules' // Regex pattern used to determine whether a file is a library file or not.
 });
 
 _opbeat('setUserContext', {
@@ -57,7 +58,8 @@ angular.module('app', ['ngOpbeat'])
     $opbeatProvider.config({
       debug: true/false,
       orgId: '<org id>',
-      appId: '<app id>'
+      appId: '<app id>',
+      libraryPathPattern: 'node_modules'
     })
 
     $opbeatProvider.install()

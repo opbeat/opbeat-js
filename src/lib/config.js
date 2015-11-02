@@ -8,6 +8,7 @@ function Config () {
     apiHost: 'intake.opbeat.com',
     orgId: null,
     appId: null,
+    libraryPathPattern: 'node_modules',
     context: {
       user: {
         uuid: _generateUUID()
