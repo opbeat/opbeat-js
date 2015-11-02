@@ -1,6 +1,7 @@
 var Promise = require('bluebird')
 var logger = require('../lib/logger')
 var frames = require('../exceptions/frames')
+var traceCache = require('./traceCache')
 
 var Trace = module.exports = function (transaction, signature, type) {
   this.transaction = transaction
@@ -17,14 +18,27 @@ var Trace = module.exports = function (transaction, signature, type) {
     this._endTraceFunc = resolve
   }.bind(this))
 
-  // Generate frames
-  frames.getFramesForCurrent()
-    .then(function(frames) {
+  var getTraceFrames = function() {
+    var key = this.getTraceFingerprint();
+    return new Promise(function(resolve) {
+      var traceFrames = traceCache.get(key)
+      if(traceFrames) {
+        resolve(traceFrames)
+      } else {
+        frames.getFramesForCurrent().then(function(traceFrames) {
+          traceCache.set(key, traceFrames)
+          resolve(traceFrames)
+        })
+      }
+    })
+  }.bind(this)
+   
+  getTraceFrames().then(function() {
       this.frames = frames
-    }.bind(this))
-    .finally(function() {
-      this._endTraceFunc();
-    }.bind(this))
+  }.bind(this))
+  .finally(function() {
+    this._endTraceFunc();
+  }.bind(this))
 
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }
@@ -72,5 +86,18 @@ Trace.prototype.parent = function () {
 Trace.prototype.setParent = function (val) {
   this._parent = val
 }
+
+Trace.prototype.getTraceFingerprint = function() {
+  var key = [this.transaction.name, this.signature, this.type]
+
+  // Iterate ove parents
+  var prev = this._parent
+  while (prev) {
+    key.push(prev.signature)
+    prev = prev._parent
+  }
+
+  return key.join('-')
+};
 
 module.exports = Trace
