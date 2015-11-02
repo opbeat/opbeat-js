@@ -18,26 +18,12 @@ var Trace = module.exports = function (transaction, signature, type) {
     this._endTraceFunc = resolve
   }.bind(this))
 
-  var getTraceFrames = function() {
-    var key = this.getTraceFingerprint();
-    return new Promise(function(resolve) {
-      var traceFrames = traceCache.get(key)
-      if(traceFrames) {
-        resolve(traceFrames)
-      } else {
-        frames.getFramesForCurrent().then(function(traceFrames) {
-          traceCache.set(key, traceFrames)
-          resolve(traceFrames)
-        })
-      }
-    })
-  }.bind(this)
-   
-  getTraceFrames().then(function() {
+  this.getTraceStackFrames(function(frames) {
+    if(frames) {
       this.frames = frames
-  }.bind(this))
-  .finally(function() {
-    this._endTraceFunc();
+    }
+
+    this._endTraceFunc(); // Mark the trace as finished
   }.bind(this))
 
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
@@ -90,7 +76,7 @@ Trace.prototype.setParent = function (val) {
 Trace.prototype.getTraceFingerprint = function() {
   var key = [this.transaction.name, this.signature, this.type]
 
-  // Iterate ove parents
+  // Iterate over parents
   var prev = this._parent
   while (prev) {
     key.push(prev.signature)
@@ -98,6 +84,22 @@ Trace.prototype.getTraceFingerprint = function() {
   }
 
   return key.join('-')
-};
+}
+
+Trace.prototype.getTraceStackFrames = function(callback) {
+  // Use callbacks instead of Promises to keep the stack
+  var key = this.getTraceFingerprint();
+  var traceFrames = traceCache.get(key)
+  if(traceFrames) {
+    callback(traceFrames)
+  } else {
+    frames.getFramesForCurrent().then(function(traceFrames) {
+      traceCache.set(key, traceFrames)
+      callback(traceFrames)
+    }).caught(function() {
+      callback(null)
+    })
+  }
+}
 
 module.exports = Trace
