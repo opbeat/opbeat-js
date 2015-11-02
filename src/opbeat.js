@@ -3,7 +3,7 @@ var utils = require('./lib/utils')
 var config = require('./lib/config')
 var Instrumentation = require('./instrumentation')
 var Exceptions = require('./exceptions')
-var APIQueue = require('./lib/apiQueue')
+var API = require('./lib/api')
 
 function Opbeat () {
   this.isInstalled = false
@@ -16,9 +16,9 @@ function Opbeat () {
   if(window._opbeat) {
     queuedCommands = _opbeat.q
   }
-  this.apiQueue = new APIQueue(this, queuedCommands)
+  this.api = new API(this, queuedCommands)
 
-  _opbeat = this.apiQueue.push
+  _opbeat = this.api.push
   window._opbeat = _opbeat
 
   this.install()
