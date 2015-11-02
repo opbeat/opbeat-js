@@ -17,8 +17,6 @@ var Trace = module.exports = function (transaction, signature, type) {
     this._endTraceFunc = resolve
   }.bind(this))
 
-  this.whenEnding
-
   // Generate frames
   frames.getFramesForCurrent()
     .then(function(frames) {
