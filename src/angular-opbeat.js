@@ -113,140 +113,15 @@ function $opbeatInstrumentationProvider ($provide) {
     }
   })
 
-  // Controller Instrumentation
-  $provide.decorator('$controller', function ($delegate, $injector) {
-    return function () {
-      var $rootScope = $injector.get('$rootScope')
-      var $location = $injector.get('$location')
+  require('./angular/cacheFactory')($provide, traceBuffer)
+  require('./angular/compile')($provide, traceBuffer)
+  require('./angular/controller')($provide, traceBuffer)
+  require('./angular/directives')($provide, traceBuffer)
+  require('./angular/http')($provide, traceBuffer)
+  require('./angular/httpBackend')($provide, traceBuffer)
+  require('./angular/resource')($provide, traceBuffer)
+  require('./angular/templateRequest')($provide, traceBuffer)
 
-      var args = Array.prototype.slice.call(arguments)
-      var controllerInfo = utils.getControllerInfoFromArgs(args)
-      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
-
-      if (controllerInfo.name) {
-        if (transaction && transaction.metadata.controllerName !== controllerInfo.name) {
-          return utils.instrumentModule($delegate, $injector, {
-            type: 'template.angular.controller',
-            prefix: 'controller.' + controllerInfo.name
-          }).apply(this, arguments)
-        }
-      }
-
-      return $delegate.apply(this, args)
-    }
-  })
-
-  // Template Compile Instrumentation
-  $provide.decorator('$compile', function ($delegate, $injector) {
-    return utils.instrumentModule($delegate, $injector, {
-      type: 'template.angular.$compile',
-      prefix: '$compile'
-    })
-  })
-
-  // Template Request Instrumentation
-  $provide.decorator('$templateRequest', function ($delegate, $injector) {
-    return utils.instrumentModule($delegate, $injector, {
-      type: 'template.angular.request',
-      prefix: '$templateRequest',
-      signatureFormatter: function (key, args) {
-        var text = ['$templateRequest', args[0]]
-        return text.join(' ')
-      }
-    })
-  })
-
-  // HTTP Instrumentation
-  $provide.decorator('$http', function ($delegate, $injector) {
-    return utils.instrumentModule($delegate, $injector, {
-      type: 'ext.http.request',
-      prefix: 'angular.$http',
-      signatureFormatter: function (key, args) {
-        var text = []
-        // $http used directly
-        if (key && args) {
-          text = ['$http', key.toUpperCase(), args[0]]
-        } else if (!key && typeof args === 'object') {
-          // $http used from $resource
-          var req = args[0]
-          text = ['$http', req.method, req.url]
-        }
-
-        return text.join(' ')
-      }
-    })
-  })
-
-  // Core directive instrumentation
-  var coreDirectives = ['ngBind', 'ngClass', 'ngModel', 'ngIf', 'ngInclude', 'ngRepeat', 'ngSrc', 'ngStyle', 'ngSwitch', 'ngTransclude']
-  coreDirectives.forEach(function (name) {
-    var directiveName = name + 'Directive'
-    $provide.decorator(directiveName, function ($delegate, $injector) {
-      utils.instrumentObject($delegate[0], $injector, {
-        type: 'template.angular.directive',
-        prefix: directiveName
-      })
-      return $delegate
-    })
-  })
-
-  // ngResource instrumentation
-  $provide.decorator('$resource', function ($delegate, $injector) {
-    return function () {
-      var args = Array.prototype.slice.call(arguments)
-      var result = $delegate.apply(this, args)
-      utils.instrumentObject(result, $injector, {
-        type: 'ext.$resource',
-        prefix: '$resource',
-        signatureFormatter: function (key, args) {
-          var text = ['$resource', key.toUpperCase(), args[0]]
-          return text.join(' ')
-        }
-      })
-      return result
-    }
-  })
-
-  // $httpBackend instrumentation
-  $provide.decorator('$httpBackend', function ($delegate, $injector) {
-    var $rootScope = $injector.get('$rootScope')
-    var $location = $injector.get('$location')
-
-    return function () {
-      var args = Array.prototype.slice.call(arguments)
-      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
-
-      var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'app.httpBackend', {
-        prefix: '$httpBackend',
-        callbackIndex: 3,
-        signatureFormatter: function (key, args) {
-          var text = ['$httpBackend', args[0].toUpperCase(), args[1]]
-          return text.join(' ')
-        }
-      }).apply(this, args)
-
-      return result
-    }
-  })
-
-  // $cacheFactory instrumentation (this happens before routeChange -> using traceBuffer)
-  $provide.decorator('$cacheFactory', function ($delegate, $injector) {
-    return function () {
-      var args = Array.prototype.slice.call(arguments)
-      var cacheName = args[0] + 'Cache'
-      var result = $delegate.apply(this, args)
-      utils.instrumentObject(result, $injector, {
-        type: 'cache.' + cacheName,
-        prefix: cacheName,
-        transaction: traceBuffer,
-        signatureFormatter: function (key, args) {
-          var text = ['$cacheFactory', key.toUpperCase(), args[0]]
-          return text.join(' ')
-        }
-      })
-      return result
-    }
-  })
 }
 
 window.angular.module('ngOpbeat', [])
