@@ -20,7 +20,6 @@ Instrumentation.prototype._flush = function () {
 }
 
 Instrumentation.prototype._dispatch = function() {
-
   logger.log('Instrumentation.scheduler._dispatch', this._queue.length)
 
   if(!this._queue.length) {
@@ -158,7 +157,12 @@ function groupingTs (ts) {
 }
 
 function transactionGroupingKey (trans) {
-  return groupingTs(trans._startStamp).getTime() + '|' + trans.name + '|' + trans.result + '|' + trans.type
+  return [
+    groupingTs(trans._startStamp).getTime(), 
+    trans.name,
+    trans.result,
+    trans.type
+  ].join('-')
 }
 
 function traceGroupingKey (trace) {
@@ -166,7 +170,13 @@ function traceGroupingKey (trace) {
     return trace.signature
   }).join(',')
 
-  return groupingTs(trace._startStamp).getTime() + '|' + trace.transaction.name + '|' + ancestors + '|' + trace.signature + '|' + trace.type
+  return [
+    groupingTs(trace._startStamp).getTime(), 
+    trace.transaction.name,
+    ancestors,
+    trace.signature,
+    trace.type
+  ].join('-')
 }
 
 module.exports = Instrumentation
