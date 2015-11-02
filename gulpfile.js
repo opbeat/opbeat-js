@@ -62,6 +62,7 @@ gulp.task('build', function () {
       .bundle()
       .pipe(source(entry))
       .pipe(rename({dirname: ''}))
+      .pipe(buffer())
       .pipe(injectVersion())
       .pipe(gulp.dest('./dist/'))
   })
