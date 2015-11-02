@@ -12,14 +12,13 @@ function Opbeat () {
 
   config.init()
 
-  var queuedCommands = [];
-  if(window._opbeat) {
-    queuedCommands = _opbeat.q
+  var queuedCommands = []
+  if (window._opbeat) {
+    queuedCommands = window._opbeat.q
   }
   this.api = new API(this, queuedCommands)
 
-  _opbeat = this.api.push
-  window._opbeat = _opbeat
+  window._opbeat = this.api.push
 
   this.install()
 }
@@ -39,7 +38,6 @@ Opbeat.prototype.isPlatformSupport = function () {
  * @param {object} options Optional set of of global options
  * @return {Opbeat}
  */
-
 Opbeat.prototype.config = function (properties) {
   config.setConfig(properties)
 
@@ -73,12 +71,11 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  this._exceptions.install();
+  this._exceptions.install()
 
   this.isInstalled = true
 
   return this
-
 }
 
 /*
@@ -87,7 +84,6 @@ Opbeat.prototype.install = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.uninstall = function () {
-
   this._exceptions.uninstall()
   this.isInstalled = false
 

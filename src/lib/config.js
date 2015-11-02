@@ -29,7 +29,7 @@ Config.prototype.get = function (key) {
   return key.split('.').reduce(function (obj, i) {
     return obj[i]
   }, this.config)
-},
+}
 
 Config.prototype.set = function (key, value) {
   var levels = key.split('.')
@@ -48,7 +48,7 @@ Config.prototype.set = function (key, value) {
       target = obj
     }
   })
-},
+}
 
 Config.prototype.setConfig = function (properties) {
   properties = properties || {}

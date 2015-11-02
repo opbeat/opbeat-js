@@ -13,21 +13,23 @@ function ngOpbeatProvider () {
     Opbeat.install()
   }
 
-  this.$get = [function () {
-    return {
-      captureException: function captureException (exception, cause) {
-        Opbeat.captureException(exception, cause)
-      },
+  this.$get = [
+    function () {
+      return {
+        captureException: function captureException (exception, cause) {
+          Opbeat.captureException(exception, cause)
+        },
 
-      setUserContext: function setUser (user) {
-        Opbeat.setUserContext(user)
-      },
+        setUserContext: function setUser (user) {
+          Opbeat.setUserContext(user)
+        },
 
-      setExtraContext: function setExtraContext (data) {
-        Opbeat.setExtraContext(data)
+        setExtraContext: function setExtraContext (data) {
+          Opbeat.setExtraContext(data)
+        }
       }
     }
-  }]
+  ]
 }
 
 function $opbeatErrorProvider ($provide) {
@@ -40,7 +42,6 @@ function $opbeatErrorProvider ($provide) {
 }
 
 function $opbeatInstrumentationProvider ($provide) {
-
   // Before controller intialize transcation
   var traceBuffer = new TraceBuffer('beforeControllerTransaction')
 
@@ -48,7 +49,7 @@ function $opbeatInstrumentationProvider ($provide) {
   $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
     $rootScope._opbeatTransactions = {}
 
-    var onRouteChange = function(e, current) {
+    var onRouteChange = function (e, current) {
       var routeControllerTarget = current.controller
       logger.log('opbeat.decorator.controller.onRouteChange')
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
@@ -58,7 +59,7 @@ function $opbeatInstrumentationProvider ($provide) {
         $rootScope._opbeatTransactions[$location.absUrl()] = transaction
 
         // Update transaction reference in traceBuffer
-        traceBuffer.setTransactionRef(transaction);
+        traceBuffer.setTransactionRef(transaction)
       }
     }
 
@@ -92,7 +93,6 @@ function $opbeatInstrumentationProvider ($provide) {
         })
 
         controllerScope.$on('$viewContentLoaded', function (event) {
-
           logger.log('opbeat.angular.controller.$viewContentLoaded')
 
           // Transaction clean up
@@ -105,7 +105,6 @@ function $opbeatInstrumentationProvider ($provide) {
               utils.uninstrumentMethod(funcScope.scope, funcScope.property)
             })
           }
-
         })
       }
 
@@ -150,7 +149,7 @@ function $opbeatInstrumentationProvider ($provide) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'template.angular.request',
       prefix: '$templateRequest',
-      signatureFormatter: function(key, args) {
+      signatureFormatter: function (key, args) {
         var text = ['$templateRequest', args[0]]
         return text.join(' ')
       }
@@ -162,12 +161,12 @@ function $opbeatInstrumentationProvider ($provide) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'ext.http.request',
       prefix: 'angular.$http',
-      signatureFormatter: function(key, args) {
+      signatureFormatter: function (key, args) {
         var text = []
         // $http used directly
-        if(key && args) {
+        if (key && args) {
           text = ['$http', key.toUpperCase(), args[0]]
-        } else if(!key && typeof args === 'object') {
+        } else if (!key && typeof args === 'object') {
           // $http used from $resource
           var req = args[0]
           text = ['$http', req.method, req.url]
@@ -180,7 +179,7 @@ function $opbeatInstrumentationProvider ($provide) {
 
   // Core directive instrumentation
   var coreDirectives = ['ngBind', 'ngClass', 'ngModel', 'ngIf', 'ngInclude', 'ngRepeat', 'ngSrc', 'ngStyle', 'ngSwitch', 'ngTransclude']
-  coreDirectives.forEach(function(name) {
+  coreDirectives.forEach(function (name) {
     var directiveName = name + 'Directive'
     $provide.decorator(directiveName, function ($delegate, $injector) {
       utils.instrumentObject($delegate[0], $injector, {
@@ -199,18 +198,17 @@ function $opbeatInstrumentationProvider ($provide) {
       utils.instrumentObject(result, $injector, {
         type: 'ext.$resource',
         prefix: '$resource',
-        signatureFormatter: function(key, args) {
+        signatureFormatter: function (key, args) {
           var text = ['$resource', key.toUpperCase(), args[0]]
           return text.join(' ')
         }
       })
       return result
-    };
+    }
   })
 
   // $httpBackend instrumentation
   $provide.decorator('$httpBackend', function ($delegate, $injector) {
-
     var $rootScope = $injector.get('$rootScope')
     var $location = $injector.get('$location')
 
@@ -221,14 +219,14 @@ function $opbeatInstrumentationProvider ($provide) {
       var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'app.httpBackend', {
         prefix: '$httpBackend',
         callbackIndex: 3,
-        signatureFormatter: function(key, args) {
+        signatureFormatter: function (key, args) {
           var text = ['$httpBackend', args[0].toUpperCase(), args[1]]
           return text.join(' ')
         }
       }).apply(this, args)
 
       return result
-    };
+    }
   })
 
   // $cacheFactory instrumentation (this happens before routeChange -> using traceBuffer)
@@ -241,15 +239,14 @@ function $opbeatInstrumentationProvider ($provide) {
         type: 'cache.' + cacheName,
         prefix: cacheName,
         transaction: traceBuffer,
-        signatureFormatter: function(key, args) {
+        signatureFormatter: function (key, args) {
           var text = ['$cacheFactory', key.toUpperCase(), args[0]]
           return text.join(' ')
         }
       })
       return result
-    };
+    }
   })
-
 }
 
 window.angular.module('ngOpbeat', [])

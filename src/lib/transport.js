@@ -13,8 +13,7 @@ module.exports = {
 
   getFile: function (fileUrl) {
     return _makeRequest(fileUrl, 'GET', '', {})
-  },
-
+  }
 }
 
 function _sendToOpbeat (endpoint, data) {
@@ -74,7 +73,5 @@ function _makeRequest (url, method, type, data, headers) {
     }
 
     xhr.send(data)
-
   })
-
 }

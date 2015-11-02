@@ -21,6 +21,5 @@ module.exports = {
     if (isDebugMode && hasConsole) {
       window.console.log.apply(window.console, args)
     }
-
   }
 }

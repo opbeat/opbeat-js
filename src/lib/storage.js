@@ -6,13 +6,13 @@ module.exports = {
 
   get: function (key) {
     var value = window.localStorage.getItem(key)
-    if (typeof value != 'string') {
+    if (typeof value !== 'string') {
       return undefined
     }
 
     try {
       return JSON.parse(value)
-    } catch(e) {
+    } catch (e) {
       return value || undefined
     }
   }
