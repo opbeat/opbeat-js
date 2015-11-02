@@ -23,9 +23,8 @@ var Transaction = function (queue, name, type) {
 }
 
 Transaction.prototype.end = function () {
-
-  if(this.activetraces.length > 1) {
-    this._endAfterActiveTraces = true;
+  if (this.activetraces.length > 1) {
+    this._endAfterActiveTraces = true
   } else {
     this.ended = true
     this._endAfterActiveTraces = false
@@ -35,15 +34,14 @@ Transaction.prototype.end = function () {
   }
 
   // When all traces are finished, the transaction can be added to the queue
-  var whenAllTracesFinished = this.traces.map(function(trace) {
+  var whenAllTracesFinished = this.traces.map(function (trace) {
     return trace._isFinish
   })
 
-  Promise.all(whenAllTracesFinished).then(function() {
+  Promise.all(whenAllTracesFinished).then(function () {
     logger.log('- %c opbeat.instrumentation.transaction.whenAllTracesFinished', 'color: #3360A3', this.name)
     this._queue.add(this)
   }.bind(this))
-
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
@@ -63,12 +61,11 @@ Transaction.prototype._onTraceEnd = function (trace) {
     this.activetraces.splice(index, 1)
   }
 
-  if(this._endAfterActiveTraces) {
-    this.end();
+  if (this._endAfterActiveTraces) {
+    this.end()
   }
 
   logger.log('opbeat.instrumentation.transaction._endTrace', this.name, this.activetraces.length)
-
 }
 
 module.exports = Transaction

@@ -11,30 +11,29 @@ var Trace = module.exports = function (transaction, signature, type) {
   this._parent = null
 
   // Start timers
-  this._start = performance.now()
+  this._start = window.performance.now()
   this._startStamp = new Date()
 
-  this._isFinish = new Promise(function(resolve, reject) {
+  this._isFinish = new Promise(function (resolve, reject) {
     this._endTraceFunc = resolve
   }.bind(this))
 
-  this.getTraceStackFrames(function(frames) {
-    if(frames) {
+  this.getTraceStackFrames(function (frames) {
+    if (frames) {
       this.frames = frames
     }
 
-    this._endTraceFunc(); // Mark the trace as finished
+    this._endTraceFunc() // Mark the trace as finished
   }.bind(this))
 
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }
 
 Trace.prototype.end = function () {
-  this._diff = performance.now() - this._start
+  this._diff = window.performance.now() - this._start
   this.ended = true
 
   this.transaction._onTraceEnd(this)
-  
   logger.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._diff)
 }
 
@@ -73,7 +72,7 @@ Trace.prototype.setParent = function (val) {
   this._parent = val
 }
 
-Trace.prototype.getTraceFingerprint = function() {
+Trace.prototype.getTraceFingerprint = function () {
   var key = [this.transaction.name, this.signature, this.type]
 
   // Iterate over parents
@@ -86,17 +85,17 @@ Trace.prototype.getTraceFingerprint = function() {
   return key.join('-')
 }
 
-Trace.prototype.getTraceStackFrames = function(callback) {
+Trace.prototype.getTraceStackFrames = function (callback) {
   // Use callbacks instead of Promises to keep the stack
-  var key = this.getTraceFingerprint();
+  var key = this.getTraceFingerprint()
   var traceFrames = traceCache.get(key)
-  if(traceFrames) {
+  if (traceFrames) {
     callback(traceFrames)
   } else {
-    frames.getFramesForCurrent().then(function(traceFrames) {
+    frames.getFramesForCurrent().then(function (traceFrames) {
       traceCache.set(key, traceFrames)
       callback(traceFrames)
-    }).caught(function() {
+    }).caught(function () {
       callback(null)
     })
   }

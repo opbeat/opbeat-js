@@ -19,11 +19,11 @@ Instrumentation.prototype._flush = function () {
   this._queue = []
 }
 
-Instrumentation.prototype._dispatch = function() {
+Instrumentation.prototype._dispatch = function () {
   logger.log('Instrumentation.scheduler._dispatch', this._queue.length)
 
-  if(!this._queue.length) {
-    return 
+  if (!this._queue.length) {
+    return
   }
 
   var transactions = this._formatTransactions()
@@ -40,7 +40,7 @@ Instrumentation.prototype._formatTransactions = function () {
   }))
 
   var groupedTraces = groupTraces(traces)
-  var groupedTracesTimings = getRawGroupedTracesTimings(traces, groupedTraces);
+  var groupedTracesTimings = getRawGroupedTracesTimings(traces, groupedTraces)
 
   return {
     transactions: transactions,
@@ -70,13 +70,12 @@ function groupTransactions (transactions) {
 }
 
 function getRawGroupedTracesTimings (traces, groupedTraces) {
-
   var getTraceGroupIndex = function (col, item) {
     var index = 0
     var targetGroup = traceGroupingKey(item)
 
     col.forEach(function (item, i) {
-      if(item._group === targetGroup) {
+      if (item._group === targetGroup) {
         index = i
       }
     })
@@ -84,7 +83,7 @@ function getRawGroupedTracesTimings (traces, groupedTraces) {
     return index
   }
 
-  var groupedByTransaction = grouper(traces, function(trace) {
+  var groupedByTransaction = grouper(traces, function (trace) {
     return trace.transaction.name
   })
 
@@ -94,28 +93,26 @@ function getRawGroupedTracesTimings (traces, groupedTraces) {
 
     var data = [transaction.duration()]
 
-    traces.forEach(function(trace) {
+    traces.forEach(function (trace) {
       var groupIndex = getTraceGroupIndex(groupedTraces, trace)
       data.push([groupIndex, trace._start - transaction._start, trace.duration()])
     })
 
-    return data;
-  });
-
+    return data
+  })
 }
 
 function groupTraces (traces) {
   var groupedByMinute = grouper(traces, traceGroupingKey)
 
-
   return Object.keys(groupedByMinute).map(function (key) {
     var trace = groupedByMinute[key][0]
 
     var startTime = trace._start
-    if(trace.transaction) {
+    if (trace.transaction) {
       startTime = startTime - trace.transaction._start
     } else {
-      startTime = 0;
+      startTime = 0
     }
 
     return {
@@ -129,10 +126,9 @@ function groupTraces (traces) {
       },
       _group: key
     }
-  }).sort(function(a, b) {
+  }).sort(function (a, b) {
     return a.start_time - b.start_time
   })
-
 }
 
 function grouper (arr, func) {
@@ -140,7 +136,7 @@ function grouper (arr, func) {
 
   arr.forEach(function (obj) {
     var key = func(obj)
-    if (key in groups){
+    if (key in groups) {
       groups[key].push(obj)
     } else {
       groups[key] = [obj]
@@ -158,7 +154,7 @@ function groupingTs (ts) {
 
 function transactionGroupingKey (trans) {
   return [
-    groupingTs(trans._startStamp).getTime(), 
+    groupingTs(trans._startStamp).getTime(),
     trans.name,
     trans.result,
     trans.type
@@ -171,7 +167,7 @@ function traceGroupingKey (trace) {
   }).join(',')
 
   return [
-    groupingTs(trace._startStamp).getTime(), 
+    groupingTs(trace._startStamp).getTime(),
     trace.transaction.name,
     ancestors,
     trace.signature,

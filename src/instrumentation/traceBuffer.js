@@ -11,7 +11,7 @@ var TraceBuffer = function (name) {
 TraceBuffer.prototype.startTrace = function (signature, type) {
   var trace = new Trace(this.traceTransactionRef, signature, type)
 
-  if(this._setTraceParent) {
+  if (this._setTraceParent) {
     trace.setParent(this.traceTransactionRef._rootTrace)
   }
 
@@ -34,18 +34,16 @@ TraceBuffer.prototype._onTraceEnd = function (trace) {
 }
 
 TraceBuffer.prototype.setTransactionRef = function (transaction) {
-
   this.traceTransactionRef = transaction
   this._setTraceParent = true
 
-  this.activetraces.forEach(function(trace) {
+  this.activetraces.forEach(function (trace) {
     trace.transaction = this.traceTransactionRef
   }.bind(this))
 
-  this.traces.forEach(function(trace) {
+  this.traces.forEach(function (trace) {
     trace.transaction = this.traceTransactionRef
   }.bind(this))
-
 }
 
 TraceBuffer.prototype.getTraces = function () {

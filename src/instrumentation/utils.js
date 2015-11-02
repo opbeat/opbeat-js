@@ -7,9 +7,9 @@ module.exports = {
       var args = Array.prototype.slice.call(arguments)
 
       // Before callback
-      if(typeof before === 'function' ) {
+      if (typeof before === 'function') {
         var beforeData = before.apply(this, [context].concat(args))
-        if(beforeData.args) {
+        if (beforeData.args) {
           args = beforeData.args
         }
       }
@@ -18,7 +18,7 @@ module.exports = {
       var result = fn.apply(this, args)
 
       // After callback
-      if(typeof after === 'function' ) {
+      if (typeof after === 'function') {
         // After + Promise handling
         if (result && typeof result.then === 'function') {
           result.finally(function () {
@@ -37,11 +37,11 @@ module.exports = {
     options = options || {}
     var nameParts = []
 
-    if(options.prefix) {
+    if (options.prefix) {
       nameParts.push(options.prefix)
     }
 
-    if(fnName) {
+    if (fnName) {
       nameParts.push(fnName)
     }
 
@@ -56,12 +56,11 @@ module.exports = {
     }
 
     var wrappedMethod = this.wrapMethod(ref, function instrumentMethodWithCallbackBefore (context) {
-
       var args = Array.prototype.slice.call(arguments).slice(1)
       var callback = args[options.callbackIndex]
 
       // Wrap callback
-      var wrappedCallback = this.wrapMethod(callback, function instrumentMethodWithCallbackBeforeCallback() {
+      var wrappedCallback = this.wrapMethod(callback, function instrumentMethodWithCallbackBeforeCallback () {
         instrumentMethodAfter.apply(this, [context])
         return {}
       }, null)
@@ -71,7 +70,6 @@ module.exports = {
 
       // Call base
       return instrumentMethodBefore.apply(this, [context].concat(args))
-
     }.bind(this), null, context)
 
     wrappedMethod.original = ref
@@ -84,10 +82,11 @@ module.exports = {
     var ref
     var nameParts = []
 
-    if(options.prefix) {
+    if (options.prefix) {
       nameParts.push(options.prefix)
     }
-    if(fn) {
+
+    if (fn) {
       nameParts.push(fn)
     }
 
@@ -119,7 +118,7 @@ module.exports = {
 
   instrumentModule: function (module, $injector, options) {
     options = options || {}
-    var that = this;
+    var that = this
 
     var $rootScope = $injector.get('$rootScope')
     var $location = $injector.get('$location')
@@ -133,7 +132,7 @@ module.exports = {
           prefix: options.prefix,
           override: false,
           instrumentModule: true,
-          signatureFormatter: options.signatureFormatter,
+          signatureFormatter: options.signatureFormatter
         })
       } else {
         logger.log('%c instrumentModule.error.transaction.missing', 'background-color: #ffff00', module)
@@ -174,7 +173,7 @@ module.exports = {
     this.getObjectFunctions(object).forEach(function (funcScope) {
       var transaction
 
-      if(options.transaction) {
+      if (options.transaction) {
         transaction = options.transaction
       } else {
         transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
@@ -189,7 +188,6 @@ module.exports = {
       } else {
         logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
       }
-
     }.bind(this))
 
     return object
@@ -233,17 +231,14 @@ module.exports = {
       name: name
     }
   }
-
 }
 
-
 function instrumentMethodBefore (context) {
-
   var args = Array.prototype.slice.call(arguments).slice(1)
-  var name = context.traceName;
+  var name = context.traceName
   var transaction = context.transaction
 
-  if(context.options.signatureFormatter) {
+  if (context.options.signatureFormatter) {
     name = context.options.signatureFormatter.apply(this, [context.fn, args])
   }
 
@@ -253,7 +248,6 @@ function instrumentMethodBefore (context) {
   return {
     args: args
   }
-
 }
 
 function instrumentMethodAfter (context) {
@@ -261,5 +255,3 @@ function instrumentMethodAfter (context) {
     context.trace.end()
   }
 }
-
-
