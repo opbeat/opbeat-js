@@ -230,6 +230,14 @@ module.exports = {
       scope: scope,
       name: name
     }
+  },
+
+  resolveAngularDependenciesByType: function($rootElement, type) {
+    return angular.module($rootElement.attr('ng-app'))._invokeQueue.filter(function(m) {
+      return m[1] === type
+    }).map(function(m) {
+      return m[2][0]
+    })
   }
 }
 
