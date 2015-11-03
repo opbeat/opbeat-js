@@ -120,21 +120,21 @@ function $opbeatInstrumentationProvider ($provide) {
     var directivesInstrumentation = require('./angular/directives')($provide)
 
     // Factory instrumentation
-    if(!$rootScope._opbeatHasInstrumentedFactories) {
+    if($rootScope._opbeatHasInstrumentedFactories) {
       var factories = utils.resolveAngularDependenciesByType($rootElement, 'factory')
       require('./angular/factories')($provide).instrumentationAll(factories)
       $rootScope._opbeatHasInstrumentedFactories = true
     }
 
-    // Custom directive instrumentation
     if(!$rootScope._opbeatHasInstrumentedDirectives) {
+      // Custom directive instrumentation
       var directives = utils.resolveAngularDependenciesByType($rootElement, 'directive')
       directivesInstrumentation.instrumentationAll(directives)
       $rootScope._opbeatHasInstrumentedDirectives = true
-    }
 
-    // Core directives instrumentation
-    directivesInstrumentation.instrumentationCore();
+      // Core directives instrumentation
+      directivesInstrumentation.instrumentationCore();
+    }
 
     return $delegate
   })
