@@ -113,10 +113,28 @@ function $opbeatInstrumentationProvider ($provide) {
     }
   })
 
+  $provide.decorator('$controller', function ($delegate, $rootScope, $rootElement) {
+    $rootScope._opbeatHasInstrumentedDirectives = false;
+
+    var directivesInstrumentation = require('./angular/directives')($provide)
+
+    // Custom directive instrumentation
+    if(!$rootScope._opbeatHasInstrumentedDirectives) {
+      var directives = utils.resolveAngularDependenciesByType($rootElement, 'directive')
+      directivesInstrumentation.instrumentationAll(directives)
+      $rootScope._opbeatHasInstrumentedDirectives = true
+    }
+
+    // Core directives instrumentation
+    directivesInstrumentation.instrumentationCore();
+
+    return $delegate
+  })
+
+  // Angular Core Instrumentation
   require('./angular/cacheFactory')($provide, traceBuffer)
   require('./angular/compile')($provide, traceBuffer)
   require('./angular/controller')($provide, traceBuffer)
-  require('./angular/directives')($provide, traceBuffer)
   require('./angular/http')($provide, traceBuffer)
   require('./angular/httpBackend')($provide, traceBuffer)
   require('./angular/resource')($provide, traceBuffer)
