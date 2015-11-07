@@ -74,7 +74,7 @@ Trace.prototype.setParent = function (val) {
   this._parent = val
 }
 
-Trace.prototype.getTraceFingerprint = function () {
+Trace.prototype.getFingerprint = function () {
   var key = [this.transaction.name, this.signature, this.type]
 
   // Iterate over parents
@@ -89,7 +89,7 @@ Trace.prototype.getTraceFingerprint = function () {
 
 Trace.prototype.getTraceStackFrames = function (callback) {
   // Use callbacks instead of Promises to keep the stack
-  var key = this.getTraceFingerprint()
+  var key = this.getFingerprint()
   var traceFrames = traceCache.get(key)
   if (traceFrames) {
     callback(traceFrames)
