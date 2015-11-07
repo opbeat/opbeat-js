@@ -15,15 +15,14 @@ var Trace = module.exports = function (transaction, signature, type) {
   this._startStamp = new Date()
 
   this._isFinish = new Promise(function (resolve, reject) {
-    this._endTraceFunc = resolve
+    this._markFinishedFunc = resolve
   }.bind(this))
 
   this.getTraceStackFrames(function (frames) {
     if (frames) {
       this.frames = frames
     }
-
-    this._endTraceFunc() // Mark the trace as finished
+    this._markFinishedFunc() // Mark the trace as finished
   }.bind(this))
 
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
