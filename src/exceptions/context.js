@@ -125,7 +125,6 @@ module.exports = {
           }
         }
 
-        logger.log('Opbeat.getExceptionContexts', contexts)
         resolve(contexts)
       }.bind(this)).caught(reject)
     }.bind(this))
