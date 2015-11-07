@@ -1,4 +1,4 @@
-var utils = require('../instrumentation/utils')
+var utils = require('../utils')
 
 module.exports = function($provide) {
   

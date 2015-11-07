@@ -117,12 +117,12 @@ function $opbeatInstrumentationProvider ($provide) {
     $rootScope._opbeatHasInstrumentedFactories = false;
     $rootScope._opbeatHasInstrumentedDirectives = false;
 
-    var directivesInstrumentation = require('./angular/directives')($provide)
+    var directivesInstrumentation = require('./instrumentation/angular/directives')($provide)
 
     // Factory instrumentation
     if($rootScope._opbeatHasInstrumentedFactories) {
       var factories = utils.resolveAngularDependenciesByType($rootElement, 'factory')
-      require('./angular/factories')($provide).instrumentationAll(factories)
+      require('./instrumentation/angular/factories')($provide).instrumentationAll(factories)
       $rootScope._opbeatHasInstrumentedFactories = true
     }
 
@@ -140,13 +140,13 @@ function $opbeatInstrumentationProvider ($provide) {
   })
 
   // Angular Core Instrumentation
-  require('./angular/cacheFactory')($provide, traceBuffer)
-  require('./angular/compile')($provide, traceBuffer)
-  require('./angular/controller')($provide, traceBuffer)
-  require('./angular/http')($provide, traceBuffer)
-  require('./angular/httpBackend')($provide, traceBuffer)
-  require('./angular/resource')($provide, traceBuffer)
-  require('./angular/templateRequest')($provide, traceBuffer)
+  require('./instrumentation/angular/cacheFactory')($provide, traceBuffer)
+  require('./instrumentation/angular/compile')($provide, traceBuffer)
+  require('./instrumentation/angular/controller')($provide, traceBuffer)
+  require('./instrumentation/angular/http')($provide, traceBuffer)
+  require('./instrumentation/angular/httpBackend')($provide, traceBuffer)
+  require('./instrumentation/angular/resource')($provide, traceBuffer)
+  require('./instrumentation/angular/templateRequest')($provide, traceBuffer)
 
 }
 
