@@ -29,7 +29,7 @@ Instrumentation.prototype._dispatch = function () {
   var transactions = this._formatTransactions()
   var flush = this._flush.bind(this)
 
-  request.sendTransaction(transactions).then(flush)
+  request.sendTransaction(transactions).finally(flush)
 }
 
 Instrumentation.prototype._formatTransactions = function () {
@@ -38,7 +38,7 @@ Instrumentation.prototype._formatTransactions = function () {
   var traces = [].concat.apply([], this._queue.map(function (trans) {
     return trans.traces
   }))
-
+  
   var groupedTraces = groupTraces(traces)
   var groupedTracesTimings = getRawGroupedTracesTimings(traces, groupedTraces)
 
