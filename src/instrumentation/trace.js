@@ -34,7 +34,7 @@ Trace.prototype.end = function () {
 
   logger.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._diff)
 
-  this._isFinish.then(function() {
+  this._isFinish.then(function () {
     this.transaction._onTraceEnd(this)
   }.bind(this))
 }

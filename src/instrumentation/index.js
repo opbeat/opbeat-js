@@ -38,7 +38,7 @@ Instrumentation.prototype._formatTransactions = function () {
   var traces = [].concat.apply([], this._queue.map(function (trans) {
     return trans.traces
   }))
-  
+
   var groupedTraces = groupTraces(traces)
   var groupedTracesTimings = getRawGroupedTracesTimings(traces, groupedTraces)
 

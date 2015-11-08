@@ -1,7 +1,6 @@
 var utils = require('../utils')
 
-module.exports = function($provide) {
-
+module.exports = function ($provide) {
   var instrumentDirective = function (name) {
     var directiveName = name + 'Directive'
     $provide.decorator(directiveName, function ($delegate, $injector) {
@@ -10,23 +9,22 @@ module.exports = function($provide) {
         prefix: directiveName
       })
       return $delegate
-    }) 
+    })
   }
 
   return {
-    instrumentationAll: function(modules) {
+    instrumentationAll: function (modules) {
       console.log('instrumentationAll', modules)
       modules.forEach(function (name) {
         instrumentDirective(name)
       })
     },
-    instrumentationCore: function() {
+    instrumentationCore: function () {
       // Core directive instrumentation
       var coreDirectives = ['ngBind', 'ngClass', 'ngModel', 'ngIf', 'ngInclude', 'ngRepeat', 'ngSrc', 'ngStyle', 'ngSwitch', 'ngTransclude']
       coreDirectives.forEach(function (name) {
         instrumentDirective(name)
       })
-    }    
+    }
   }
-
 }

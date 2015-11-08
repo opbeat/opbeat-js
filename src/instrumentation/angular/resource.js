@@ -1,7 +1,6 @@
 var utils = require('../utils')
 
-module.exports = function($provide, traceBuffer) {
-
+module.exports = function ($provide, traceBuffer) {
   try {
     // ngResource instrumentation
     $provide.decorator('$resource', function ($delegate, $injector) {
@@ -19,8 +18,6 @@ module.exports = function($provide, traceBuffer) {
         return result
       }
     })
-  } catch(e) {
-
-  } 
-
+  } catch (e) {
+  }
 }

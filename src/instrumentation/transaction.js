@@ -25,7 +25,7 @@ var Transaction = function (queue, name, type) {
 Transaction.prototype.end = function () {
   if (Object.keys(this._activeTraces).length > 1) {
     this._endAfterActiveTraces = true
-    return 
+    return
   }
 
   this.ended = true

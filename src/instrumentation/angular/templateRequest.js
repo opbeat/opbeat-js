@@ -1,7 +1,6 @@
 var utils = require('../utils')
 
-module.exports = function($provide, traceBuffer) {
-
+module.exports = function ($provide, traceBuffer) {
   // Template Request Instrumentation
   $provide.decorator('$templateRequest', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
@@ -13,5 +12,4 @@ module.exports = function($provide, traceBuffer) {
       }
     })
   })
-  
 }

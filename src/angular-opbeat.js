@@ -114,26 +114,26 @@ function $opbeatInstrumentationProvider ($provide) {
   })
 
   $provide.decorator('$controller', function ($delegate, $rootScope, $rootElement) {
-    $rootScope._opbeatHasInstrumentedFactories = false;
-    $rootScope._opbeatHasInstrumentedDirectives = false;
+    $rootScope._opbeatHasInstrumentedFactories = false
+    $rootScope._opbeatHasInstrumentedDirectives = false
 
     var directivesInstrumentation = require('./instrumentation/angular/directives')($provide)
 
     // Factory instrumentation
-    if($rootScope._opbeatHasInstrumentedFactories) {
+    if ($rootScope._opbeatHasInstrumentedFactories) {
       var factories = utils.resolveAngularDependenciesByType($rootElement, 'factory')
       require('./instrumentation/angular/factories')($provide).instrumentationAll(factories)
       $rootScope._opbeatHasInstrumentedFactories = true
     }
 
-    if(!$rootScope._opbeatHasInstrumentedDirectives) {
+    if (!$rootScope._opbeatHasInstrumentedDirectives) {
       // Custom directive instrumentation
       var directives = utils.resolveAngularDependenciesByType($rootElement, 'directive')
       directivesInstrumentation.instrumentationAll(directives)
       $rootScope._opbeatHasInstrumentedDirectives = true
 
       // Core directives instrumentation
-      directivesInstrumentation.instrumentationCore();
+      directivesInstrumentation.instrumentationCore()
     }
 
     return $delegate
@@ -147,7 +147,6 @@ function $opbeatInstrumentationProvider ($provide) {
   require('./instrumentation/angular/httpBackend')($provide, traceBuffer)
   require('./instrumentation/angular/resource')($provide, traceBuffer)
   require('./instrumentation/angular/templateRequest')($provide, traceBuffer)
-
 }
 
 window.angular.module('ngOpbeat', [])
