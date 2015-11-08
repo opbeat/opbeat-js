@@ -120,13 +120,10 @@ module.exports = {
     options = options || {}
     var that = this
 
-    var $rootScope = $injector.get('$rootScope')
-    var $location = $injector.get('$location')
-
     var wrapper = function () {
       var fn = module
       var args = Array.prototype.slice.call(arguments)
-      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+      var transaction = that.getCurrentTransaction($injector)
       if (transaction) {
         fn = that.instrumentMethod(module, '', transaction, options.type, {
           prefix: options.prefix,
@@ -146,7 +143,7 @@ module.exports = {
       wrapper[funcScope.property] = function () {
         var fn = funcScope.ref
         var args = Array.prototype.slice.call(arguments)
-        var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+        var transaction = that.getCurrentTransaction($injector)
         if (transaction) {
           fn = that.instrumentMethod(module, funcScope.property, transaction, options.type, {
             prefix: options.prefix,
@@ -166,8 +163,6 @@ module.exports = {
 
   instrumentObject: function (object, $injector, options) {
     options = options || {}
-    var $rootScope = $injector.get('$rootScope')
-    var $location = $injector.get('$location')
 
     // Instrument static functions
     this.getObjectFunctions(object).forEach(function (funcScope) {
@@ -176,7 +171,7 @@ module.exports = {
       if (options.transaction) {
         transaction = options.transaction
       } else {
-        transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+        transaction = this.getCurrentTransaction($injector)
       }
 
       if (transaction) {
@@ -232,12 +227,19 @@ module.exports = {
     }
   },
 
-  resolveAngularDependenciesByType: function($rootElement, type) {
-    return angular.module($rootElement.attr('ng-app'))._invokeQueue.filter(function(m) {
+  resolveAngularDependenciesByType: function ($rootElement, type) {
+    return window.angular.module($rootElement.attr('ng-app'))._invokeQueue.filter(function (m) {
       return m[1] === type
-    }).map(function(m) {
+    }).map(function (m) {
       return m[2][0]
     })
+  },
+
+  getCurrentTransaction: function ($injector) {
+    var $rootScope = $injector.get('$rootScope')
+    var $location = $injector.get('$location')
+
+    return $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
   }
 }
 

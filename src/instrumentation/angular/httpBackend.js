@@ -4,12 +4,10 @@ module.exports = function($provide) {
   
   // $httpBackend instrumentation
   $provide.decorator('$httpBackend', function ($delegate, $injector) {
-    var $rootScope = $injector.get('$rootScope')
-    var $location = $injector.get('$location')
 
     return function () {
       var args = Array.prototype.slice.call(arguments)
-      var transaction = $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
+      var transaction = utils.getCurrentTransaction($injector)
 
       var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'app.httpBackend', {
         prefix: '$httpBackend',
