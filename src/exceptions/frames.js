@@ -68,7 +68,7 @@ module.exports = {
   stackInfoToOpbeatException: function (stackInfo) {
     return new Promise(function (resolve, reject) {
       if (stackInfo.stack && stackInfo.stack.length) {
-        var framesPromises = mapSeries(stackInfo.stack, function (stack, index) {
+        var framesPromises = promiseMapSeries(stackInfo.stack, function (stack, index) {
           return this.buildOpbeatFrame(stack)
         }.bind(this))
 
