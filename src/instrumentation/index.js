@@ -4,7 +4,7 @@ var logger = require('../lib/logger')
 
 var Instrumentation = function () {
   this._queue = []
-  this.scheduler = setInterval(this._dispatch.bind(this), 10000)
+  this.scheduler = setInterval(this._dispatch.bind(this), 5000)
 }
 
 Instrumentation.prototype.add = function (transaction) {
