@@ -2,7 +2,7 @@ var utils = require('../utils')
 
 module.exports = function ($provide, traceBuffer) {
   return {
-    instrumentationAll: function (modules) {
+    instrumentAll: function (modules) {
       modules.forEach(function (name) {
         $provide.decorator(name, function ($delegate, $injector) {
           utils.instrumentObject($delegate, $injector, {

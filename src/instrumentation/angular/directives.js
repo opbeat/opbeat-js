@@ -13,13 +13,13 @@ module.exports = function ($provide) {
   }
 
   return {
-    instrumentationAll: function (modules) {
+    instrumentAll: function (modules) {
       console.log('instrumentationAll', modules)
       modules.forEach(function (name) {
         instrumentDirective(name)
       })
     },
-    instrumentationCore: function () {
+    instrumentCore: function () {
       // Core directive instrumentation
       var coreDirectives = ['ngBind', 'ngClass', 'ngModel', 'ngIf', 'ngInclude', 'ngRepeat', 'ngSrc', 'ngStyle', 'ngSwitch', 'ngTransclude']
       coreDirectives.forEach(function (name) {
