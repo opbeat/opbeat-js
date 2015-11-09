@@ -29,7 +29,7 @@ Instrumentation.prototype._dispatch = function () {
   var transactions = this._formatTransactions()
   var flush = this._flush.bind(this)
 
-  request.sendTransaction(transactions).finally(flush)
+  request.sendTransaction(transactions).then(flush, flush)
 }
 
 Instrumentation.prototype._formatTransactions = function () {
