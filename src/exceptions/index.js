@@ -1,4 +1,4 @@
-var Promise = require('bluebird')
+var Promise = require('es6-promise').Promise
 var stackTrace = require('./stacktrace')
 var frames = require('./frames')
 
@@ -53,7 +53,7 @@ function processError (error, msg, file, line, col) {
     return frames.stackInfoToOpbeatException(exception).then(function (exception) {
       frames.processOpbeatException(exception)
     })
-  }).caught(function () {})
+  })['catch'](function () {})
 }
 
 module.exports = Exceptions

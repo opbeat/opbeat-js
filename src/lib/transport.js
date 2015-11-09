@@ -1,6 +1,6 @@
 var logger = require('./logger')
 var config = require('./config')
-var Promise = require('bluebird')
+var Promise = require('es6-promise').Promise
 
 module.exports = {
   sendError: function (data) {

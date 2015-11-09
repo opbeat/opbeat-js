@@ -1,4 +1,4 @@
-var Promise = require('bluebird')
+var Promise = require('es6-promise').Promise
 var SimpleCache = require('simple-lru-cache')
 
 var logger = require('../lib/logger')
@@ -65,7 +65,7 @@ module.exports = {
         } else {
           reject('no sourceMapUrl')
         }
-      }).caught(reject)
+      })['catch'](reject)
     })
   },
 
@@ -126,7 +126,7 @@ module.exports = {
         }
 
         resolve(contexts)
-      }.bind(this)).caught(reject)
+      }.bind(this))['catch'](reject)
     }.bind(this))
   },
 

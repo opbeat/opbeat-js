@@ -1,4 +1,4 @@
-var Promise = require('bluebird')
+var Promise = require('es6-promise').Promise
 var logger = require('../lib/logger')
 var frames = require('../exceptions/frames')
 var traceCache = require('./traceCache')
@@ -97,7 +97,7 @@ Trace.prototype.getTraceStackFrames = function (callback) {
     frames.getFramesForCurrent().then(function (traceFrames) {
       traceCache.set(key, traceFrames)
       callback(traceFrames)
-    }).caught(function () {
+    })['catch'](function () {
       callback(null)
     })
   }

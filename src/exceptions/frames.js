@@ -1,4 +1,4 @@
-var Promise = require('bluebird')
+var Promise = require('es6-promise').Promise
 
 var logger = require('../lib/logger')
 var config = require('../lib/config')
@@ -57,7 +57,7 @@ module.exports = {
       sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
         resolve(frame)
-      }).caught(function () {
+      })['catch'](function () {
         // // Resolve contexts if no source map
         var cleanedFileName = this.cleanFileName(stack.fileName)
         var contextsResolver = context.getExceptionContexts(cleanedFileName, stack.lineNumber)
@@ -68,7 +68,7 @@ module.exports = {
           frame.post_context = contexts.postContext
 
           resolve(frame)
-        }).caught(function () {
+        })['catch'](function () {
           resolve(frame)
         })
       }.bind(this))

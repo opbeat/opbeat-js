@@ -1,6 +1,6 @@
 var ErrorStackParser = require('error-stack-parser')
 var StackGenerator = require('stack-generator')
-var Promise = require('bluebird')
+var Promise = require('es6-promise').Promise
 var utils = require('../lib/utils')
 
 var defaultOptions = {
