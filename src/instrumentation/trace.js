@@ -20,7 +20,7 @@ var Trace = module.exports = function (transaction, signature, type) {
 
   this.getTraceStackFrames(function (frames) {
     if (frames) {
-      this.frames = frames
+      this.frames = frames.reverse() // Reverse frames to make Opbeat happy
     }
     this._markFinishedFunc() // Mark the trace as finished
   }.bind(this))
