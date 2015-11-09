@@ -6,7 +6,7 @@ var Transaction = function (queue, name, type) {
   this.name = name
   this.type = type
   this.ended = false
-  this._endAfterActiveTraces = false
+  this._markDoneAfterLastTrace = false
 
   this.traces = []
   this._activeTraces = {}
@@ -23,8 +23,7 @@ var Transaction = function (queue, name, type) {
 }
 
 Transaction.prototype.end = function () {
-  if (Object.keys(this._activeTraces).length > 1) {
-    this._endAfterActiveTraces = true
+  if(this.ended) {
     return
   }
 
@@ -32,7 +31,18 @@ Transaction.prototype.end = function () {
   this._endAfterActiveTraces = false
   this._rootTrace.end()
 
-  logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name)
+  logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, Object.keys(this._activeTraces).length)
+
+  if (Object.keys(this._activeTraces).length > 0) {
+    this._markDoneAfterLastTrace = true
+  } else {
+    this._markAsDone()
+  }
+
+}
+
+Transaction.prototype._markAsDone = function () {
+  logger.log('- %c opbeat.instrumentation.transaction._markAsDone', 'color: #3360A3', this.name)
 
   // When all traces are finished, the transaction can be added to the queue
   var whenAllTracesFinished = this.traces.map(function (trace) {
@@ -64,9 +74,10 @@ Transaction.prototype._onTraceEnd = function (trace) {
   // Remove trace from _activeTraces
   delete this._activeTraces[trace.getFingerprint()]
 
-  if (this._endAfterActiveTraces) {
-    this.end()
+  if (this._markDoneAfterLastTrace && Object.keys(this._activeTraces).length === 0) {
+    this._markAsDone()
   }
+
 }
 
 module.exports = Transaction
