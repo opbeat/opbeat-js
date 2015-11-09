@@ -6,29 +6,19 @@ var transport = require('../lib/transport')
 var utils = require('../lib/utils')
 var context = require('./context')
 var stackTrace = require('./stacktrace')
-
-function mapSeries (things, fn) {
-  var results = []
-  return Promise.each(things, function (value, index, length) {
-    var ret = fn(value, index, length)
-    results.push(ret)
-    return ret
-  }).thenReturn(results).all()
-}
+var promiseMapSeries = require('promise-map-series')
 
 module.exports = {
 
   getFramesForCurrent: function () {
-    return new Promise(function (resolve, reject) {
-      stackTrace.get().then(function (frames) {
-        var framesPromises = mapSeries(frames, function (stack, index) {
-          return this.buildOpbeatFrame(stack)
-        }.bind(this))
-
-        framesPromises.then(function (frames) {
-          resolve(frames)
-        })
+    return stackTrace.get().then(function (frames) {
+      var framesPromises = promiseMapSeries(frames, function (stack) {
+        return this.buildOpbeatFrame(stack)
       }.bind(this))
+
+      return framesPromises.then(function (frames) {
+        return frames
+      })
     }.bind(this))
   },
 
