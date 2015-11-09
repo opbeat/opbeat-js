@@ -32,6 +32,10 @@ module.exports = {
       var filePath = this.cleanFilePath(stack.fileName)
       var fileName = this.filePathToFileName(filePath)
 
+      if(this.isFileInline(filePath)) {
+        fileName = '(inline script)'
+      }
+
       // Build Opbeat frame data
       var frame = {
         'filename': fileName,
@@ -117,7 +121,11 @@ module.exports = {
       }
     }
 
-    culprit = fileName
+    if(this.isFileInline(filePath)) {
+      culprit = '(inline script)'
+    } else {
+      culprit = fileName
+    }
 
     var data = {
       message: type + ': ' + message,
@@ -166,6 +174,14 @@ module.exports = {
     }
 
     return fileUrl
+  },
+
+  isFileInline: function (fileUrl) {
+    if(fileUrl) {
+      return window.location.href.indexOf(fileUrl) === 0
+    } else {
+      return false
+    }
   },
 
   isFileInApp: function (filename) {
