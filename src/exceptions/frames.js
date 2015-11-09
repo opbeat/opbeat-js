@@ -29,28 +29,29 @@ module.exports = {
         return resolve({})
       }
 
-      var cleanedFileName = this.cleanFileName(stack.fileName)
+      var filePath = this.cleanFilePath(stack.fileName)
+      var fileName = this.filePathToFileName(filePath)
 
       // Build Opbeat frame data
       var frame = {
-        'filename': this.fileUrlToFileName(cleanedFileName),
+        'filename': fileName,
         'lineno': stack.lineNumber,
         'colno': stack.columnNumber,
         'function': stack.functionName || '[anonymous]',
         'abs_path': stack.fileName,
-        'in_app': this.isFileInApp(cleanedFileName)
+        'in_app': this.isFileInApp(filePath)
       }
 
       // Detect Sourcemaps
-      var sourceMapResolver = context.getFileSourceMapUrl(cleanedFileName)
+      var sourceMapResolver = context.getFileSourceMapUrl(filePath)
 
       sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
         resolve(frame)
       })['catch'](function () {
         // // Resolve contexts if no source map
-        var cleanedFileName = this.cleanFileName(stack.fileName)
-        var contextsResolver = context.getExceptionContexts(cleanedFileName, stack.lineNumber)
+        var filePath = this.cleanFilePath(stack.fileName)
+        var contextsResolver = context.getExceptionContexts(filePath, stack.lineNumber)
 
         contextsResolver.then(function (contexts) {
           frame.pre_context = contexts.preContext
@@ -86,15 +87,17 @@ module.exports = {
   processOpbeatException: function (exception) {
     var type = exception.type
     var message = String(exception.message) || 'Script error'
-    var fileUrl = this.fileUrlToFileName(this.cleanFileName(exception.fileurl))
+    var filePath = this.cleanFilePath(exception.fileurl)
+    var fileName = this.filePathToFileName(filePath)
     var frames = exception.frames || []
+    var culprit
 
     if (frames && frames.length) {
       // Opbeat.com expects frames oldest to newest and JS sends them as newest to oldest
       frames.reverse()
-    } else if (fileUrl) {
+    } else if (fileName) {
       frames.push({
-        filename: fileUrl,
+        filename: fileName,
         lineno: exception.lineno
       })
     }
@@ -103,18 +106,18 @@ module.exports = {
       frames: frames
     }
 
-    // Set fileUrl from last frame, if filename is missing
-    if (!fileUrl && frames.length) {
+    // Set fileName from last frame, if filename is missing
+    if (!fileName && frames.length) {
       var lastFrame = frames[frames.length - 1]
       if (lastFrame.filename) {
-        fileUrl = lastFrame.filename
+        fileName = lastFrame.filename
       } else {
         // If filename empty, assume inline script
-        fileUrl = '(inline script)'
+        fileName = '(inline script)'
       }
     }
 
-    var culprit = fileUrl
+    culprit = fileName
 
     var data = {
       message: type + ': ' + message,
@@ -143,19 +146,19 @@ module.exports = {
     transport.sendError(data)
   },
 
-  cleanFileName: function (fileName) {
-    if (!fileName) {
-      fileName = ''
+  cleanFilePath: function (filePath) {
+    if (!filePath) {
+      filePath = ''
     }
 
-    if (fileName === '<anonymous>') {
-      fileName = ''
+    if (filePath === '<anonymous>') {
+      filePath = ''
     }
 
-    return fileName
+    return filePath
   },
 
-  fileUrlToFileName: function (fileUrl) {
+  filePathToFileName: function (fileUrl) {
     var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname + (window.location.port ? (':' + window.location.port) : '')
 
     if (fileUrl.indexOf(origin) > -1) {
