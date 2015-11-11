@@ -41,7 +41,7 @@ module.exports = {
         'filename': fileName,
         'lineno': stack.lineNumber,
         'colno': stack.columnNumber,
-        'function': stack.functionName || '[anonymous]',
+        'function': stack.functionName || '<anonymous>',
         'abs_path': stack.fileName,
         'in_app': this.isFileInApp(filePath)
       }
