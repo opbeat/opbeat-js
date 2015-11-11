@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "bluebird": "^2.10.0",
-    "error-stack-normalizer": "^1.0.0",
+    "error-stack-normalizer": "^1.0.1",
     "error-stack-parser": "^1.2.3",
     "es6-promise": "^3.0.2",
     "event-stream": "^3.3.1",
