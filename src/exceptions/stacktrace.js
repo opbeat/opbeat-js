@@ -2,6 +2,7 @@ var ErrorStackParser = require('error-stack-parser')
 var StackGenerator = require('stack-generator')
 var Promise = require('es6-promise').Promise
 var utils = require('../lib/utils')
+var ErrorStackNormalizer = require('error-stack-normalizer')
 
 var defaultOptions = {
   filter: function (stackframe) {
@@ -37,6 +38,9 @@ module.exports = {
     if (typeof opts.filter === 'function') {
       stackFrames = stackFrames.filter(opts.filter)
     }
+
+    stackFrames = ErrorStackNormalizer(stackFrames)
+
     return Promise.resolve(stackFrames)
   },
 
@@ -49,6 +53,7 @@ module.exports = {
         stackFrames = stackFrames.filter(opts.filter)
       }
 
+      stackFrames = ErrorStackNormalizer(stackFrames)
       
       resolve(Promise.all(stackFrames.map(function (sf) {
         return new Promise(function (resolve) {
