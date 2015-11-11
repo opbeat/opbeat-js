@@ -34,6 +34,13 @@ function processError (error, msg, file, line, col) {
     'colno': col || null
   }
 
+  if (!exception.type) {
+    // Try to extract type from message formatted like 'ReferenceError: Can't find variable: initHighlighting'
+    if (exception.message.indexOf(':') > -1) {
+      exception.type = exception.message.split(':')[0]
+    }
+  }
+
   var resolveStackFrames
 
   if (error) {
