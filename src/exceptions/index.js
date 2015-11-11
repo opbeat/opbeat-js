@@ -28,7 +28,7 @@ function processError (error, msg, file, line, col) {
 
   var exception = {
     'message': error ? error.message : msg,
-    'type': error.name || null,
+    'type': error ? error.name : null,
     'fileurl': file || null,
     'lineno': line || null,
     'colno': col || null
