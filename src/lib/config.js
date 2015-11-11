@@ -4,7 +4,7 @@ var storage = require('./storage')
 function Config () {
   this.config = {}
   this.defaults = {
-    VERSION: this.VERSION,
+    VERSION: '%%GULP_INJECT_VERSION%%',
     apiHost: 'intake.opbeat.com',
     orgId: null,
     appId: null,
