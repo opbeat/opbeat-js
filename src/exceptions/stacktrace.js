@@ -44,11 +44,13 @@ module.exports = {
     opts = utils.mergeObject(defaultOptions, opts)
 
     return new Promise(function (resolve) {
-      var stackframes = ErrorStackParser.parse(error)
+      var stackFrames = ErrorStackParser.parse(error)
       if (typeof opts.filter === 'function') {
-        stackframes = stackframes.filter(opts.filter)
+        stackFrames = stackFrames.filter(opts.filter)
       }
-      resolve(Promise.all(stackframes.map(function (sf) {
+
+      
+      resolve(Promise.all(stackFrames.map(function (sf) {
         return new Promise(function (resolve) {
           resolve(sf)
         })
