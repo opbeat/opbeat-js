@@ -140,7 +140,7 @@ function $opbeatInstrumentationProvider ($provide) {
   })
 
   // Angular Core Instrumentation
-  require('./instrumentation/angular/cacheFactory')($provide, traceBuffer)
+  // require('./instrumentation/angular/cacheFactory')($provide, traceBuffer)
   require('./instrumentation/angular/compile')($provide, traceBuffer)
   require('./instrumentation/angular/controller')($provide, traceBuffer)
   require('./instrumentation/angular/http')($provide, traceBuffer)
