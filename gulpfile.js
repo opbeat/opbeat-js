@@ -9,6 +9,7 @@ var uglify = require('gulp-uglify')
 var taskListing = require('gulp-task-listing')
 var awspublish = require('gulp-awspublish')
 var injectVersion = require('gulp-inject-version')
+var derequire = require('gulp-derequire');
 
 var es = require('event-stream')
 
@@ -30,7 +31,6 @@ gulp.task('build:release', function () {
   var path = './dist/' + majorVersion
 
   var tasks = sourceTargets.map(function (entry) {
-    console.log('entry', entry)
     return browserify({
       entries: [entry],
       standalone: ''
@@ -40,6 +40,7 @@ gulp.task('build:release', function () {
       .pipe(rename({dirname: ''}))
       .pipe(buffer())
       .pipe(injectVersion())
+      .pipe(derequire())
       .pipe(gulp.dest(path))
       .pipe(rename({
         extname: '.min.js'
@@ -54,7 +55,6 @@ gulp.task('build:release', function () {
 
 gulp.task('build', function () {
   var tasks = sourceTargets.map(function (entry) {
-    console.log('entry', entry)
     return browserify({
       entries: [entry],
       standalone: ''
@@ -64,6 +64,7 @@ gulp.task('build', function () {
       .pipe(rename({dirname: ''}))
       .pipe(buffer())
       .pipe(injectVersion())
+      .pipe(derequire())
       .pipe(gulp.dest('./dist/'))
   })
 
@@ -103,19 +104,14 @@ gulp.task('deploy', ['build:release'], function () {
   }
 
   return gulp.src('dist/**')
-
     // Gzip
     .pipe(awspublish.gzip())
-
     // Publish files with headers
     .pipe(publisher.publish(headers))
-
     // Create a cache file to speed up consecutive uploads
     .pipe(publisher.cache())
-
     // Print upload updates to console
     .pipe(awspublish.reporter())
-
 })
 
 gulp.task('default', taskListing)
