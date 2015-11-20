@@ -138,8 +138,15 @@ module.exports = {
       return fn.apply(module, args)
     }
 
-    // Instrument static functions
-    this.getObjectFunctions(module).forEach(function (funcScope) {
+    // Copy all properties over
+    for (var key in module) {
+      if (module.hasOwnProperty(key)) {
+        wrapper[key] = module[key]
+      }
+    }
+
+    // Instrument functions
+    this.getObjectFunctions(module).forEach(function(funcScope) {
       wrapper[funcScope.property] = function () {
         var fn = funcScope.ref
         var args = Array.prototype.slice.call(arguments)
