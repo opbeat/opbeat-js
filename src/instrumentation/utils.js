@@ -259,8 +259,12 @@ function instrumentMethodBefore (context) {
     name = context.options.signatureFormatter.apply(this, [context.fn, args])
   }
 
-  var trace = transaction.startTrace(name, context.traceType)
-  context.trace = trace
+  if(transaction) {
+    var trace = transaction.startTrace(name, context.traceType)
+    context.trace = trace
+  } else {
+    logger.log('%c instrumentMethodBefore.error.transaction.missing', 'background-color: #ffff00', context)
+  }
 
   return {
     args: args
