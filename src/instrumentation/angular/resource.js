@@ -3,7 +3,7 @@ var utils = require('../utils')
 module.exports = function ($provide, traceBuffer) {
   try {
     // ngResource instrumentation
-    $provide.decorator('$resource', function ($delegate, $injector) {
+    $provide.decorator('$resource', ['$delegate', '$injector', function ($delegate, $injector) {
       return function () {
         var args = Array.prototype.slice.call(arguments)
         var result = $delegate.apply(this, args)
@@ -17,7 +17,7 @@ module.exports = function ($provide, traceBuffer) {
         })
         return result
       }
-    })
+    }])
   } catch (e) {
   }
 }

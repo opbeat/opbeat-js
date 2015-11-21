@@ -2,7 +2,7 @@ var utils = require('../utils')
 
 module.exports = function ($provide, traceBuffer) {
   // $cacheFactory instrumentation (this happens before routeChange -> using traceBuffer)
-  $provide.decorator('$cacheFactory', function ($delegate, $injector) {
+  $provide.decorator('$cacheFactory', ['$delegate', '$injector', function ($delegate, $injector) {
     return function () {
       var args = Array.prototype.slice.call(arguments)
       var cacheName = args[0] + 'Cache'
@@ -18,5 +18,5 @@ module.exports = function ($provide, traceBuffer) {
       })
       return result
     }
-  })
+  }])
 }

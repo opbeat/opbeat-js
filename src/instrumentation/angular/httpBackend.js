@@ -2,7 +2,7 @@ var utils = require('../utils')
 
 module.exports = function ($provide) {
   // $httpBackend instrumentation
-  $provide.decorator('$httpBackend', function ($delegate, $injector) {
+  $provide.decorator('$httpBackend', ['$delegate', '$injector', function ($delegate, $injector) {
     return function () {
       var args = Array.prototype.slice.call(arguments)
       var transaction = utils.getCurrentTransaction($injector)
@@ -17,5 +17,5 @@ module.exports = function ($provide) {
       }).apply(this, args)
       return result
     }
-  })
+  }])
 }

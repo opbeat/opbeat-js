@@ -2,7 +2,7 @@ var utils = require('../utils')
 
 module.exports = function ($provide, traceBuffer) {
   // Controller Instrumentation
-  $provide.decorator('$controller', function ($delegate, $injector) {
+  $provide.decorator('$controller', ['$delegate', '$injector', function ($delegate, $injector) {
     return function () {
       var args = Array.prototype.slice.call(arguments)
       var controllerInfo = utils.getControllerInfoFromArgs(args)
@@ -19,5 +19,5 @@ module.exports = function ($provide, traceBuffer) {
 
       return $delegate.apply(this, args)
     }
-  })
+  }])
 }

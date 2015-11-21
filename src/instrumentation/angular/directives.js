@@ -3,13 +3,13 @@ var utils = require('../utils')
 module.exports = function ($provide) {
   var instrumentDirective = function (name) {
     var directiveName = name + 'Directive'
-    $provide.decorator(directiveName, function ($delegate, $injector) {
+    $provide.decorator(directiveName, ['$delegate', '$injector', function ($delegate, $injector) {
       utils.instrumentObject($delegate[0], $injector, {
         type: 'template.angular.directive',
         prefix: directiveName
       })
       return $delegate
-    })
+    }])
   }
 
   return {
