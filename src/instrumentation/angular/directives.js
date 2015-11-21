@@ -14,7 +14,6 @@ module.exports = function ($provide) {
 
   return {
     instrumentAll: function (modules) {
-      console.log('instrumentationAll', modules)
       modules.forEach(function (name) {
         instrumentDirective(name)
       })
