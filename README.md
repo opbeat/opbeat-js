@@ -26,14 +26,15 @@ _opbeat = window._opbeat || function() {
 };
 
 _opbeat('config', {
-  debug: true/false,
-  orgId: '<org id>',
-  appId: '<app id>',
+  debug: true/false, // Toggles debug-mode, that outputs debug messages to the console
+  orgId: '<org id>', // Your Opbeat org id
+  appId: '<app id>', // Your Opbeat app id
   libraryPathPattern: 'node_modules' // Regex pattern used to determine whether a file is a library file or not.
 });
 
+// Optional: Pass user data to the reported exceptions
 _opbeat('setUserContext', {
-  email: 'vanja@opbeat.com',
+  email: 'vanja@opbeat.com', 
   id: 1,
   isSuperDuperAwesome: true
 });
@@ -56,12 +57,19 @@ In order to provide code instrumentation we have chosen a framework-specific app
 angular.module('app', ['ngOpbeat'])
   .config(function ($opbeatProvider) {
     $opbeatProvider.config({
-      debug: true/false,
-      orgId: '<org id>',
-      appId: '<app id>',
-      libraryPathPattern: 'node_modules'
+      debug: true/false, // Toggles debug-mode, that outputs debug messages to the console
+      orgId: '<org id>', // Your Opbeat org id
+      appId: '<app id>', // Your Opbeat app id
+      libraryPathPattern: 'node_modules' // Regex pattern used to determine whether a file is a library file or not.
     })
-
+    
+    // Optional: Pass user data to the reported exceptions
+    $opbeatProvider.setUserContext({
+      email: 'vanja@opbeat.com', 
+      id: 1,
+      isSuperDuperAwesome: true
+    });  
+    
     $opbeatProvider.install()
   })
 ```
