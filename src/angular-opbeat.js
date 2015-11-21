@@ -46,7 +46,7 @@ function $opbeatInstrumentationProvider ($provide) {
   var traceBuffer = new TraceBuffer('beforeControllerTransaction')
 
   // Route controller Instrumentation
-  $provide.decorator('$controller', function ($delegate, $location, $rootScope) {
+  $provide.decorator('$controller', ['$delegate', '$location', '$rootScope', function ($delegate, $location, $rootScope) {
     $rootScope._opbeatTransactions = {}
 
     var onRouteChange = function (e, current) {
@@ -111,9 +111,9 @@ function $opbeatInstrumentationProvider ($provide) {
       logger.log('opbeat.decorator.controller.end')
       return result
     }
-  })
+  }])
 
-  $provide.decorator('$controller', function ($delegate, $rootScope, $rootElement) {
+  $provide.decorator('$controller', ['$delegate', '$rootScope', '$rootElement', function ($delegate, $rootScope, $rootElement) {
     $rootScope._opbeatHasInstrumentedFactories = false
     $rootScope._opbeatHasInstrumentedDirectives = false
 
@@ -137,10 +137,10 @@ function $opbeatInstrumentationProvider ($provide) {
     }
 
     return $delegate
-  })
+  }])
 
   // Angular Core Instrumentation
-  // require('./instrumentation/angular/cacheFactory')($provide, traceBuffer)
+  require('./instrumentation/angular/cacheFactory')($provide, traceBuffer)
   require('./instrumentation/angular/compile')($provide, traceBuffer)
   require('./instrumentation/angular/controller')($provide, traceBuffer)
   require('./instrumentation/angular/http')($provide, traceBuffer)
