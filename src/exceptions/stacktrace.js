@@ -54,7 +54,7 @@ module.exports = {
       }
 
       stackFrames = ErrorStackNormalizer(stackFrames)
-      
+
       resolve(Promise.all(stackFrames.map(function (sf) {
         return new Promise(function (resolve) {
           resolve(sf)

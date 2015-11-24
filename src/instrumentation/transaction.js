@@ -23,7 +23,7 @@ var Transaction = function (queue, name, type) {
 }
 
 Transaction.prototype.end = function () {
-  if(this.ended) {
+  if (this.ended) {
     return
   }
 
@@ -38,7 +38,6 @@ Transaction.prototype.end = function () {
   } else {
     this._markAsDone()
   }
-
 }
 
 Transaction.prototype._markAsDone = function () {
@@ -77,7 +76,6 @@ Transaction.prototype._onTraceEnd = function (trace) {
   if (this._markDoneAfterLastTrace && Object.keys(this._activeTraces).length === 0) {
     this._markAsDone()
   }
-
 }
 
 module.exports = Transaction

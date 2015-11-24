@@ -146,7 +146,7 @@ module.exports = {
     }
 
     // Instrument functions
-    this.getObjectFunctions(module).forEach(function(funcScope) {
+    this.getObjectFunctions(module).forEach(function (funcScope) {
       wrapper[funcScope.property] = function () {
         var fn = funcScope.ref
         var args = Array.prototype.slice.call(arguments)
@@ -259,7 +259,7 @@ function instrumentMethodBefore (context) {
     name = context.options.signatureFormatter.apply(this, [context.fn, args])
   }
 
-  if(transaction) {
+  if (transaction) {
     var trace = transaction.startTrace(name, context.traceType)
     context.trace = trace
   } else {

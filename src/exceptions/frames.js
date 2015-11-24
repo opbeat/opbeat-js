@@ -44,7 +44,7 @@ module.exports = {
       var filePath = this.cleanFilePath(stack.fileName)
       var fileName = this.filePathToFileName(filePath)
 
-      if(this.isFileInline(filePath)) {
+      if (this.isFileInline(filePath)) {
         fileName = '(inline script)'
       }
 
@@ -73,7 +73,6 @@ module.exports = {
           frame.pre_context = contexts.preContext
           frame.context_line = contexts.contextLine
           frame.post_context = contexts.postContext
-
           resolve(frame)
         })['catch'](function () {
           resolve(frame)
@@ -135,7 +134,7 @@ module.exports = {
       }
     }
 
-    if(this.isFileInline(filePath)) {
+    if (this.isFileInline(filePath)) {
       culprit = '(inline script)'
     } else {
       culprit = fileName
@@ -191,7 +190,7 @@ module.exports = {
   },
 
   isFileInline: function (fileUrl) {
-    if(fileUrl) {
+    if (fileUrl) {
       return window.location.href.indexOf(fileUrl) === 0
     } else {
       return false
