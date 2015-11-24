@@ -8,7 +8,7 @@ function Config () {
     apiHost: 'intake.opbeat.com',
     orgId: null,
     appId: null,
-    libraryPathPattern: 'node_modules',
+    libraryPathPattern: '(node_modules|bowser_components|webpack)',
     context: {
       user: {
         uuid: _generateUUID()
