@@ -6,18 +6,30 @@ var transport = require('../lib/transport')
 var utils = require('../lib/utils')
 var context = require('./context')
 var stackTrace = require('./stacktrace')
-var promiseMapSeries = require('promise-map-series')
+
+var promiseSequence = function (tasks) {
+  var current = Promise.resolve()
+  var results = []
+
+  for (var k = 0; k < tasks.length; ++k) {
+    results.push(current = current.then(tasks[k]))
+  }
+
+  return Promise.all(results)
+}
 
 module.exports = {
 
   getFramesForCurrent: function () {
     return stackTrace.get().then(function (frames) {
-      var framesPromises = promiseMapSeries(frames, function (stack) {
-        return this.buildOpbeatFrame(stack)
+      var tasks = frames.map(function (frame) {
+        return this.buildOpbeatFrame.bind(this, frame)
       }.bind(this))
 
-      return framesPromises.then(function (frames) {
-        return frames
+      var allFrames = promiseSequence(tasks)
+
+      return allFrames.then(function (opbeatFrames) {
+        return opbeatFrames
       })
     }.bind(this))
   },
@@ -73,11 +85,13 @@ module.exports = {
   stackInfoToOpbeatException: function (stackInfo) {
     return new Promise(function (resolve, reject) {
       if (stackInfo.stack && stackInfo.stack.length) {
-        var framesPromises = promiseMapSeries(stackInfo.stack, function (stack, index) {
-          return this.buildOpbeatFrame(stack)
+        var tasks = stackInfo.stack.map(function (frame) {
+          return this.buildOpbeatFrame.bind(this, frame)
         }.bind(this))
 
-        framesPromises.then(function (frames) {
+        var allFrames = promiseSequence(tasks)
+
+        allFrames.then(function (frames) {
           stackInfo.frames = frames
           stackInfo.stack = null
           resolve(stackInfo)

@@ -19,7 +19,6 @@
     "error-stack-parser": "github:auchenberg/error-stack-parser#ie-anonymous-functions",
     "es6-promise": "^3.0.2",
     "event-stream": "^3.3.1",
-    "promise-map-series": "auchenberg/promise-map-series#any-promise",
     "simple-lru-cache": "0.0.2",
     "stack-generator": "^1.0.7"
   },
