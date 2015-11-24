@@ -1,37 +1,6 @@
 var Promise = require('es6-promise').Promise
-var SimpleCache = require('simple-lru-cache')
-
-var logger = require('../lib/logger')
-var transport = require('../lib/transport')
 var utils = require('../lib/utils')
-
-var cache = new SimpleCache({
-  'maxSize': 1000
-})
-
-var _getFile = function (url) {
-  return new Promise(function (resolve, reject) {
-    var getFileFromCache = function (callback) {
-      var cachedSource = cache.get(url)
-      if (cachedSource) {
-        resolve(cachedSource)
-      } else {
-        callback()
-      }
-    }
-
-    getFileFromCache(function () {
-      transport.getFile(url).then(function (source) {
-        cache.set(url, source)
-        resolve(source)
-      }).catch(function () {
-        getFileFromCache(function () {
-          reject()
-        })
-      })
-    })
-  })
-}
+var fileFetcher = require('../lib/fileFetcher')
 
 module.exports = {
 
@@ -57,7 +26,7 @@ module.exports = {
     }
 
     return new Promise(function (resolve, reject) {
-      _getFile(fileUrl).then(function (source) {
+      fileFetcher.getFile(fileUrl).then(function (source) {
         var sourceMapUrl = _findSourceMappingURL(source)
         if (sourceMapUrl) {
           sourceMapUrl = fileBasePath + sourceMapUrl
@@ -75,7 +44,7 @@ module.exports = {
     }
 
     return new Promise(function (resolve, reject) {
-      _getFile(url).then(function (source) {
+      fileFetcher.getFile(url).then(function (source) {
         line -= 1 // convert line to 0-based index
 
         var sourceLines = source.split('\n')
