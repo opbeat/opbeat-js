@@ -48,7 +48,6 @@ In order to provide code instrumentation we have chosen a framework-specific app
 
 ### angular-opbeat
 
-
 ```html
 <script src="https://d3tvtfb6518e3e.cloudfront.net/1/angular-opbeat.min.js"></script>
 ```
@@ -73,6 +72,10 @@ angular.module('app', ['ngOpbeat'])
     $opbeatProvider.install()
   })
 ```
+
+#### Supported AngularJS versions
+
+Our angular-opbeat agent is tested with AngularJS 1.2.x, 1.3.x and 1.4.x releases.
 
 
 ## License
