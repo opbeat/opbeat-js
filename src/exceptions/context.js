@@ -8,7 +8,7 @@ module.exports = {
     var fileBasePath
 
     if (!fileUrl) {
-      return Promise.reject()
+      return Promise.reject('no fileUrl')
     }
 
     function _findSourceMappingURL (source) {
@@ -34,13 +34,13 @@ module.exports = {
         } else {
           reject('no sourceMapUrl')
         }
-      })['catch'](reject)
+      }, reject)
     })
   },
 
   getExceptionContexts: function (url, line) {
     if (!url || !line) {
-      return Promise.reject()
+      return Promise.reject('no line or url')
     }
 
     return new Promise(function (resolve, reject) {
@@ -95,7 +95,7 @@ module.exports = {
         }
 
         resolve(contexts)
-      }.bind(this))['catch'](reject)
+      }.bind(this), reject)
     }.bind(this))
   },
 

@@ -64,7 +64,7 @@ module.exports = {
       sourceMapResolver.then(function (sourceMapUrl) {
         frame.sourcemap_url = sourceMapUrl
         resolve(frame)
-      })['catch'](function () {
+      }, function () {
         // // Resolve contexts if no source map
         var filePath = this.cleanFilePath(stack.fileName)
         var contextsResolver = context.getExceptionContexts(filePath, stack.lineNumber)
