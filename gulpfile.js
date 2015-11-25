@@ -10,8 +10,9 @@ var taskListing = require('gulp-task-listing')
 var awspublish = require('gulp-awspublish')
 var injectVersion = require('gulp-inject-version')
 var derequire = require('gulp-derequire');
-
 var es = require('event-stream')
+
+require('gulp-release-tasks')(gulp);
 
 var sourceTargets = [
   './src/opbeat.js',
