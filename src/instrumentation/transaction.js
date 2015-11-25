@@ -7,6 +7,7 @@ var Transaction = function (queue, name, type) {
   this.type = type
   this.ended = false
   this._markDoneAfterLastTrace = false
+  this._isDone = false
 
   this.traces = []
   this._activeTraces = {}
@@ -42,6 +43,12 @@ Transaction.prototype.end = function () {
 
 Transaction.prototype._markAsDone = function () {
   logger.log('- %c opbeat.instrumentation.transaction._markAsDone', 'color: #3360A3', this.name)
+
+  if(this._isDone) {
+    return
+  }
+
+  this._isDone = true
 
   // When all traces are finished, the transaction can be added to the queue
   var whenAllTracesFinished = this.traces.map(function (trace) {
