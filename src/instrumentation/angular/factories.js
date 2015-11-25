@@ -6,7 +6,7 @@ module.exports = function ($provide, traceBuffer) {
       modules.forEach(function (name) {
         $provide.decorator(name, ['$delegate', '$injector', function ($delegate, $injector) {
           utils.instrumentObject($delegate, $injector, {
-            type: 'app.angular.factory',
+            type: 'app.$factory',
             prefix: name
           })
           return $delegate

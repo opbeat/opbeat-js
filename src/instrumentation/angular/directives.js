@@ -5,7 +5,7 @@ module.exports = function ($provide) {
     var directiveName = name + 'Directive'
     $provide.decorator(directiveName, ['$delegate', '$injector', function ($delegate, $injector) {
       utils.instrumentObject($delegate[0], $injector, {
-        type: 'template.angular.directive',
+        type: 'template.$directive',
         prefix: directiveName
       })
       return $delegate

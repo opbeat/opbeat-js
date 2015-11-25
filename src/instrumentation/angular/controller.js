@@ -11,7 +11,7 @@ module.exports = function ($provide, traceBuffer) {
       if (controllerInfo.name) {
         if (transaction && transaction.metadata.controllerName !== controllerInfo.name) {
           return utils.instrumentModule($delegate, $injector, {
-            type: 'template.angular.controller',
+            type: 'template.$controller',
             prefix: 'controller.' + controllerInfo.name
           }).apply(this, arguments)
         }

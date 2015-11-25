@@ -1,11 +1,11 @@
 var utils = require('../utils')
 
 module.exports = function ($provide, traceBuffer) {
-  try { 
+  try {
     // Template Request Instrumentation
     $provide.decorator('$templateRequest', ['$delegate', '$injector', function ($delegate, $injector) {
       return utils.instrumentModule($delegate, $injector, {
-        type: 'template.angular.request',
+        type: 'template.$templateRequest',
         prefix: '$templateRequest',
         signatureFormatter: function (key, args) {
           var text = ['$templateRequest', args[0]]
