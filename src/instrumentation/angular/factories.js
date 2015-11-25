@@ -7,7 +7,7 @@ module.exports = function ($provide, traceBuffer) {
         $provide.decorator(name, ['$delegate', '$injector', function ($delegate, $injector) {
           utils.instrumentObject($delegate, $injector, {
             type: 'angular.factory',
-            prefix: name
+          prefix: 'app.factory.' + name
           })
           return $delegate
         }])
