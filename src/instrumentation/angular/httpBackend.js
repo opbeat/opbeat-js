@@ -9,6 +9,7 @@ module.exports = function ($provide) {
 
       var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'app.httpBackend', {
         prefix: '$httpBackend',
+        type: 'ext.$httpBackend',
         callbackIndex: 3,
         signatureFormatter: function (key, args) {
           var text = ['$httpBackend', args[0].toUpperCase(), args[1]]
