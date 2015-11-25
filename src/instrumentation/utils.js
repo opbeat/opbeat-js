@@ -1,4 +1,5 @@
 var logger = require('../lib/logger')
+var config = require('../lib/config')
 
 module.exports = {
 
@@ -235,7 +236,13 @@ module.exports = {
   },
 
   resolveAngularDependenciesByType: function ($rootElement, type) {
-    return window.angular.module($rootElement.attr('ng-app'))._invokeQueue.filter(function (m) {
+    var appName = $rootElement.attr('ng-app') || config.get('appName')
+
+    if(!appName) {
+      return []
+    }
+
+    return window.angular.module(appName)._invokeQueue.filter(function (m) {
       return m[1] === type
     }).map(function (m) {
       return m[2][0]
