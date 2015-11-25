@@ -26,10 +26,11 @@ var getFileFromNetwork = function (url) {
           fn()
         })
       }
-    }, function () {
-      reject()
-    }).finally(function () {
       fetchQueue[url] = null
+
+    }, function (err) {
+      fetchQueue[url] = null
+      reject(err)
     })
   })
 }
@@ -54,9 +55,7 @@ module.exports = {
       }, function () {
         getFileFromNetwork(url).then(function (fileSource) { // then try network
           resolve(fileSource)
-        }, function () { // give up
-          reject()
-        })
+        }, reject) // give up
       })
     })
   }
