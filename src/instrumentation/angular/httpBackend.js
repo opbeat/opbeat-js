@@ -7,9 +7,8 @@ module.exports = function ($provide) {
       var args = Array.prototype.slice.call(arguments)
       var transaction = utils.getCurrentTransaction($injector)
 
-      var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'app.httpBackend', {
+      var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'ext.$httpBackend', {
         prefix: '$httpBackend',
-        type: 'ext.$httpBackend',
         callbackIndex: 3,
         signatureFormatter: function (key, args) {
           var text = ['$httpBackend', args[0].toUpperCase(), args[1]]
