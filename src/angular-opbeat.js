@@ -59,7 +59,11 @@ function $opbeatInstrumentationProvider ($provide) {
         $rootScope._opbeatTransactions[$location.absUrl()] = transaction
 
         // Update transaction reference in traceBuffer
-        traceBuffer.setTransactionRef(transaction)
+        traceBuffer.setTransactionReference(transaction)
+
+        // Lock traceBuffer, as we only want to migrate the initial traces to the first transaction
+        traceBuffer.lock();
+
       }
     }
 

@@ -4,20 +4,20 @@ var Trace = require('./trace')
 var TraceBuffer = function (name) {
   this.traces = []
   this.activetraces = []
-  this.traceTransactionRef = this
-  this._setTraceParent = false
+  this.traceTransactionReference = this
+  this._isLocked = false;
 }
 
 TraceBuffer.prototype.startTrace = function (signature, type) {
-  var trace = new Trace(this.traceTransactionRef, signature, type)
+  var trace = new Trace(this.traceTransactionReference, signature, type)
 
-  if (this._setTraceParent) {
-    trace.setParent(this.traceTransactionRef._rootTrace)
+  if (this._isLocked) {
+    trace.setParent(this.traceTransactionReference._rootTrace)
   }
 
   this.activetraces.push(trace)
 
-  logger.log('opbeat.instrumentation.traceHolder.startTrace', signature)
+  logger.log('opbeat.instrumentation.TraceBuffer.startTrace', signature)
 
   return trace
 }
@@ -30,30 +30,32 @@ TraceBuffer.prototype._onTraceEnd = function (trace) {
     this.activetraces.splice(index, 1)
   }
 
-  logger.log('opbeat.instrumentation.traceHolder._endTrace', this.name, trace.signature)
+  // TODO: Buffer should probably be flushed at somepoint to save memory
+
+  logger.log('opbeat.instrumentation.TraceBuffer._endTrace', this.name, trace.signature)
 }
 
-TraceBuffer.prototype.setTransactionRef = function (transaction) {
-  this.traceTransactionRef = transaction
-  this._setTraceParent = true
+TraceBuffer.prototype.setTransactionReference = function (transaction) {
+  if(this._isLocked) {
+    return
+  }
+
+  this.traceTransactionReference = transaction
 
   this.activetraces.forEach(function (trace) {
-    trace.transaction = this.traceTransactionRef
-    trace.setParent(this.traceTransactionRef._rootTrace)
+    trace.transaction = this.traceTransactionReference
   }.bind(this))
 
   this.traces.forEach(function (trace) {
-    trace.transaction = this.traceTransactionRef
-    trace.setParent(this.traceTransactionRef._rootTrace)
+    trace.transaction = this.traceTransactionReference
+    trace.setParent(this.traceTransactionReference._rootTrace)
   }.bind(this))
+
+  this.traces = []
 }
 
-TraceBuffer.prototype.getTraces = function () {
-  return this.traces
-}
-
-TraceBuffer.prototype.getActiveTraces = function () {
-  return this.activetraces
+TraceBuffer.prototype.lock = function() {
+  this._isLocked = true
 }
 
 module.exports = TraceBuffer
