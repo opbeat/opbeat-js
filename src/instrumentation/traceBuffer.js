@@ -39,10 +39,12 @@ TraceBuffer.prototype.setTransactionRef = function (transaction) {
 
   this.activetraces.forEach(function (trace) {
     trace.transaction = this.traceTransactionRef
+    trace.setParent(this.traceTransactionRef._rootTrace)
   }.bind(this))
 
   this.traces.forEach(function (trace) {
     trace.transaction = this.traceTransactionRef
+    trace.setParent(this.traceTransactionRef._rootTrace)
   }.bind(this))
 }
 
