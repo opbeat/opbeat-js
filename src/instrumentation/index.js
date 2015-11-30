@@ -84,7 +84,7 @@ function getRawGroupedTracesTimings (traces, groupedTraces) {
   }
 
   var groupedByTransaction = grouper(traces, function (trace) {
-    return trace.transaction.name
+    return trace.transaction.name + '|' + trace.transaction._start
   })
 
   return Object.keys(groupedByTransaction).map(function (key) {
