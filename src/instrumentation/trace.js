@@ -41,7 +41,7 @@ Trace.prototype.end = function () {
 
 Trace.prototype.duration = function () {
   if (!this.ended) {
-    console.error('Trying to call trace.duration() on un-ended Trace!')
+    logger.log('%c -- opbeat.instrumentation.trace.duration.error.un-ended.trace!', 'color: #ff0000', this.signature, this._diff)
     return null
   }
 
@@ -50,7 +50,7 @@ Trace.prototype.duration = function () {
 
 Trace.prototype.startTime = function () {
   if (!this.ended || !this.transaction.ended) {
-    logger.error('Trying to call trace.startTime() for un-ended Trace/Transaction!')
+    logger.log('%c -- opbeat.instrumentation.trace.startTime.error.un-ended.trace!', 'color: #ff0000', this.signature, this._diff)
     return null
   }
 
