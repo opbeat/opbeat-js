@@ -8,7 +8,7 @@ function Config () {
     apiHost: 'intake.opbeat.com',
     orgId: null,
     appId: null,
-    appName: null,
+    angularAppName: null,
     libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {
       user: {

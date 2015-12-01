@@ -2,7 +2,7 @@
 
 opbeat.js is the official JavaScript agent for Opbeat. This agent enables automatic exception collection and framework-specific code instrumentation of your front-end code.
 
-## Installation 
+## Installation
 
 Include this `<script>` before your main application. Typically in your <head>
 
@@ -34,7 +34,7 @@ _opbeat('config', {
 
 // Optional: Pass user data to the reported exceptions
 _opbeat('setUserContext', {
-  email: 'vanja@opbeat.com', 
+  email: 'vanja@opbeat.com',
   id: 1,
   isSuperDuperAwesome: true
 });
@@ -52,25 +52,36 @@ In order to provide code instrumentation we have chosen a framework-specific app
 <script src="https://d3tvtfb6518e3e.cloudfront.net/1/angular-opbeat.min.js"></script>
 ```
 
-```javascript 
+```javascript
 angular.module('app', ['ngOpbeat'])
   .config(function ($opbeatProvider) {
     $opbeatProvider.config({
       debug: true/false, // Toggles debug-mode, that outputs debug messages to the console
       orgId: '<org id>', // Your Opbeat org id
       appId: '<app id>', // Your Opbeat app id
-      libraryPathPattern: '(node_modules|bower_components|webpack)' // Regex pattern used to determine whether a file is a library file or not.
+      libraryPathPattern: '(node_modules|bower_components|webpack)', // Regex pattern used to determine whether a file is a library file or not.
+      angularAppName: '' // The name of the angular app, if booted manually
     })
-    
+
     // Optional: Pass user data to the reported exceptions
     $opbeatProvider.setUserContext({
-      email: 'vanja@opbeat.com', 
+      email: 'vanja@opbeat.com',
       id: 1,
       isSuperDuperAwesome: true
-    });  
-    
+    });
+
     $opbeatProvider.install()
   })
+```
+
+#### Pass in angular app name for manually booted applications
+
+For Angular applications that aren't using the `ng-app` directive to boot, you need to pass in the app name via the config:
+
+```
+    $opbeatProvider.config({
+      angularAppName: 'my app name'
+    })
 ```
 
 #### Supported AngularJS versions

@@ -221,7 +221,7 @@ module.exports = {
   },
 
   resolveAngularDependenciesByType: function ($rootElement, type) {
-    var appName = $rootElement.attr('ng-app') || config.get('appName')
+    var appName = $rootElement.attr('ng-app') || config.get('angularAppName')
 
     if (!appName) {
       return []
