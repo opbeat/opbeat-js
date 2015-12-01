@@ -1,37 +1,22 @@
 var logger = require('../lib/logger')
 var config = require('../lib/config')
 
+var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
+var FN_ARG_SPLIT = /,/
+var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
+
 module.exports = {
 
-  wrapMethod: function (fn, before, after, context) {
-    return function opbeatInstrumentationWrapper () {
-      var args = Array.prototype.slice.call(arguments)
-
-      // Before callback
-      if (typeof before === 'function') {
-        var beforeData = before.apply(this, [context].concat(args))
-        if (beforeData.args) {
-          args = beforeData.args
-        }
-      }
-
-      // Execute original function
-      var result = fn.apply(this, args)
-
-      // After callback
-      if (typeof after === 'function') {
-        // After + Promise handling
-        if (result && typeof result.then === 'function') {
-          result.finally(function () {
-            after.apply(this, [context].concat(args))
-          }.bind(this))
-        } else {
-          after.apply(this, [context].concat(args))
-        }
-      }
-
-      return result
+  wrapMethod: function (_opbeatOriginalFunction, _opbeatBefore, _opbeatAfter, _opbeatContext) {
+    var namedArguments = extractNamedFunctionArgs(_opbeatOriginalFunction).join(',')
+    var context = {
+      _opbeatOriginalFunction: _opbeatOriginalFunction,
+      _opbeatBefore: _opbeatBefore,
+      _opbeatAfter: _opbeatAfter,
+      _opbeatContext: _opbeatContext
     }
+
+    return buildWrapperFunction(context, namedArguments)
   },
 
   instrumentMethodWithCallback: function (fn, fnName, transaction, type, options) {
@@ -174,6 +159,7 @@ module.exports = {
 
     // Instrument static functions
     this.getObjectFunctions(object).forEach(function (funcScope) {
+
       var transaction
 
       if (options.transaction) {
@@ -282,4 +268,46 @@ function instrumentMethodAfter (context) {
   if (context.trace) {
     context.trace.end()
   }
+}
+
+function extractNamedFunctionArgs(fn) {
+  fnText = fn.toString().replace(STRIP_COMMENTS, '')
+  argDecl = fnText.match(FN_ARGS)
+  return argDecl[1].split(FN_ARG_SPLIT)
+}
+
+function buildWrapperFunction(ctx, funcArguments){
+  var funcBody = 'var args = Array.prototype.slice.call(arguments)\n' +
+    '// Before callback\n' +
+    'if (typeof _opbeatBefore === "function") {\n' +
+      'var beforeData = _opbeatBefore.apply(this, [_opbeatContext].concat(args))\n' +
+      'if (beforeData.args) {\n' +
+      ' args = beforeData.args\n' +
+      '}\n' +
+    '}\n' +
+    '// Execute original function\n' +
+    'var result = _opbeatOriginalFunction.apply(this, args)\n' +
+    '// After callback\n' +
+    'if (typeof _opbeatAfter === "function") {\n' +
+    '  // After + Promise handling\n' +
+    '  if (result && typeof result.then === "function") {\n' +
+    '    result.finally(function () {\n' +
+    '      _opbeatAfter.apply(this, [_opbeatContext].concat(args))\n' +
+    '    }.bind(this))\n' +
+    '  } else {\n' +
+    '    _opbeatAfter.apply(this, [_opbeatContext].concat(args))\n' +
+    '  }\n' +
+    '}\n' +
+    'return result\n'
+
+  var newBody = []
+  for(var k in ctx) {
+    var i =  "var "+k + " = ctx['"+k+"'];"
+    newBody.push(i)
+  }
+
+  var res = "return function opbeatFunctionWrapper(" + funcArguments + "){ " +funcBody+ " }"
+  newBody.push(res)
+  var F = new Function("ctx", newBody.join('\n'))
+  return F(ctx)
 }
