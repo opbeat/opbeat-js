@@ -44,7 +44,7 @@ Transaction.prototype.end = function () {
 Transaction.prototype._markAsDone = function () {
   logger.log('- %c opbeat.instrumentation.transaction._markAsDone', 'color: #3360A3', this.name)
 
-  if(this._isDone) {
+  if (this._isDone) {
     return
   }
 

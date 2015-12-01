@@ -5,7 +5,7 @@ var TraceBuffer = function (name) {
   this.traces = []
   this.activetraces = []
   this.traceTransactionReference = this
-  this._isLocked = false;
+  this._isLocked = false
 }
 
 TraceBuffer.prototype.startTrace = function (signature, type) {
@@ -36,7 +36,7 @@ TraceBuffer.prototype._onTraceEnd = function (trace) {
 }
 
 TraceBuffer.prototype.setTransactionReference = function (transaction) {
-  if(this._isLocked) {
+  if (this._isLocked) {
     return
   }
 
@@ -54,7 +54,7 @@ TraceBuffer.prototype.setTransactionReference = function (transaction) {
   this.traces = []
 }
 
-TraceBuffer.prototype.lock = function() {
+TraceBuffer.prototype.lock = function () {
   this._isLocked = true
 }
 

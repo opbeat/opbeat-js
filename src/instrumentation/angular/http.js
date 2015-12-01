@@ -7,9 +7,9 @@ module.exports = function ($provide, traceBuffer) {
       type: 'ext.$http',
       prefix: '$http',
       signatureFormatter: function (key, args) {
-        text = []
-        if(args.length) {
-          if(typeof args[0] == 'object') {
+        var text = []
+        if (args.length) {
+          if (typeof args[0] === 'object') {
             text = ['$http', args[0].method.toUpperCase(), args[0].url]
           } else {
             text = ['$http', args[0]]

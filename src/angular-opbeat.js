@@ -62,8 +62,7 @@ function $opbeatInstrumentationProvider ($provide) {
         traceBuffer.setTransactionReference(transaction)
 
         // Lock traceBuffer, as we only want to migrate the initial traces to the first transaction
-        traceBuffer.lock();
-
+        traceBuffer.lock()
       }
     }
 

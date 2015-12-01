@@ -159,7 +159,6 @@ module.exports = {
 
     // Instrument static functions
     this.getObjectFunctions(object).forEach(function (funcScope) {
-
       var transaction
 
       if (options.transaction) {
@@ -224,7 +223,7 @@ module.exports = {
   resolveAngularDependenciesByType: function ($rootElement, type) {
     var appName = $rootElement.attr('ng-app') || config.get('appName')
 
-    if(!appName) {
+    if (!appName) {
       return []
     }
 
@@ -270,13 +269,13 @@ function instrumentMethodAfter (context) {
   }
 }
 
-function extractNamedFunctionArgs(fn) {
-  fnText = fn.toString().replace(STRIP_COMMENTS, '')
-  argDecl = fnText.match(FN_ARGS)
+function extractNamedFunctionArgs (fn) {
+  var fnText = fn.toString().replace(STRIP_COMMENTS, '')
+  var argDecl = fnText.match(FN_ARGS)
   return argDecl[1].split(FN_ARG_SPLIT)
 }
 
-function buildWrapperFunction(ctx, funcArguments){
+function buildWrapperFunction (ctx, funcArguments) {
   var funcBody = 'var args = Array.prototype.slice.call(arguments)\n' +
     '// Before callback\n' +
     'if (typeof _opbeatBefore === "function") {\n' +
@@ -301,13 +300,13 @@ function buildWrapperFunction(ctx, funcArguments){
     'return result\n'
 
   var newBody = []
-  for(var k in ctx) {
-    var i =  "var "+k + " = ctx['"+k+"'];"
+  for (var k in ctx) {
+    var i = 'var ' + k + ' = ctx["' + k + '"];'
     newBody.push(i)
   }
 
-  var res = "return function opbeatFunctionWrapper(" + funcArguments + "){ " +funcBody+ " }"
+  var res = 'return function opbeatFunctionWrapper(' + funcArguments + '){ ' + funcBody + ' }'
   newBody.push(res)
-  var F = new Function("ctx", newBody.join('\n'))
+  var F = new Function('ctx', newBody.join('\n'))
   return F(ctx)
 }

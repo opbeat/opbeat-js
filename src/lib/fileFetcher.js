@@ -27,7 +27,6 @@ var getFileFromNetwork = function (url) {
         })
       }
       fetchQueue[url] = null
-
     }, function (err) {
       fetchQueue[url] = null
       reject(err)
