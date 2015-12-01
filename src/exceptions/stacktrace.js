@@ -10,6 +10,7 @@ var defaultOptions = {
     return (stackframe.functionName || '').indexOf('StackTrace$$') === -1 &&
       (stackframe.functionName || '').indexOf('ErrorStackParser$$') === -1 &&
       (stackframe.functionName || '').indexOf('StackGenerator$$') === -1 &&
+      (stackframe.functionName || '').indexOf('opbeatFunctionWrapper') === -1 &&
       (stackframe.fileName || '').indexOf('angular-opbeat.js') === -1 &&
       (stackframe.fileName || '').indexOf('angular-opbeat.min.js') === -1 &&
       (stackframe.fileName || '').indexOf('opbeat.js') === -1 &&
