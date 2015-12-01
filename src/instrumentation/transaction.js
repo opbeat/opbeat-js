@@ -57,8 +57,20 @@ Transaction.prototype._markAsDone = function () {
 
   Promise.all(whenAllTracesFinished).then(function () {
     logger.log('- %c opbeat.instrumentation.transaction.whenAllTracesFinished', 'color: #3360A3', this.name)
+
+    this._adjustStartToEarliestTrace()
+
     this._queue.add(this)
   }.bind(this))
+}
+
+Transaction.prototype._adjustStartToEarliestTrace = function () {
+  var trace = getEarliestTrace(this.traces)
+
+  if(trace) {
+    this._start = trace._start
+    this._startStamp = trace._startStamp
+  }
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
@@ -84,5 +96,21 @@ Transaction.prototype._onTraceEnd = function (trace) {
     this._markAsDone()
   }
 }
+
+function getEarliestTrace (traces) {
+  var earliestTrace = null
+
+  traces.forEach(function(trace) {
+    if(!earliestTrace) {
+      earliestTrace = trace
+    }
+    if(earliestTrace && earliestTrace._start > trace._start) {
+      earliestTrace = trace
+    }
+  })
+
+  return earliestTrace
+}
+
 
 module.exports = Transaction
