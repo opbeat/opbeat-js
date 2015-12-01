@@ -9,6 +9,8 @@ var TraceBuffer = function (name) {
 }
 
 TraceBuffer.prototype.startTrace = function (signature, type) {
+  logger.log('opbeat.instrumentation.TraceBuffer.startTrace', signature)
+
   var trace = new Trace(this.traceTransactionReference, signature, type)
 
   if (this._isLocked) {
@@ -17,25 +19,24 @@ TraceBuffer.prototype.startTrace = function (signature, type) {
 
   this.activetraces.push(trace)
 
-  logger.log('opbeat.instrumentation.TraceBuffer.startTrace', signature)
-
   return trace
 }
 
 TraceBuffer.prototype._onTraceEnd = function (trace) {
+  logger.log('opbeat.instrumentation.TraceBuffer._endTrace', this.name, trace.signature)
   this.traces.push(trace)
 
   var index = this.activetraces.indexOf(trace)
   if (index > -1) {
     this.activetraces.splice(index, 1)
   }
-
   // TODO: Buffer should probably be flushed at somepoint to save memory
-
-  logger.log('opbeat.instrumentation.TraceBuffer._endTrace', this.name, trace.signature)
 }
 
 TraceBuffer.prototype.setTransactionReference = function (transaction) {
+
+  logger.log('opbeat.instrumentation.TraceBuffer.setTransactionReference', transaction)
+
   if (this._isLocked) {
     return
   }
