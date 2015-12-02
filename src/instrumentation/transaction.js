@@ -1,13 +1,14 @@
 var logger = require('../lib/logger')
 var Trace = require('./trace')
 
-var Transaction = function (queue, name, type) {
+var Transaction = function (queue, name, type, options) {
   this.metadata = {}
   this.name = name
   this.type = type
   this.ended = false
   this._markDoneAfterLastTrace = false
   this._isDone = false
+  this._options = options
 
   this.traces = []
   this._activeTraces = {}
@@ -16,7 +17,7 @@ var Transaction = function (queue, name, type) {
   logger.log('- %c opbeat.instrumentation.transaction.ctor', 'color: #3360A3', this.name)
 
   // A transaction should always have a root trace spanning the entire transaction.
-  this._rootTrace = this.startTrace('transaction', 'transaction')
+  this._rootTrace = this.startTrace('transaction', 'transaction', this._options)
   this._startStamp = this._rootTrace._startStamp
   this._start = this._rootTrace._start
 
@@ -74,7 +75,7 @@ Transaction.prototype._adjustStartToEarliestTrace = function () {
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
-  var trace = new Trace(this, signature, type)
+  var trace = new Trace(this, signature, type, this._options)
   trace.setParent(this._rootTrace)
 
   this._activeTraces[trace.getFingerprint()] = trace

@@ -9,6 +9,7 @@ function Opbeat () {
   this.isInstalled = false
   this._instrumentation = new Instrumentation()
   this._exceptions = new Exceptions()
+  this._config = config
 
   config.init()
 
@@ -39,11 +40,14 @@ Opbeat.prototype.isPlatformSupport = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.config = function (properties) {
-  config.setConfig(properties)
+
+  if(properties) {
+    config.setConfig(properties)
+  }
 
   this.install()
 
-  return this
+  return this._config
 }
 
 /*
@@ -144,8 +148,8 @@ Opbeat.prototype.setExtraContext = function (extra) {
   return this
 }
 
-Opbeat.prototype.startTransaction = function (name, type) {
-  return this._instrumentation.startTransaction(name, type)
+Opbeat.prototype.startTransaction = function (name, type, options) {
+  return this._instrumentation.startTransaction(name, type, options)
 }
 
 module.exports = new Opbeat()

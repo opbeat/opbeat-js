@@ -89,7 +89,7 @@ module.exports = {
       traceType: type,
       options: options,
       fn: fn,
-      transaction: transaction
+      transaction: transaction,
     }
 
     var wrappedMethod = this.wrapMethod(ref, instrumentMethodBefore, instrumentMethodAfter, context)
@@ -115,7 +115,8 @@ module.exports = {
           prefix: options.prefix,
           override: false,
           instrumentModule: true,
-          signatureFormatter: options.signatureFormatter
+          signatureFormatter: options.signatureFormatter,
+          config: options.config
         })
       } else {
         logger.log('%c instrumentModule.error.transaction.missing', 'background-color: #ffff00', module)
@@ -171,7 +172,8 @@ module.exports = {
         this.instrumentMethod(object, funcScope.property, transaction, options.type, {
           prefix: options.prefix,
           override: true,
-          signatureFormatter: options.signatureFormatter
+          signatureFormatter: options.signatureFormatter,
+          config: options.config
         })
       } else {
         logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
@@ -257,7 +259,7 @@ function instrumentMethodBefore (context) {
   }
 
   if (transaction) {
-    var trace = transaction.startTrace(name, context.traceType)
+    var trace = transaction.startTrace(name, context.traceType, context.options)
     context.trace = trace
   } else {
     logger.log('%c instrumentMethodBefore.error.transaction.missing', 'background-color: #ffff00', context)

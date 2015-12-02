@@ -1,17 +1,18 @@
 var logger = require('../lib/logger')
 var Trace = require('./trace')
 
-var TraceBuffer = function (name) {
+var TraceBuffer = function (name, options) {
   this.traces = []
   this.activetraces = []
   this.traceTransactionReference = this
   this._isLocked = false
+  this._options = options
 }
 
 TraceBuffer.prototype.startTrace = function (signature, type) {
   logger.log('opbeat.instrumentation.TraceBuffer.startTrace', signature)
 
-  var trace = new Trace(this.traceTransactionReference, signature, type)
+  var trace = new Trace(this.traceTransactionReference, signature, type, this._options)
 
   if (this._isLocked) {
     trace.setParent(this.traceTransactionReference._rootTrace)

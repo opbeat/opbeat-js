@@ -11,8 +11,8 @@ Instrumentation.prototype.add = function (transaction) {
   this._queue.push(transaction)
 }
 
-Instrumentation.prototype.startTransaction = function (name, type) {
-  return new Transaction(this, name, type)
+Instrumentation.prototype.startTransaction = function (name, type, options) {
+  return new Transaction(this, name, type, options)
 }
 
 Instrumentation.prototype._flush = function () {

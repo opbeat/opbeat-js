@@ -16,6 +16,9 @@ function ngOpbeatProvider () {
   this.$get = [
     function () {
       return {
+        getConfig: function config () {
+          return Opbeat.config()
+        },
         captureException: function captureException (exception, cause) {
           Opbeat.captureException(exception, cause)
         },
@@ -41,9 +44,15 @@ function $opbeatErrorProvider ($provide) {
   }])
 }
 
-function $opbeatInstrumentationProvider ($provide) {
+function $opbeatInstrumentationProvider ($provide, $opbeat) {
+
+  var config = $opbeat.$get[0]().getConfig()
+  var transactionOptions = {
+    config: config
+  }
+
   // Before controller intialize transcation
-  var traceBuffer = new TraceBuffer('beforeControllerTransaction')
+  var traceBuffer = new TraceBuffer('beforeControllerTransaction', transactionOptions)
 
   // Route controller Instrumentation
   $provide.decorator('$controller', ['$delegate', '$location', '$rootScope', function ($delegate, $location, $rootScope) {
@@ -54,7 +63,8 @@ function $opbeatInstrumentationProvider ($provide) {
       logger.log('opbeat.decorator.controller.onRouteChange')
       var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
       if (!transaction) {
-        transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction')
+        transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction', transactionOptions)
+
         transaction.metadata.controllerName = routeControllerTarget
         $rootScope._opbeatTransactions[$location.absUrl()] = transaction
 
@@ -87,7 +97,8 @@ function $opbeatInstrumentationProvider ($provide) {
         // Instrument controller scope functions
         utils.getObjectFunctions(controllerScope).forEach(function (funcScope) {
           utils.instrumentMethod(funcScope.scope, funcScope.property, transaction, 'app.angular.controller', {
-            override: true
+            override: true,
+            config: config
           })
         })
 
@@ -146,7 +157,7 @@ function $opbeatInstrumentationProvider ($provide) {
 
 window.angular.module('ngOpbeat', [])
   .provider('$opbeat', ngOpbeatProvider)
-  .config(['$provide', $opbeatErrorProvider])
-  .config(['$provide', $opbeatInstrumentationProvider])
+  .config(['$provide', '$opbeatProvider', $opbeatErrorProvider])
+  .config(['$provide', '$opbeatProvider', $opbeatInstrumentationProvider])
 
 window.angular.module('angular-opbeat', ['ngOpbeat'])
