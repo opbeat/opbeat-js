@@ -9,6 +9,9 @@ function Config () {
     orgId: null,
     appId: null,
     angularAppName: null,
+    performance: {
+      enableStackFrames: true,
+    },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {
       user: {

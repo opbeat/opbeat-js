@@ -18,12 +18,16 @@ var Trace = module.exports = function (transaction, signature, type, options) {
     this._markFinishedFunc = resolve
   }.bind(this))
 
-  this.getTraceStackFrames(function (frames) {
-    if (frames) {
-      this.frames = frames.reverse() // Reverse frames to make Opbeat happy
-    }
+  if(options.config.get('performance.enableStackFrames')) {
+    this.getTraceStackFrames(function (frames) {
+      if (frames) {
+        this.frames = frames.reverse() // Reverse frames to make Opbeat happy
+      }
+      this._markFinishedFunc() // Mark the trace as finished
+    }.bind(this))
+  } else {
     this._markFinishedFunc() // Mark the trace as finished
-  }.bind(this))
+  }
 
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }

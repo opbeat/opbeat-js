@@ -60,7 +60,10 @@ angular.module('app', ['ngOpbeat'])
       orgId: '<org id>', // Your Opbeat org id
       appId: '<app id>', // Your Opbeat app id
       libraryPathPattern: '(node_modules|bower_components|webpack)', // Regex pattern used to determine whether a file is a library file or not.
-      angularAppName: '' // The name of the angular app, if booted manually
+      angularAppName: '' // The name of the angular app, if booted manually,
+      performance: {
+        enableStackFrames: true/false // Toggles whether stack frames should be generated for traces
+      }
     })
 
     // Optional: Pass user data to the reported exceptions
