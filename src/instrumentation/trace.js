@@ -33,10 +33,11 @@ var Trace = module.exports = function (transaction, signature, type, options) {
 }
 
 Trace.prototype.end = function () {
-  this._diff = window.performance.now() - this._start
+  this._end = window.performance.now()
+  this._diff = this._end - this._start
   this.ended = true
 
-  logger.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._diff)
+  logger.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._end)
 
   this._isFinish.then(function () {
     this.transaction._onTraceEnd(this)
