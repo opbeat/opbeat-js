@@ -97,17 +97,9 @@ function $opbeatInstrumentationProvider ($provide) {
 
         controllerScope.$on('$viewContentLoaded', function (event) {
           logger.log('opbeat.angular.controller.$viewContentLoaded')
-
           // Transaction clean up
           transaction.end()
           $rootScope._opbeatTransactions[$location.absUrl()] = null
-
-          if (controllerScope) {
-            // Uninstrument controller scope functions
-            utils.getObjectFunctions(controllerScope).forEach(function (funcScope) {
-              utils.uninstrumentMethod(funcScope.scope, funcScope.property)
-            })
-          }
         })
       }
 
