@@ -98,7 +98,7 @@ function getRawGroupedTracesTimings (traces, groupedTraces) {
       var relativeTraceStart = trace._start - transaction._start
 
       if (relativeTraceStart > transaction.duration() ) {
-        logger.log('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.relativeTraceStartLargerThanTransactionDuration', 'color: #ff0000', relativeTraceStart, trace._start, transaction.duration(), trace)
+        logger.log('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.relativeTraceStartLargerThanTransactionDuration', 'color: #ff0000', relativeTraceStart, transaction._start, transaction.duration(), { trace: trace, transaction: transaction })
       } else if (relativeTraceStart < 0) {
         logger.log('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.negativeRelativeTraceStart!', 'color: #ff0000', relativeTraceStart, trace._start, transaction._start, trace)
       } else {
