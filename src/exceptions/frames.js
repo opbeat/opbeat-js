@@ -41,6 +41,11 @@ module.exports = {
         return resolve({})
       }
 
+      if (!stack.columnNumber && !stack.lineNumber) {
+        // We can't use frames with no columnNumber & lineNumber, so ignore for now
+        return resolve({})
+      }
+
       var filePath = this.cleanFilePath(stack.fileName)
       var fileName = this.filePathToFileName(filePath)
 
