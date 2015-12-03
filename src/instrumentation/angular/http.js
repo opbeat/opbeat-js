@@ -10,6 +10,9 @@ module.exports = function ($provide, traceBuffer) {
         var text = []
         if (args.length) {
           if (typeof args[0] === 'object') {
+            if(!args[0].method) {
+              args[0].method = 'get'
+            }
             text = ['$http', args[0].method.toUpperCase(), args[0].url]
           } else {
             text = ['$http', args[0]]
