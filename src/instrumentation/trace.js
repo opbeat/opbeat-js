@@ -2,6 +2,7 @@ var Promise = require('es6-promise').Promise
 var logger = require('../lib/logger')
 var frames = require('../exceptions/frames')
 var traceCache = require('./traceCache')
+var utils = require('../lib/utils')
 
 var Trace = module.exports = function (transaction, signature, type, options) {
   this.transaction = transaction
@@ -18,7 +19,14 @@ var Trace = module.exports = function (transaction, signature, type, options) {
     this._markFinishedFunc = resolve
   }.bind(this))
 
+  // Only generate stack frames 10% of the time
+  var shouldGenerateStackFrames = utils.getRandomInt(0, 10) === '1'
+
   if(options.config.get('performance.enableStackFrames')) {
+    shouldGenerateStackFrames = true
+  }
+
+  if(shouldGenerateStackFrames) {
     this.getTraceStackFrames(function (frames) {
       if (frames) {
         this.frames = frames.reverse() // Reverse frames to make Opbeat happy
