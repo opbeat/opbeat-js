@@ -118,12 +118,12 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
     $rootScope._opbeatHasInstrumentedFactories = false
     $rootScope._opbeatHasInstrumentedDirectives = false
 
-    var directivesInstrumentation = require('./instrumentation/angular/directives')($provide)
+    var directivesInstrumentation = require('./instrumentation/angular/directives')($provide, traceBuffer)
 
     // Factory instrumentation
     if (!$rootScope._opbeatHasInstrumentedFactories) {
       var factories = utils.resolveAngularDependenciesByType($rootElement, 'factory')
-      require('./instrumentation/angular/factories')($provide).instrumentAll(factories)
+      require('./instrumentation/angular/factories')($provide, traceBuffer).instrumentAll(factories)
       $rootScope._opbeatHasInstrumentedFactories = true
     }
 

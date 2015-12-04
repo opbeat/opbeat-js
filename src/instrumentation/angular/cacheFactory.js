@@ -10,7 +10,7 @@ module.exports = function ($provide, traceBuffer) {
       utils.instrumentObject(result, $injector, {
         type: 'cache.' + cacheName,
         prefix: cacheName,
-        transaction: traceBuffer,
+        traceBuffer: traceBuffer,
         signatureFormatter: function (key, args) {
           var text = ['$cacheFactory', key.toUpperCase(), args[0]]
           return text.join(' ')

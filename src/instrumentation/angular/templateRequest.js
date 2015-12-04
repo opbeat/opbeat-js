@@ -7,6 +7,7 @@ module.exports = function ($provide, traceBuffer) {
       return utils.instrumentModule($delegate, $injector, {
         type: 'template.$templateRequest',
         prefix: '$templateRequest',
+        traceBuffer: traceBuffer,
         signatureFormatter: function (key, args) {
           var text = ['$templateRequest', args[0]]
           return text.join(' ')

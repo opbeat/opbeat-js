@@ -60,4 +60,8 @@ TraceBuffer.prototype.lock = function () {
   this._isLocked = true
 }
 
+TraceBuffer.prototype.isLocked = function() {
+  return this._isLocked
+}
+
 module.exports = TraceBuffer

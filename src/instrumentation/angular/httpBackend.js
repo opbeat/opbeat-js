@@ -1,7 +1,7 @@
 var utils = require('../utils')
 var transactionStore = require('../transactionStore')
 
-module.exports = function ($provide) {
+module.exports = function ($provide, traceBuffer) {
   // $httpBackend instrumentation
   $provide.decorator('$httpBackend', ['$delegate', '$injector', function ($delegate, $injector) {
     return function () {
@@ -11,6 +11,7 @@ module.exports = function ($provide) {
       var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'ext.$httpBackend', {
         prefix: '$httpBackend',
         callbackIndex: 3,
+        traceBuffer: traceBuffer,
         signatureFormatter: function (key, args) {
           var text = ['$httpBackend', args[0].toUpperCase(), args[1]]
           return text.join(' ')

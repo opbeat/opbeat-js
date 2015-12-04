@@ -32,6 +32,10 @@ module.exports = {
       nameParts.push(fnName)
     }
 
+    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+      transaction = options.traceBuffer
+    }
+
     var name = nameParts.join('.')
     var ref = fn
     var context = {
@@ -79,6 +83,10 @@ module.exports = {
 
     var name = nameParts.join('.')
 
+    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+      transaction = options.traceBuffer
+    }
+
     if (options.instrumentModule) {
       ref = module
     } else {
@@ -111,6 +119,11 @@ module.exports = {
       var fn = module
       var args = Array.prototype.slice.call(arguments)
       var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
+
+      if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+        transaction = options.traceBuffer
+      }
+
       if (transaction) {
         fn = that.instrumentMethod(module, '', transaction, options.type, {
           prefix: options.prefix,
@@ -139,6 +152,11 @@ module.exports = {
         var fn = funcScope.ref
         var args = Array.prototype.slice.call(arguments)
         var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
+
+        if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+          transaction = options.traceBuffer
+        }
+
         if (transaction) {
           fn = that.instrumentMethod(module, funcScope.property, transaction, options.type, {
             prefix: options.prefix,
@@ -165,6 +183,10 @@ module.exports = {
     } else {
       var url = $injector.get('$location').absUrl()
       transaction = transactionStore.getRecentByUrl(url)
+    }
+
+    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+      transaction = options.traceBuffer
     }
 
     if (transaction) {

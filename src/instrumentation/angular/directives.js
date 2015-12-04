@@ -1,12 +1,13 @@
 var utils = require('../utils')
 
-module.exports = function ($provide) {
+module.exports = function ($provide, traceBuffer) {
   var instrumentDirective = function (name) {
     var directiveName = name + 'Directive'
     $provide.decorator(directiveName, ['$delegate', '$injector', function ($delegate, $injector) {
       utils.instrumentObject($delegate[0], $injector, {
         type: 'template.$directive',
-        prefix: '$directive.' + name
+        prefix: '$directive.' + name,
+        traceBuffer: traceBuffer
       })
       return $delegate
     }])

@@ -6,6 +6,7 @@ module.exports = function ($provide, traceBuffer) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'ext.$http',
       prefix: '$http',
+      traceBuffer: traceBuffer,
       signatureFormatter: function (key, args) {
         var text = []
         if (args.length) {

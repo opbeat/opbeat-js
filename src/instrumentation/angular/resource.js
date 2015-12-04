@@ -10,6 +10,7 @@ module.exports = function ($provide, traceBuffer) {
         utils.instrumentObject(result, $injector, {
           type: 'ext.$resource',
           prefix: '$resource',
+          traceBuffer: traceBuffer,
           signatureFormatter: function (key, args) {
             var text = ['$resource', key.toUpperCase(), args[0]]
             return text.join(' ')
