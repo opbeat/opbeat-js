@@ -1,4 +1,5 @@
 var utils = require('../utils')
+var transactionStore = require('../transactionStore')
 
 module.exports = function ($provide, traceBuffer) {
   // Controller Instrumentation
@@ -6,7 +7,7 @@ module.exports = function ($provide, traceBuffer) {
     return function () {
       var args = Array.prototype.slice.call(arguments)
       var controllerInfo = utils.getControllerInfoFromArgs(args)
-      var transaction = utils.getCurrentTransaction($injector)
+      var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
 
       if (controllerInfo.name) {
         if (transaction && transaction.metadata.controllerName !== controllerInfo.name) {

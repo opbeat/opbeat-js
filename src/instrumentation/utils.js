@@ -1,5 +1,6 @@
 var logger = require('../lib/logger')
 var config = require('../lib/config')
+var transactionStore = require('./transactionStore')
 
 var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
 var FN_ARG_SPLIT = /,/
@@ -109,7 +110,7 @@ module.exports = {
     var wrapper = function () {
       var fn = module
       var args = Array.prototype.slice.call(arguments)
-      var transaction = that.getCurrentTransaction($injector)
+      var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
       if (transaction) {
         fn = that.instrumentMethod(module, '', transaction, options.type, {
           prefix: options.prefix,
@@ -137,7 +138,7 @@ module.exports = {
       wrapper[funcScope.property] = function () {
         var fn = funcScope.ref
         var args = Array.prototype.slice.call(arguments)
-        var transaction = that.getCurrentTransaction($injector)
+        var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
         if (transaction) {
           fn = that.instrumentMethod(module, funcScope.property, transaction, options.type, {
             prefix: options.prefix,
@@ -158,27 +159,27 @@ module.exports = {
   instrumentObject: function (object, $injector, options) {
     options = options || {}
 
-    // Instrument static functions
-    this.getObjectFunctions(object).forEach(function (funcScope) {
-      var transaction
+    var transaction;
+    if (options.transaction) {
+      transaction = options.transaction
+    } else {
+      var url = $injector.get('$location').absUrl()
+      var transaction = transactionStore.getRecentByUrl(url)
+    }
 
-      if (options.transaction) {
-        transaction = options.transaction
-      } else {
-        transaction = this.getCurrentTransaction($injector)
-      }
-
-      if (transaction) {
-        this.instrumentMethod(object, funcScope.property, transaction, options.type, {
-          prefix: options.prefix,
-          override: true,
-          signatureFormatter: options.signatureFormatter,
-          config: options.config
-        })
-      } else {
-        logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
-      }
-    }.bind(this))
+    if (transaction) {
+      // Instrument static functions
+      this.getObjectFunctions(object).forEach(function (funcScope) {
+          this.instrumentMethod(object, funcScope.property, transaction, options.type, {
+            prefix: options.prefix,
+            override: true,
+            signatureFormatter: options.signatureFormatter,
+            config: options.config
+          })
+      }.bind(this))
+    } else {
+      logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
+    }
 
     return object
   },
@@ -239,13 +240,6 @@ module.exports = {
     }).map(function (m) {
       return m[2][0]
     })
-  },
-
-  getCurrentTransaction: function ($injector) {
-    var $rootScope = $injector.get('$rootScope')
-    var $location = $injector.get('$location')
-
-    return $rootScope._opbeatTransactions && $rootScope._opbeatTransactions[$location.absUrl()]
   }
 }
 

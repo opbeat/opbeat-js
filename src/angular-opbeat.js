@@ -1,5 +1,6 @@
 var Opbeat = require('./opbeat')
 var TraceBuffer = require('./instrumentation/traceBuffer')
+var transactionStore = require('./instrumentation/transactionStore')
 
 var utils = require('./instrumentation/utils')
 var logger = require('./lib/logger')
@@ -55,25 +56,25 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
   var traceBuffer = new TraceBuffer('beforeControllerTransaction', transactionOptions)
 
   // Route controller Instrumentation
-  $provide.decorator('$controller', ['$delegate', '$location', '$rootScope', function ($delegate, $location, $rootScope) {
-    $rootScope._opbeatTransactions = {}
+  $provide.decorator('$controller', ['$delegate', '$location', '$rootScope', '$injector', function ($delegate, $location, $rootScope, $injector) {
+
+    transactionStore.init($injector)
 
     var onRouteChange = function (e, current) {
       var routeControllerTarget = current.controller
       logger.log('opbeat.decorator.controller.onRouteChange')
-      var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
-      if (!transaction) {
-        transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction', transactionOptions)
 
-        transaction.metadata.controllerName = routeControllerTarget
-        $rootScope._opbeatTransactions[$location.absUrl()] = transaction
+      var transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction', transactionOptions)
+      transaction.metadata.controllerName = routeControllerTarget
 
-        // Update transaction reference in traceBuffer
-        traceBuffer.setTransactionReference(transaction)
+      // Update transaction store
+      transactionStore.pushToUrl($location.absUrl(), transaction)
 
-        // Lock traceBuffer, as we only want to migrate the initial traces to the first transaction
-        traceBuffer.lock()
-      }
+      // Update transaction reference in traceBuffer
+      traceBuffer.setTransactionReference(transaction)
+
+      // Lock traceBuffer, as we only want to migrate the initial traces to the first transaction
+      traceBuffer.lock()
     }
 
     $rootScope.$on('$routeChangeStart', onRouteChange) // ng-router
@@ -83,7 +84,10 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
       logger.log('opbeat.decorator.controller.ctor')
 
       var args = Array.prototype.slice.call(arguments)
-      var transaction = $rootScope._opbeatTransactions[$location.absUrl()]
+
+      var url = $injector.get('$location').absUrl()
+      var transaction = transactionStore.getRecentByUrl(url)
+
       var controllerInfo = utils.getControllerInfoFromArgs(args)
       var controllerName = controllerInfo.name
       var controllerScope = controllerInfo.scope
@@ -107,9 +111,11 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
         controllerScope.$on('$viewContentLoaded', function (event) {
           logger.log('opbeat.angular.controller.$viewContentLoaded')
-          // Transaction clean up
-          transaction.end()
-          $rootScope._opbeatTransactions[$location.absUrl()] = null
+
+          transactionStore.getAllByUrl(url).forEach(function(trans) {
+            transaction.end()
+          })
+          transactionStore.clearByUrl(url)
         })
       }
 
