@@ -91,17 +91,16 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
       var result = $delegate.apply(this, args)
 
+      // Instrument controller scope functions
+      utils.getObjectFunctions(controllerScope).forEach(function (funcScope) {
+        utils.instrumentMethod(funcScope.scope, funcScope.property, transaction, 'app.angular.controller', {
+          override: true,
+          config: config
+        })
+      })
+
       if (isRouteController && controllerScope) {
         logger.log('opbeat.angular.controller', controllerName)
-
-        // Instrument controller scope functions
-        utils.getObjectFunctions(controllerScope).forEach(function (funcScope) {
-          utils.instrumentMethod(funcScope.scope, funcScope.property, transaction, 'app.angular.controller', {
-            override: true,
-            config: config
-          })
-        })
-
         controllerScope.$on('$destroy', function () {
           logger.log('opbeat.angular.controller.destroy')
         })
