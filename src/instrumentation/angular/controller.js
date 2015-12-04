@@ -8,10 +8,12 @@ module.exports = function ($provide, traceBuffer) {
       var args = Array.prototype.slice.call(arguments)
       var controllerInfo = utils.getControllerInfoFromArgs(args)
 
-      return utils.instrumentModule($delegate, $injector, {
-        type: 'app.$controller',
-        prefix: '$controller.' + controllerInfo.name
-      }).apply(this, arguments)
+      if(controllerInfo.name) { // Only instrument controllers with a name
+        return utils.instrumentModule($delegate, $injector, {
+          type: 'app.$controller',
+          prefix: '$controller.' + controllerInfo.name
+        }).apply(this, arguments)
+      }
 
       return $delegate.apply(this, args)
     }
