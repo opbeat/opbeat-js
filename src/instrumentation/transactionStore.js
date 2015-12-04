@@ -10,42 +10,42 @@ TransactionStore.prototype.init = function($injector) {
 }
 
 TransactionStore.prototype.pushToUrl = function (url, transaction) {
-	var transactions = this.$rootScope._opbeatTransactionStore[url] || [];
-	transactions.push(transaction)
+  var transactions = this.$rootScope._opbeatTransactionStore[url] || [];
+  transactions.push(transaction)
 
-	logger.log('opbeat.instrumentation.TransactionStore.pushToUrl', url, transaction)
+  logger.log('opbeat.instrumentation.TransactionStore.pushToUrl', url, transaction)
 
-	this.$rootScope._opbeatTransactionStore[url] = transactions
+  this.$rootScope._opbeatTransactionStore[url] = transactions
 }
 
 TransactionStore.prototype.getAllByUrl = function (url) {
-	logger.log('opbeat.instrumentation.TransactionStore.pushToUrl', url, this.$rootScope)
+  logger.log('opbeat.instrumentation.TransactionStore.pushToUrl', url, this.$rootScope)
 
-	if (!this.$rootScope) {
-		return []
-	}
+  if (!this.$rootScope) {
+    return []
+  }
 
-	return this.$rootScope._opbeatTransactionStore[url] || []
+  return this.$rootScope._opbeatTransactionStore[url] || []
 }
 
 TransactionStore.prototype.getRecentByUrl = function (url) {
-	var transactions
+  var transactions
 
-	if (this.$rootScope) {
-		transactions  = this.$rootScope._opbeatTransactionStore[url];
-	}
+  if (this.$rootScope) {
+    transactions  = this.$rootScope._opbeatTransactionStore[url];
+  }
 
-	logger.log('opbeat.instrumentation.TransactionStore.getRecentByUrl', url, transactions)
+  logger.log('opbeat.instrumentation.TransactionStore.getRecentByUrl', url, transactions)
 
-	if (transactions && transactions.length) {
+  if (transactions && transactions.length) {
     return transactions.slice(-1)[0]
-	}
+  }
 
-	return null
+  return null
 }
 
 TransactionStore.prototype.clearByUrl = function (url) {
-	this.$rootScope._opbeatTransactionStore[url] = []
+  this.$rootScope._opbeatTransactionStore[url] = []
 }
 
 module.exports = new TransactionStore()
