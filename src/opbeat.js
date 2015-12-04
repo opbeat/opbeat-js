@@ -40,8 +40,7 @@ Opbeat.prototype.isPlatformSupport = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.config = function (properties) {
-
-  if(properties) {
+  if (properties) {
     config.setConfig(properties)
   }
 

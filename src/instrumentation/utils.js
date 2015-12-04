@@ -90,7 +90,7 @@ module.exports = {
       traceType: type,
       options: options,
       fn: fn,
-      transaction: transaction,
+      transaction: transaction
     }
 
     var wrappedMethod = this.wrapMethod(ref, instrumentMethodBefore, instrumentMethodAfter, context)
@@ -159,23 +159,23 @@ module.exports = {
   instrumentObject: function (object, $injector, options) {
     options = options || {}
 
-    var transaction;
+    var transaction
     if (options.transaction) {
       transaction = options.transaction
     } else {
       var url = $injector.get('$location').absUrl()
-      var transaction = transactionStore.getRecentByUrl(url)
+      transaction = transactionStore.getRecentByUrl(url)
     }
 
     if (transaction) {
       // Instrument static functions
       this.getObjectFunctions(object).forEach(function (funcScope) {
-          this.instrumentMethod(object, funcScope.property, transaction, options.type, {
-            prefix: options.prefix,
-            override: true,
-            signatureFormatter: options.signatureFormatter,
-            config: options.config
-          })
+        this.instrumentMethod(object, funcScope.property, transaction, options.type, {
+          prefix: options.prefix,
+          override: true,
+          signatureFormatter: options.signatureFormatter,
+          config: options.config
+        })
       }.bind(this))
     } else {
       logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
@@ -213,7 +213,7 @@ module.exports = {
       name = args[0].name
 
       // Function has been wrapped by us, use original function name
-      if(name === 'opbeatFunctionWrapper' && args[0].original) {
+      if (name === 'opbeatFunctionWrapper' && args[0].original) {
         name = args[0].original.name
       }
     }

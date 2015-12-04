@@ -35,7 +35,6 @@ TraceBuffer.prototype._onTraceEnd = function (trace) {
 }
 
 TraceBuffer.prototype.setTransactionReference = function (transaction) {
-
   logger.log('opbeat.instrumentation.TraceBuffer.setTransactionReference', transaction)
 
   if (this._isLocked) {

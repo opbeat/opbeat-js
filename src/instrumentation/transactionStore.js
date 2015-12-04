@@ -4,13 +4,13 @@ var TransactionStore = function () {
 
 }
 
-TransactionStore.prototype.init = function($injector) {
+TransactionStore.prototype.init = function ($injector) {
   this.$rootScope = $injector.get('$rootScope')
   this.$rootScope._opbeatTransactionStore = {}
 }
 
 TransactionStore.prototype.pushToUrl = function (url, transaction) {
-  var transactions = this.$rootScope._opbeatTransactionStore[url] || [];
+  var transactions = this.$rootScope._opbeatTransactionStore[url] || []
   transactions.push(transaction)
 
   logger.log('opbeat.instrumentation.TransactionStore.pushToUrl', url, transaction)
@@ -32,7 +32,7 @@ TransactionStore.prototype.getRecentByUrl = function (url) {
   var transactions
 
   if (this.$rootScope) {
-    transactions  = this.$rootScope._opbeatTransactionStore[url];
+    transactions = this.$rootScope._opbeatTransactionStore[url]
   }
 
   logger.log('opbeat.instrumentation.TransactionStore.getRecentByUrl', url, transactions)

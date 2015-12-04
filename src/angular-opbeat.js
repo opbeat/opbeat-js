@@ -46,7 +46,6 @@ function $opbeatErrorProvider ($provide) {
 }
 
 function $opbeatInstrumentationProvider ($provide, $opbeat) {
-
   var config = $opbeat.$get[0]().getConfig()
   var transactionOptions = {
     config: config
@@ -57,7 +56,6 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
   // Route controller Instrumentation
   $provide.decorator('$controller', ['$delegate', '$location', '$rootScope', '$injector', function ($delegate, $location, $rootScope, $injector) {
-
     transactionStore.init($injector)
 
     var onRouteChange = function (e, current) {
@@ -112,7 +110,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
         controllerScope.$on('$viewContentLoaded', function (event) {
           logger.log('opbeat.angular.controller.$viewContentLoaded')
 
-          transactionStore.getAllByUrl(url).forEach(function(trans) {
+          transactionStore.getAllByUrl(url).forEach(function (trans) {
             transaction.end()
           })
           transactionStore.clearByUrl(url)

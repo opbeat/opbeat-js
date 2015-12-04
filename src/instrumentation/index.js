@@ -53,7 +53,6 @@ Instrumentation.prototype._formatTransactions = function () {
 
 function groupTransactions (transactions) {
   var groups = grouper(transactions, transactionGroupingKey)
-
   return Object.keys(groups).map(function (key) {
     var trans = groups[key][0]
     var durations = groups[key].map(function (trans) {
@@ -97,7 +96,7 @@ function getRawGroupedTracesTimings (traces, groupedTraces) {
       var groupIndex = getTraceGroupIndex(groupedTraces, trace)
       var relativeTraceStart = trace._start - transaction._start
 
-      if (relativeTraceStart > transaction.duration() ) {
+      if (relativeTraceStart > transaction.duration()) {
         logger.log('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.relativeTraceStartLargerThanTransactionDuration', 'color: #ff0000', relativeTraceStart, transaction._start, transaction.duration(), { trace: trace, transaction: transaction })
       } else if (relativeTraceStart < 0) {
         logger.log('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.negativeRelativeTraceStart!', 'color: #ff0000', relativeTraceStart, trace._start, transaction._start, trace)

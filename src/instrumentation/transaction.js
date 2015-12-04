@@ -68,7 +68,7 @@ Transaction.prototype._markAsDone = function () {
 Transaction.prototype._adjustStartToEarliestTrace = function () {
   var trace = getEarliestTrace(this.traces)
 
-  if(trace) {
+  if (trace) {
     this._start = trace._start
     this._startStamp = trace._startStamp
   }
@@ -101,17 +101,16 @@ Transaction.prototype._onTraceEnd = function (trace) {
 function getEarliestTrace (traces) {
   var earliestTrace = null
 
-  traces.forEach(function(trace) {
-    if(!earliestTrace) {
+  traces.forEach(function (trace) {
+    if (!earliestTrace) {
       earliestTrace = trace
     }
-    if(earliestTrace && earliestTrace._start > trace._start) {
+    if (earliestTrace && earliestTrace._start > trace._start) {
       earliestTrace = trace
     }
   })
 
   return earliestTrace
 }
-
 
 module.exports = Transaction

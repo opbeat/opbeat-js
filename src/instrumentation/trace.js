@@ -2,7 +2,6 @@ var Promise = require('es6-promise').Promise
 var logger = require('../lib/logger')
 var frames = require('../exceptions/frames')
 var traceCache = require('./traceCache')
-var utils = require('../lib/utils')
 
 var Trace = module.exports = function (transaction, signature, type, options) {
   this.transaction = transaction
@@ -23,7 +22,7 @@ var Trace = module.exports = function (transaction, signature, type, options) {
 
   logger.log('%c -- opbeat.instrumentation.trace.shouldGenerateStackFrames', 'color: #9a6bcb', this.signature, shouldGenerateStackFrames)
 
-  if(shouldGenerateStackFrames) {
+  if (shouldGenerateStackFrames) {
     this.getTraceStackFrames(function (frames) {
       if (frames) {
         this.frames = frames.reverse() // Reverse frames to make Opbeat happy
