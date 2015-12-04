@@ -93,20 +93,24 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
       var result = $delegate.apply(this, args)
 
+      var onViewFinished = function(argument) {
+        logger.log('opbeat.angular.controller.$onViewFinished')
+
+        transactionStore.getAllByUrl(url).forEach(function (trans) {
+          transaction.end()
+        })
+        transactionStore.clearByUrl(url)
+      }
+
+      var onScopeDestroyed = function() {
+        logger.log('opbeat.angular.controller.destroy')
+      }
+
       if (isRouteController && controllerScope) {
         logger.log('opbeat.angular.controller', controllerName)
-        controllerScope.$on('$destroy', function () {
-          logger.log('opbeat.angular.controller.destroy')
-        })
-
-        controllerScope.$on('$viewContentLoaded', function (event) {
-          logger.log('opbeat.angular.controller.$viewContentLoaded')
-
-          transactionStore.getAllByUrl(url).forEach(function (trans) {
-            transaction.end()
-          })
-          transactionStore.clearByUrl(url)
-        })
+        controllerScope.$on('$destroy', onScopeDestroyed)
+        controllerScope.$on('$ionicView.enter', onViewFinished);
+        controllerScope.$on('$viewContentLoaded', onViewFinished)
       }
 
       logger.log('opbeat.decorator.controller.end')
