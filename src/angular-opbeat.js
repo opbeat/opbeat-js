@@ -59,11 +59,34 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
     transactionStore.init($injector)
 
     var onRouteChange = function (e, current) {
-      var routeControllerTarget = current.controller
+
       logger.log('opbeat.decorator.controller.onRouteChange')
 
-      var transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerTarget, 'transaction', transactionOptions)
-      transaction.metadata.controllerName = routeControllerTarget
+      var routeControllerName
+      var routeController
+
+      // Detect controller
+      if(current.controller) {
+        routeController = current.controller
+      } else if(current.views) {
+        var keys = Object.keys(current.views)
+        if(keys) {
+          routeController = current.views[keys[0]].controller
+        }
+      }
+
+      // Extract controller name
+      if(typeof(routeController) === 'string') {
+        routeControllerName = routeController
+      }
+
+      if(!routeControllerName) {
+        logger.log('%c opbeat.decorator.controller.onRouteChange.error.routeControllerName.missing', 'background-color: #ffff00', current)
+        return
+      }
+
+      var transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerName, 'transaction', transactionOptions)
+      transaction.metadata.controllerName = routeControllerName
 
       // Update transaction store
       transactionStore.pushToUrl($location.absUrl(), transaction)
