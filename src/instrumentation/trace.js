@@ -19,12 +19,9 @@ var Trace = module.exports = function (transaction, signature, type, options) {
     this._markFinishedFunc = resolve
   }.bind(this))
 
-  // Only generate stack frames 10% of the time
-  var shouldGenerateStackFrames = utils.getRandomInt(0, 10) === '1'
+  var shouldGenerateStackFrames = options.config.get('performance.enableStackFrames')
 
-  if(options.config.get('performance.enableStackFrames')) {
-    shouldGenerateStackFrames = true
-  }
+  logger.log('%c -- opbeat.instrumentation.trace.shouldGenerateStackFrames', 'color: #9a6bcb', this.signature, shouldGenerateStackFrames)
 
   if(shouldGenerateStackFrames) {
     this.getTraceStackFrames(function (frames) {

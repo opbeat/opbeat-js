@@ -10,7 +10,7 @@ function Config () {
     appId: null,
     angularAppName: null,
     performance: {
-      enableStackFrames: true,
+      enableStackFrames: false,
     },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {
@@ -19,6 +19,12 @@ function Config () {
       },
       extra: null
     }
+  }
+
+  // Only generate stack frames 10% of the time
+  var shouldGenerateStackFrames = utils.getRandomInt(0, 10) === 1
+  if(shouldGenerateStackFrames) {
+    this.defaults.performance.enableStackFrames = shouldGenerateStackFrames
   }
 }
 
