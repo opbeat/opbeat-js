@@ -24,7 +24,7 @@ TraceBuffer.prototype.startTrace = function (signature, type) {
 }
 
 TraceBuffer.prototype._onTraceEnd = function (trace) {
-  logger.log('opbeat.instrumentation.TraceBuffer._endTrace', this.name, trace.signature)
+  logger.log('opbeat.instrumentation.TraceBuffer._endTrace', trace.signature)
   this.traces.push(trace)
 
   var index = this.activetraces.indexOf(trace)
