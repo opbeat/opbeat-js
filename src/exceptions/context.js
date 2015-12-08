@@ -112,7 +112,7 @@ module.exports = {
     var indentCount = 0
     var overCharLimit = false
 
-    if(!source) {
+    if (!source) {
       return false
     }
 

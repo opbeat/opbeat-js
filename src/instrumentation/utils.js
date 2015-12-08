@@ -32,7 +32,7 @@ module.exports = {
       nameParts.push(fnName)
     }
 
-    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
       transaction = options.traceBuffer
     }
 
@@ -83,7 +83,7 @@ module.exports = {
 
     var name = nameParts.join('.')
 
-    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
       transaction = options.traceBuffer
     }
 
@@ -120,7 +120,7 @@ module.exports = {
       var args = Array.prototype.slice.call(arguments)
       var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
 
-      if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+      if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
         transaction = options.traceBuffer
       }
 
@@ -153,7 +153,7 @@ module.exports = {
         var args = Array.prototype.slice.call(arguments)
         var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
 
-        if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+        if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
           transaction = options.traceBuffer
         }
 
@@ -185,7 +185,7 @@ module.exports = {
       transaction = transactionStore.getRecentByUrl(url)
     }
 
-    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked() ) {
+    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
       transaction = options.traceBuffer
     }
 
@@ -330,6 +330,6 @@ function buildWrapperFunction (ctx, funcArguments) {
 
   var res = 'return function opbeatFunctionWrapper(' + funcArguments + '){ ' + funcBody + ' }'
   newBody.push(res)
-  var F = new Function('ctx', newBody.join('\n'))
+  var F = new Function('ctx', newBody.join('\n')) // eslint-disable-line no-new-func
   return F(ctx)
 }
