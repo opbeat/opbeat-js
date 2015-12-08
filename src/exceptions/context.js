@@ -94,6 +94,24 @@ module.exports = {
           }
         }
 
+        var charLimit = 1000
+        // Circuit breaker for huge file contexts
+        if (contexts.contextLine.length > charLimit) {
+          reject('aborting generating contexts, as line is over 1000 chars')
+        }
+
+        contexts.preContext.forEach(function (line) {
+          if (line.length > charLimit) {
+            reject('aborting generating contexts, as preContext line is over 1000 chars')
+          }
+        })
+
+        contexts.postContext.forEach(function (line) {
+          if (line.length > charLimit) {
+            reject('aborting generating contexts, as postContext line is over 1000 chars')
+          }
+        })
+
         resolve(contexts)
       }.bind(this), reject)
     }.bind(this))
