@@ -112,6 +112,10 @@ module.exports = {
     var indentCount = 0
     var overCharLimit = false
 
+    if(!source) {
+      return false
+    }
+
     // Strip comments.
     source = source.replace(/\/\*[\S\s]*?\*\/|\/\/(.+|\n)/g, '')
 
