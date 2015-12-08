@@ -11,6 +11,7 @@ var awspublish = require('gulp-awspublish')
 var injectVersion = require('gulp-inject-version')
 var derequire = require('gulp-derequire');
 var es = require('event-stream')
+var karma = require('karma')
 
 require('gulp-release-tasks')(gulp);
 
@@ -114,5 +115,14 @@ gulp.task('deploy', ['build:release'], function () {
     // Print upload updates to console
     .pipe(awspublish.reporter())
 })
+
+
+gulp.task('test', function (done) {
+  new karma.Server({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, done).start();
+});
+
 
 gulp.task('default', taskListing)
