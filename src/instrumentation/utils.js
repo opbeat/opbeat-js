@@ -24,6 +24,11 @@ module.exports = {
     options = options || {}
     var nameParts = []
 
+    if (!config.get('isInstalled')) {
+      logger.log('opbeat.instrumentation.instrumentMethodWithCallback.not.installed')
+      return fn
+    }
+
     if (options.prefix) {
       nameParts.push(options.prefix)
     }
@@ -93,6 +98,11 @@ module.exports = {
       ref = module[fn]
     }
 
+    if (!config.get('isInstalled')) {
+      logger.log('opbeat.instrumentation.instrumentMethod.not.installed')
+      return ref
+    }
+
     var context = {
       traceName: name,
       traceType: type,
@@ -114,6 +124,11 @@ module.exports = {
   instrumentModule: function (module, $injector, options) {
     options = options || {}
     var that = this
+
+    if (!config.get('isInstalled')) {
+      logger.log('opbeat.instrumentation.instrumentModule.not.installed')
+      return module
+    }
 
     var wrapper = function () {
       var fn = module
@@ -176,6 +191,11 @@ module.exports = {
 
   instrumentObject: function (object, $injector, options) {
     options = options || {}
+
+    if (!config.get('isInstalled')) {
+      logger.log('opbeat.instrumentation.instrumentObject.not.installed')
+      return object
+    }
 
     var transaction
     if (options.transaction) {

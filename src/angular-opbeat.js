@@ -51,11 +51,6 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
     config: config
   }
 
-  if (!config.get('isInstalled')) {
-    logger.log('opbeat.instrumentation.platform.unsupported')
-    return
-  }
-
   // Before controller intialize transcation
   var traceBuffer = new TraceBuffer('beforeControllerTransaction', transactionOptions)
 
@@ -66,6 +61,11 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
     var onRouteChange = function (e, current) {
 
       logger.log('opbeat.decorator.controller.onRouteChange')
+
+      if (!config.get('isInstalled')) {
+        logger.log('opbeat.instrumentation.onRouteChange.not.installed')
+        return
+      }
 
       var routeControllerName
       var routeController
