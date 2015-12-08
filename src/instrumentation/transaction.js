@@ -125,7 +125,6 @@ function getLongestTrace (traces) {
   return match
 }
 
-
 function getEarliestTrace (traces) {
   var earliestTrace = null
 
