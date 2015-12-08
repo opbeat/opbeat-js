@@ -14,7 +14,6 @@
     "url": "https://github.com/opbeat/opbeat-js.git"
   },
   "dependencies": {
-    "bluebird": "^3.0.6",
     "error-stack-normalizer": "^1.0.2",
     "error-stack-parser": "github:auchenberg/error-stack-parser#ie-anonymous-functions",
     "es6-promise": "^3.0.2",
