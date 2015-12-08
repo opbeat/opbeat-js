@@ -1,6 +1,6 @@
 var context = require('../../src/exceptions/context')
 
-describe("Minified code detection", function() {
+describe("isSourceMinified", function() {
 
   it("Empty source returns false", function() {
 		expect(context.isSourceMinified('')).toBe(false)
