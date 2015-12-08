@@ -51,6 +51,11 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
     config: config
   }
 
+  if (!config.get('isInstalled')) {
+    logger.log('opbeat.instrumentation.platform.unsupported')
+    return
+  }
+
   // Before controller intialize transcation
   var traceBuffer = new TraceBuffer('beforeControllerTransaction', transactionOptions)
 
