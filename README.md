@@ -1,5 +1,8 @@
 # opbeat.js
 
+[![Build status](https://travis-ci.org/opbeat/opbeat-js.svg?branch=master)](https://travis-ci.org/opbeat/opbeat-js)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
+
 opbeat.js is the official JavaScript agent for Opbeat. This agent enables automatic exception collection and framework-specific code instrumentation of your front-end code.
 
 ## Installation
