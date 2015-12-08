@@ -6,10 +6,10 @@ var Exceptions = require('./exceptions')
 var API = require('./lib/api')
 
 function Opbeat () {
-  this.isInstalled = false
   this._instrumentation = new Instrumentation()
   this._exceptions = new Exceptions()
   this._config = config
+  this._config.set('isInstalled', false)
 
   config.init()
 
@@ -69,14 +69,14 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  if (this.isInstalled) {
+  if (this._config.get('isInstalled')) {
     logger.log('opbeat.install.already.installed')
     return this
   }
 
   this._exceptions.install()
 
-  this.isInstalled = true
+  this._config.set('isInstalled', true)
 
   return this
 }
@@ -101,7 +101,8 @@ Opbeat.prototype.uninstall = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.captureException = function (ex, options) {
-  if (!this.isInstalled) {
+
+  if (!this._config.get('isInstalled')) {
     throw new Error("Can't capture exception. Opbeat isn't intialized")
   }
 
