@@ -30,7 +30,6 @@ Transaction.prototype.end = function () {
   }
 
   this.ended = true
-  this._endAfterActiveTraces = false
   this._rootTrace.end()
 
   logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, Object.keys(this._activeTraces).length)
@@ -60,6 +59,7 @@ Transaction.prototype._markAsDone = function () {
     logger.log('- %c opbeat.instrumentation.transaction.whenAllTracesFinished', 'color: #3360A3', this.name)
 
     this._adjustStartToEarliestTrace()
+    this._adjustDurationToLongestTrace()
 
     this._queue.add(this)
   }.bind(this))
@@ -71,6 +71,18 @@ Transaction.prototype._adjustStartToEarliestTrace = function () {
   if (trace) {
     this._start = trace._start
     this._startStamp = trace._startStamp
+  }
+}
+
+Transaction.prototype._adjustDurationToLongestTrace = function () {
+  var trace = getLongestTrace(this.traces)
+
+  if (trace) {
+    var currentDuration = this._rootTrace._diff
+    var maxDuration = trace.duration()
+    if (maxDuration > currentDuration) {
+      this._rootTrace._diff = maxDuration
+    }
   }
 }
 
@@ -97,6 +109,22 @@ Transaction.prototype._onTraceEnd = function (trace) {
     this._markAsDone()
   }
 }
+
+function getLongestTrace (traces) {
+  var match = null
+
+  traces.forEach(function (trace) {
+    if (!match) {
+      match = trace
+    }
+    if (match && match.duration() < trace.duration()) {
+      match = trace
+    }
+  })
+
+  return match
+}
+
 
 function getEarliestTrace (traces) {
   var earliestTrace = null
