@@ -94,7 +94,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
       if(current.$$route) { // ngRoute
         transactionName = current.$$route.originalPath
       } else if(current.url) { // UI Router
-        transactionName = current.url
+        transactionName = current.name // Use state name over URL
       }
 
       if(!transactionName) {
