@@ -286,7 +286,14 @@ module.exports = {
 }
 
 function instrumentMethodBefore (context) {
-  var args = Array.prototype.slice.call(arguments).slice(1)
+
+  // Optimized copy of arguments (V8 https://github.com/GoogleChrome/devtools-docs/issues/53#issuecomment-51941358)
+  var args = new Array(arguments.length);
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    args[i] = arguments[i];
+  }
+  args = args.slice(1)
+
   var name = context.traceName
   var transaction = context.transaction
 
