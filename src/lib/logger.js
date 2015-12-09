@@ -9,9 +9,9 @@ module.exports = {
 
   log: function (message, data) {
     // Optimized copy of arguments (V8 https://github.com/GoogleChrome/devtools-docs/issues/53#issuecomment-51941358)
-    var args = new Array(arguments.length);
+    var args = new Array(arguments.length)
     for (var i = 0, l = arguments.length; i < l; i++) {
-      args[i] = arguments[i];
+      args[i] = arguments[i]
     }
 
     var isDebugMode = config.get('debug') === true || config.get('debug') === 'true'
