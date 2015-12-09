@@ -319,7 +319,11 @@ function extractNamedFunctionArgs (fn) {
 }
 
 function buildWrapperFunction (ctx, funcArguments) {
-  var funcBody = 'var args = Array.prototype.slice.call(arguments)\n' +
+
+  var funcBody = 'var args = new Array(arguments.length)\n' +
+    'for (var i = 0, l = arguments.length; i < l; i++) {\n' +
+    '  args[i] = arguments[i]\n' +
+    '}\n' +
     '// Before callback\n' +
     'if (typeof _opbeatBefore === "function") {\n' +
       'var beforeData = _opbeatBefore.apply(this, [_opbeatContext].concat(args))\n' +
