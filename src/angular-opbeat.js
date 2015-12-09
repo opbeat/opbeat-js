@@ -60,7 +60,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
     var onRouteChange = function (e, current) {
 
-      logger.log('opbeat.decorator.controller.onRouteChange')
+      logger.log('opbeat.decorator.controller.onRouteChange', current)
 
       if (!config.get('isInstalled')) {
         logger.log('opbeat.instrumentation.onRouteChange.not.installed')
@@ -69,6 +69,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
       var routeControllerName
       var routeController
+      var transactionName
 
       // Detect controller
       if(current.controller) {
@@ -90,7 +91,18 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
         return
       }
 
-      var transaction = Opbeat.startTransaction('app.angular.controller.' + routeControllerName, 'transaction', transactionOptions)
+      if(current.$$route) { // ngRoute
+        transactionName = current.$$route.originalPath
+      } else if(current.url) { // UI Router
+        transactionName = current.url
+      }
+
+      if(!transactionName) {
+        logger.log('%c opbeat.decorator.controller.onRouteChange.error.transactionName.missing', 'background-color: #ffff00', current)
+        return
+      }
+
+      var transaction = Opbeat.startTransaction(transactionName, 'transaction', transactionOptions)
       transaction.metadata.controllerName = routeControllerName
 
       // Update transaction store
