@@ -24,7 +24,7 @@ function Opbeat () {
   this.install()
 }
 
-Opbeat.prototype.VERSION = '%%GULP_INJECT_VERSION%%'
+Opbeat.prototype.VERSION = '%%VERSION%%'
 
 Opbeat.prototype.isPlatformSupport = function () {
   return typeof Array.prototype.forEach === 'function' &&

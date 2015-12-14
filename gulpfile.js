@@ -41,7 +41,9 @@ gulp.task('build:release', function () {
       .pipe(source(entry))
       .pipe(rename({dirname: ''}))
       .pipe(buffer())
-      .pipe(injectVersion())
+      .pipe(injectVersion({
+        replace: new RegExp(RegExp.escape('%%VERSION%%'),'g')
+      }))
       .pipe(derequire())
       .pipe(gulp.dest(path))
       .pipe(rename({
@@ -65,7 +67,9 @@ gulp.task('build', function () {
       .pipe(source(entry))
       .pipe(rename({dirname: ''}))
       .pipe(buffer())
-      .pipe(injectVersion())
+      .pipe(injectVersion({
+        replace: new RegExp(RegExp.escape('%%VERSION%%'),'g')
+      }))
       .pipe(derequire())
       .pipe(gulp.dest('./dist/'))
   })

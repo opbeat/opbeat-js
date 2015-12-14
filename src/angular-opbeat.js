@@ -14,6 +14,8 @@ function ngOpbeatProvider () {
     Opbeat.install()
   }
 
+  this.version = '%%VERSION%%'
+
   this.$get = [
     function () {
       return {
