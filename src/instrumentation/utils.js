@@ -322,7 +322,12 @@ function instrumentMethodAfter (context) {
 function extractNamedFunctionArgs (fn) {
   var fnText = fn.toString().replace(STRIP_COMMENTS, '')
   var argDecl = fnText.match(FN_ARGS)
-  return argDecl[1].split(FN_ARG_SPLIT)
+
+  if (argDecl.length === 2) {
+    return argDecl[1].split(FN_ARG_SPLIT)
+  }
+
+  return []
 }
 
 function buildWrapperFunction (ctx, funcArguments) {
