@@ -102,9 +102,15 @@ module.exports = {
       return ref
     }
 
+    if(typeof type === 'function') {
+      traceType = type.call(options)
+    } else {
+      traceType = type
+    }
+
     var context = {
       traceName: name,
-      traceType: type,
+      traceType: traceType,
       options: options,
       fn: fn,
       transaction: transaction
