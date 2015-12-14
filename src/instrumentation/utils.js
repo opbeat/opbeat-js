@@ -326,7 +326,7 @@ function instrumentMethodBefore (context) {
   var transaction = context.transaction
 
   if (context.options.signatureFormatter) {
-    name = context.options.signatureFormatter.apply(this, [context.fn, args])
+    name = context.options.signatureFormatter.apply(this, [context.fn, args, context.options])
   }
 
   if (transaction) {
