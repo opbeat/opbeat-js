@@ -244,12 +244,8 @@ module.exports = {
     if (transaction) {
       // Instrument static functions
       this.getObjectFunctions(object).forEach(function (funcScope) {
-        this.instrumentMethod(object, funcScope.property, transaction, options.type, {
-          prefix: options.prefix,
-          override: true,
-          signatureFormatter: options.signatureFormatter,
-          config: options.config
-        })
+        options.override = true;
+        this.instrumentMethod(object, funcScope.property, transaction, options.type, options)
       }.bind(this))
     } else {
       logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
