@@ -61,7 +61,6 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
     transactionStore.init($injector)
 
     var onRouteChange = function (e, current) {
-
       logger.log('opbeat.decorator.controller.onRouteChange', current)
 
       if (!config.get('isInstalled')) {
@@ -74,32 +73,32 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
       var transactionName
 
       // Detect controller
-      if(current.controller) {
+      if (current.controller) {
         routeController = current.controller
-      } else if(current.views) {
+      } else if (current.views) {
         var keys = Object.keys(current.views)
-        if(keys) {
+        if (keys) {
           routeController = current.views[keys[0]].controller
         }
       }
 
       // Extract controller name
-      if(typeof(routeController) === 'string') {
+      if (typeof (routeController) === 'string') {
         routeControllerName = routeController
       }
 
-      if(!routeControllerName) {
+      if (!routeControllerName) {
         logger.log('%c opbeat.decorator.controller.onRouteChange.error.routeControllerName.missing', 'background-color: #ffff00', current)
         return
       }
 
-      if(current.$$route) { // ngRoute
+      if (current.$$route) { // ngRoute
         transactionName = current.$$route.originalPath
-      } else if(current.url) { // UI Router
+      } else if (current.url) { // UI Router
         transactionName = current.name // Use state name over URL
       }
 
-      if(!transactionName) {
+      if (!transactionName) {
         logger.log('%c opbeat.decorator.controller.onRouteChange.error.transactionName.missing', 'background-color: #ffff00', current)
         return
       }
@@ -135,7 +134,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
       var result = $delegate.apply(this, args)
 
-      var onViewFinished = function(argument) {
+      var onViewFinished = function (argument) {
         logger.log('opbeat.angular.controller.$onViewFinished')
 
         transactionStore.getAllByUrl(url).forEach(function (trans) {
@@ -144,14 +143,14 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
         transactionStore.clearByUrl(url)
       }
 
-      var onScopeDestroyed = function() {
+      var onScopeDestroyed = function () {
         logger.log('opbeat.angular.controller.destroy')
       }
 
       if (isRouteController && controllerScope) {
         logger.log('opbeat.angular.controller', controllerName)
         controllerScope.$on('$destroy', onScopeDestroyed)
-        controllerScope.$on('$ionicView.enter', onViewFinished);
+        controllerScope.$on('$ionicView.enter', onViewFinished)
         controllerScope.$on('$viewContentLoaded', onViewFinished)
       }
 

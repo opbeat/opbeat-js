@@ -28,9 +28,9 @@ Opbeat.prototype.VERSION = '%%VERSION%%'
 
 Opbeat.prototype.isPlatformSupport = function () {
   return typeof Array.prototype.forEach === 'function' &&
-    typeof JSON.stringify === 'function' &&
-    typeof Function.bind === 'function' &&
-    utils.isCORSSupported()
+  typeof JSON.stringify === 'function' &&
+  typeof Function.bind === 'function' &&
+  utils.isCORSSupported()
 }
 
 /*
@@ -101,7 +101,6 @@ Opbeat.prototype.uninstall = function () {
  * @return {Opbeat}
  */
 Opbeat.prototype.captureException = function (ex, options) {
-
   if (!this._config.get('isInstalled')) {
     throw new Error("Can't capture exception. Opbeat isn't intialized")
   }
