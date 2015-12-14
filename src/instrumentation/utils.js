@@ -185,7 +185,10 @@ module.exports = {
           override: false,
           instrumentModule: true,
           signatureFormatter: options.signatureFormatter,
-          config: options.config
+          config: options.config,
+          wrapper: {
+            args: args
+          }
         })
       } else {
         logger.log('%c instrumentModule.error.transaction.missing', 'background-color: #ffff00', module)
