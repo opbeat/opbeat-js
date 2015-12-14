@@ -7,7 +7,6 @@ var FN_ARG_SPLIT = /,/
 var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
 
 module.exports = {
-
   wrapMethod: function (_opbeatOriginalFunction, _opbeatBefore, _opbeatAfter, _opbeatContext) {
     var namedArguments = extractNamedFunctionArgs(_opbeatOriginalFunction).join(',')
     var context = {
@@ -337,10 +336,10 @@ function buildWrapperFunction (ctx, funcArguments) {
     '}\n' +
     '// Before callback\n' +
     'if (typeof _opbeatBefore === "function") {\n' +
-      'var beforeData = _opbeatBefore.apply(this, [_opbeatContext].concat(args))\n' +
-      'if (beforeData.args) {\n' +
-      ' args = beforeData.args\n' +
-      '}\n' +
+    'var beforeData = _opbeatBefore.apply(this, [_opbeatContext].concat(args))\n' +
+    'if (beforeData.args) {\n' +
+    ' args = beforeData.args\n' +
+    '}\n' +
     '}\n' +
     '// Execute original function\n' +
     'var result = _opbeatOriginalFunction.apply(this, args)\n' +
