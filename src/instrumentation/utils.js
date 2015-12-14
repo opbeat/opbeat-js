@@ -29,6 +29,10 @@ module.exports = {
     }
 
     if (options.prefix) {
+      if (typeof options.prefix === 'function') {
+        args = options.wrapper ? options.wrapper.args : []
+        options.prefix = options.prefix.call(this, args)
+      }
       nameParts.push(options.prefix)
     }
 
@@ -78,6 +82,10 @@ module.exports = {
     var nameParts = []
 
     if (options.prefix) {
+      if (typeof options.prefix === 'function') {
+        args = options.wrapper ? options.wrapper.args : []
+        options.prefix = options.prefix.call(this, args)
+      }
       nameParts.push(options.prefix)
     }
 
