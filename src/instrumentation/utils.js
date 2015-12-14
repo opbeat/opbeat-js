@@ -120,6 +120,33 @@ module.exports = {
     return wrappedMethod
   },
 
+  instrumentStaticModule: function ($delegate, $injector, options) {
+
+    var self = this;
+
+    var opbeatInstrumentInstanceWrapperFunction  =  function () {
+      var args = Array.prototype.slice.call(arguments)
+      var wrapper = $delegate.apply(this, args)
+
+      options.wrapper = {
+        args: args
+      }
+
+      self.instrumentObject(wrapper, $injector, options)
+      return wrapper
+    }
+
+    // Copy all static properties over
+    for (var key in $delegate) {
+      if ($delegate.hasOwnProperty(key)) {
+        opbeatInstrumentInstanceWrapperFunction[key] = $delegate[key]
+      }
+    }
+
+    return opbeatInstrumentInstanceWrapperFunction
+
+  },
+
   instrumentModule: function (module, $injector, options) {
     options = options || {}
     var that = this
