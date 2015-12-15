@@ -187,7 +187,7 @@ module.exports = {
         this.instrumentMethod(object, funcScope.property, transaction, options.type, options)
       }.bind(this))
     } else {
-      logger.log('%c instrumentObject.error.transaction.missing', 'background-color: #ffff00', object)
+      logger.log('%c -- instrumentObject.error.transaction.missing', 'color: #d78f00')
     }
 
     return object
