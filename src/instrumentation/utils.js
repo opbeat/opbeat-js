@@ -30,7 +30,7 @@ module.exports = {
 
     if (options.prefix) {
       if (typeof options.prefix === 'function') {
-        args = options.wrapper ? options.wrapper.args : []
+        var args = options.wrapper ? options.wrapper.args : []
         options.prefix = options.prefix.call(this, args)
       }
       nameParts.push(options.prefix)
@@ -83,7 +83,7 @@ module.exports = {
 
     if (options.prefix) {
       if (typeof options.prefix === 'function') {
-        args = options.wrapper ? options.wrapper.args : []
+        var args = options.wrapper ? options.wrapper.args : []
         options.prefix = options.prefix.call(this, args)
       }
       nameParts.push(options.prefix)
@@ -110,7 +110,8 @@ module.exports = {
       return ref
     }
 
-    if(typeof type === 'function') {
+    var traceType
+    if (typeof type === 'function') {
       traceType = type.call(options)
     } else {
       traceType = type
@@ -135,10 +136,9 @@ module.exports = {
   },
 
   instrumentStaticModule: function ($delegate, $injector, options) {
+    var self = this
 
-    var self = this;
-
-    var opbeatInstrumentInstanceWrapperFunction  =  function () {
+    var opbeatInstrumentInstanceWrapperFunction = function () {
       var args = Array.prototype.slice.call(arguments)
       var wrapper = $delegate.apply(this, args)
 
@@ -158,7 +158,6 @@ module.exports = {
     }
 
     return opbeatInstrumentInstanceWrapperFunction
-
   },
 
   instrumentModule: function (module, $injector, options) {
@@ -255,7 +254,7 @@ module.exports = {
     if (transaction) {
       // Instrument static functions
       this.getObjectFunctions(object).forEach(function (funcScope) {
-        options.override = true;
+        options.override = true
         this.instrumentMethod(object, funcScope.property, transaction, options.type, options)
       }.bind(this))
     } else {
