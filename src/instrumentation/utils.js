@@ -128,6 +128,9 @@ module.exports = {
     var wrappedMethod = this.wrapMethod(ref, instrumentMethodBefore, instrumentMethodAfter, context)
     wrappedMethod.original = ref
 
+    // Copy all properties over
+    _copyProperties(wrappedMethod.original, wrappedMethod)
+
     if (options.override) {
       module[fn] = wrappedMethod
     }
@@ -151,11 +154,7 @@ module.exports = {
     }
 
     // Copy all static properties over
-    for (var key in $delegate) {
-      if ($delegate.hasOwnProperty(key)) {
-        opbeatInstrumentInstanceWrapperFunction[key] = $delegate[key]
-      }
-    }
+    _copyProperties($delegate, opbeatInstrumentInstanceWrapperFunction)
 
     return opbeatInstrumentInstanceWrapperFunction
   },
@@ -348,6 +347,14 @@ function instrumentMethodBefore (context) {
 
   return {
     args: args
+  }
+}
+
+function _copyProperties (source, target) {
+  for (var key in source) {
+    if (source.hasOwnProperty(key)) {
+      target[key] = source[key]
+    }
   }
 }
 
