@@ -14,6 +14,5 @@ module.exports = function ($provide, traceBuffer) {
         }
       })
     }])
-  } catch (e) {
-  }
+  } catch (e) {}
 }
