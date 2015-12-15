@@ -6,7 +6,11 @@ module.exports = function ($provide, traceBuffer) {
     return utils.instrumentModule($delegate, $injector, {
       traceBuffer: traceBuffer,
       prefix: function (args) {
-        return args[0] + 'Cache'
+        if (args.length) {
+          return args[0] + 'Cache'
+        } else {
+          return 'cacheFactory'
+        }
       },
       type: function () {
         return 'cache.' + this.prefix
@@ -15,6 +19,5 @@ module.exports = function ($provide, traceBuffer) {
         return ['$' + options.prefix, key.toUpperCase(), args[0]].join(' ')
       }
     })
-
   }])
 }
