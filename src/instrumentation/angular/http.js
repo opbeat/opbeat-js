@@ -10,7 +10,7 @@ module.exports = function ($provide, traceBuffer) {
       signatureFormatter: function (key, args) {
         var text = []
         if (args.length) {
-          if (typeof args[0] === 'object') {
+          if (args[0] !== null && typeof args[0] === 'object') {
             if (!args[0].method) {
               args[0].method = 'get'
             }
