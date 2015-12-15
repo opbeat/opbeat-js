@@ -4,7 +4,7 @@ module.exports = function ($provide, traceBuffer) {
   try {
     // ngResource instrumentation
     $provide.decorator('$resource', ['$delegate', '$injector', function ($delegate, $injector) {
-      return utils.instrumentStaticModule($delegate, $injector, {
+      return utils.instrumentModule($delegate, $injector, {
         traceBuffer: traceBuffer,
         prefix: '$resource',
         type: 'ext.$resource',

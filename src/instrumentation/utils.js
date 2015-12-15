@@ -138,7 +138,7 @@ module.exports = {
     return wrappedMethod
   },
 
-  instrumentStaticModule: function ($delegate, $injector, options) {
+  instrumentModule: function ($delegate, $injector, options) {
     var self = this
 
     var opbeatInstrumentInstanceWrapperFunction = function () {
@@ -155,79 +155,9 @@ module.exports = {
 
     // Copy all static properties over
     _copyProperties($delegate, opbeatInstrumentInstanceWrapperFunction)
+    this.instrumentObject(opbeatInstrumentInstanceWrapperFunction, $injector, options)
 
     return opbeatInstrumentInstanceWrapperFunction
-  },
-
-  instrumentModule: function (module, $injector, options) {
-    options = options || {}
-    var that = this
-
-    if (!config.get('isInstalled')) {
-      logger.log('opbeat.instrumentation.instrumentModule.not.installed')
-      return module
-    }
-
-    var wrapper = function () {
-      var fn = module
-      var args = Array.prototype.slice.call(arguments)
-      var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
-
-      if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
-        transaction = options.traceBuffer
-      }
-
-      if (transaction) {
-        fn = that.instrumentMethod(module, '', transaction, options.type, {
-          prefix: options.prefix,
-          override: false,
-          instrumentModule: true,
-          signatureFormatter: options.signatureFormatter,
-          config: options.config,
-          wrapper: {
-            args: args
-          }
-        })
-      } else {
-        logger.log('%c instrumentModule.error.transaction.missing', 'background-color: #ffff00', module)
-      }
-
-      return fn.apply(module, args)
-    }
-
-    // Copy all properties over
-    for (var key in module) {
-      if (module.hasOwnProperty(key)) {
-        wrapper[key] = module[key]
-      }
-    }
-
-    // Instrument functions
-    this.getObjectFunctions(module).forEach(function (funcScope) {
-      wrapper[funcScope.property] = function () {
-        var fn = funcScope.ref
-        var args = Array.prototype.slice.call(arguments)
-        var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
-
-        if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
-          transaction = options.traceBuffer
-        }
-
-        if (transaction) {
-          fn = that.instrumentMethod(module, funcScope.property, transaction, options.type, {
-            prefix: options.prefix,
-            override: true,
-            signatureFormatter: options.signatureFormatter
-          })
-        } else {
-          logger.log('%c instrumentModule.error.transaction.missing', 'background-color: #ffff00', module)
-        }
-
-        return fn.apply(module, args)
-      }
-    })
-
-    return wrapper
   },
 
   instrumentObject: function (object, $injector, options) {
