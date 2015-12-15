@@ -8,7 +8,7 @@ var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
 
 module.exports = {
   wrapMethod: function (_opbeatOriginalFunction, _opbeatBefore, _opbeatAfter, _opbeatContext) {
-    var namedArguments = extractNamedFunctionArgs(_opbeatOriginalFunction).join(',')
+    var namedArguments = _extractNamedFunctionArgs(_opbeatOriginalFunction).join(',')
     var context = {
       _opbeatOriginalFunction: _opbeatOriginalFunction,
       _opbeatBefore: _opbeatBefore,
@@ -16,7 +16,7 @@ module.exports = {
       _opbeatContext: _opbeatContext
     }
 
-    return buildWrapperFunction(context, namedArguments)
+    return _buildWrapperFunction(context, namedArguments)
   },
 
   instrumentMethodWithCallback: function (fn, fnName, transaction, type, options) {
@@ -357,7 +357,7 @@ function instrumentMethodAfter (context) {
   }
 }
 
-function extractNamedFunctionArgs (fn) {
+function _extractNamedFunctionArgs (fn) {
   var fnText = fn.toString().replace(STRIP_COMMENTS, '')
   var argDecl = fnText.match(FN_ARGS)
 
@@ -368,7 +368,7 @@ function extractNamedFunctionArgs (fn) {
   return []
 }
 
-function buildWrapperFunction (ctx, funcArguments) {
+function _buildWrapperFunction (ctx, funcArguments) {
   var funcBody = 'var args = new Array(arguments.length)\n' +
     'for (var i = 0, l = arguments.length; i < l; i++) {\n' +
     '  args[i] = arguments[i]\n' +
