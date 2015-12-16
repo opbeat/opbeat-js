@@ -114,6 +114,10 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
       // Lock traceBuffer, as we only want to migrate the initial traces to the first transaction
       traceBuffer.lock()
+
+      // Add finished traces to transaction and flush buffer
+      transaction.addEndedTraces(traceBuffer.traces)
+      traceBuffer.flush()
     }
 
     $rootScope.$on('$routeChangeSuccess', onRouteChange) // ng-router
