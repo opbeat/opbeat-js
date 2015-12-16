@@ -31,10 +31,7 @@ function Config () {
 
 Config.prototype.init = function () {
   var scriptData = _getConfigFromScript()
-
-  if (Object.keys(scriptData).length) {
-    this.setConfig(scriptData)
-  }
+  this.setConfig(scriptData)
 }
 
 Config.prototype.get = function (key) {
