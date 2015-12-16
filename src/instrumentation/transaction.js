@@ -74,6 +74,10 @@ Transaction.prototype._adjustStartToEarliestTrace = function () {
   if (trace) {
     this._rootTrace._start = trace._start
     this._rootTrace._startStamp = trace._startStamp
+    this._rootTrace.calcDiff()
+
+    this._startStamp = this._rootTrace._startStamp
+    this._start = this._rootTrace._start
   }
 }
 
