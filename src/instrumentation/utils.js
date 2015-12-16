@@ -45,9 +45,10 @@ module.exports = {
     var context = {
       traceName: name,
       traceType: type,
-      options: options,
+      traceBuffer: options.traceBuffer,
+      transactionStore: transactionStore,
       fn: fn,
-      transactionStore: transactionStore
+      options: options
     }
 
     var wrappedMethod = this.wrapMethod(ref, function instrumentMethodWithCallbackBefore (context) {
