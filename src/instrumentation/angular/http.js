@@ -8,14 +8,14 @@ module.exports = function ($provide, traceBuffer) {
       prefix: '$http',
       traceBuffer: traceBuffer,
       signatureFormatter: function (key, args) {
-        var text = []
+        var text = ['$http']
         if (args.length) {
           if (args[0] !== null && typeof args[0] === 'object') {
             if (!args[0].method) {
               args[0].method = 'get'
             }
             text = ['$http', args[0].method.toUpperCase(), args[0].url]
-          } else {
+          } else if (typeof args[0] === 'string') {
             text = ['$http', args[0]]
           }
         }
