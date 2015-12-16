@@ -120,10 +120,6 @@ module.exports = {
     // Copy all properties over
     _copyProperties(wrappedMethod.original, wrappedMethod)
 
-    if (options.override) {
-      module[fn] = wrappedMethod
-    }
-
     return wrappedMethod
   },
 
@@ -172,8 +168,7 @@ module.exports = {
 
     // Instrument static functions
     this.getObjectFunctions(object).forEach(function (funcScope) {
-      options.override = true
-      this.instrumentMethod(object, funcScope.property, options.type, options)
+      object[funcScope.property] = this.instrumentMethod(object, funcScope.property, options.type, options)
     }.bind(this))
 
     return object
