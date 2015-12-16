@@ -36,9 +36,17 @@ var Trace = module.exports = function (transaction, signature, type, options) {
   logger.log('%c -- opbeat.instrumentation.trace.start', 'color: #9a6bcb', this.signature, this._start)
 }
 
+Trace.prototype.calcDiff = function () {
+  if (!this._end || !this._start) {
+    return
+  }
+  this._diff = this._end - this._start
+}
+
 Trace.prototype.end = function () {
   this._end = window.performance.now()
-  this._diff = this._end - this._start
+
+  this.calcDiff()
   this.ended = true
 
   logger.log('%c -- opbeat.instrumentation.trace.end', 'color: #9a6bcb', this.signature, this._end, this._diff)
