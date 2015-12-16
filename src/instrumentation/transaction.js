@@ -55,6 +55,10 @@ Transaction.prototype.end = function () {
   }
 }
 
+Transaction.prototype.addEndedTraces = function (existingTraces) {
+  this.traces = this.traces.concat(existingTraces)
+}
+
 Transaction.prototype._markAsDone = function () {
   logger.log('- %c opbeat.instrumentation.transaction._markAsDone', 'color: #3360A3', this.name)
 
@@ -109,6 +113,7 @@ Transaction.prototype._adjustDurationToLongestTrace = function () {
 Transaction.prototype._onTraceEnd = function (trace) {
   this.traces.push(trace)
 
+  logger.log('-- %c  opbeat.instrumentation.transaction.traceCount', 'color: red', this.traces.length)
   logger.log('- %c  opbeat.instrumentation.transaction._endTrace', 'color: #3360A3', trace.signature)
 
   // Remove trace from _activeTraces
