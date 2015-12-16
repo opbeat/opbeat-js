@@ -107,7 +107,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
       transaction.metadata.controllerName = routeControllerName
 
       // Update transaction store
-      transactionStore.pushToUrl($location.absUrl(), transaction)
+      transactionStore.pushToUrl(window.location.href, transaction)
 
       // Update transaction reference in traceBuffer
       traceBuffer.setTransactionReference(transaction)
@@ -116,7 +116,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
       traceBuffer.lock()
     }
 
-    $rootScope.$on('$routeChangeStart', onRouteChange) // ng-router
+    $rootScope.$on('$routeChangeSuccess', onRouteChange) // ng-router
     $rootScope.$on('$stateChangeSuccess', onRouteChange) // ui-router
 
     return function () {
@@ -124,7 +124,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
       var args = Array.prototype.slice.call(arguments)
 
-      var url = $injector.get('$location').absUrl()
+      var url = window.location.href
       var transaction = transactionStore.getRecentByUrl(url)
 
       var controllerInfo = utils.getControllerInfoFromArgs(args)

@@ -1,14 +1,12 @@
 var utils = require('../utils')
-var transactionStore = require('../transactionStore')
 
 module.exports = function ($provide, traceBuffer) {
   // $httpBackend instrumentation
   $provide.decorator('$httpBackend', ['$delegate', '$injector', function ($delegate, $injector) {
     return function () {
       var args = Array.prototype.slice.call(arguments)
-      var transaction = transactionStore.getRecentByUrl($injector.get('$location').absUrl())
 
-      var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', transaction, 'ext.$httpBackend', {
+      var result = utils.instrumentMethodWithCallback($delegate, '$httpBackend', 'ext.$httpBackend', {
         prefix: '$httpBackend',
         callbackIndex: 3,
         traceBuffer: traceBuffer,

@@ -19,7 +19,7 @@ module.exports = {
     return _buildWrapperFunction(context, namedArguments)
   },
 
-  instrumentMethodWithCallback: function (fn, fnName, transaction, type, options) {
+  instrumentMethodWithCallback: function (fn, fnName, type, options) {
     options = options || {}
     var nameParts = []
 
@@ -40,10 +40,6 @@ module.exports = {
       nameParts.push(fnName)
     }
 
-    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
-      transaction = options.traceBuffer
-    }
-
     var name = nameParts.join('.')
     var ref = fn
     var context = {
@@ -51,7 +47,7 @@ module.exports = {
       traceType: type,
       options: options,
       fn: fn,
-      transaction: transaction
+      transactionStore: transactionStore
     }
 
     var wrappedMethod = this.wrapMethod(ref, function instrumentMethodWithCallbackBefore (context) {
@@ -76,9 +72,9 @@ module.exports = {
     return wrappedMethod
   },
 
-  instrumentMethod: function (module, fn, transaction, type, options) {
+  instrumentMethod: function (module, fn, type, options) {
     options = options || {}
-    var ref
+
     var nameParts = []
 
     if (options.prefix) {
@@ -94,16 +90,7 @@ module.exports = {
     }
 
     var name = nameParts.join('.')
-
-    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
-      transaction = options.traceBuffer
-    }
-
-    if (options.instrumentModule) {
-      ref = module
-    } else {
-      ref = module[fn]
-    }
+    var ref =  module[fn]
 
     if (!config.get('isInstalled')) {
       logger.log('opbeat.instrumentation.instrumentMethod.not.installed')
@@ -120,9 +107,10 @@ module.exports = {
     var context = {
       traceName: name,
       traceType: traceType,
+      traceBuffer: options.traceBuffer,
       options: options,
       fn: fn,
-      transaction: transaction
+      transactionStore: transactionStore
     }
 
     var wrappedMethod = this.wrapMethod(ref, instrumentMethodBefore, instrumentMethodAfter, context)
@@ -140,6 +128,11 @@ module.exports = {
 
   instrumentModule: function ($delegate, $injector, options) {
     var self = this
+
+    if (!config.get('isInstalled')) {
+      logger.log('opbeat.instrumentation.instrumentModule.not.installed')
+      return object
+    }
 
     var opbeatInstrumentInstanceWrapperFunction = function () {
       var args = Array.prototype.slice.call(arguments)
@@ -168,27 +161,11 @@ module.exports = {
       return object
     }
 
-    var transaction
-    if (options.transaction) {
-      transaction = options.transaction
-    } else {
-      var url = $injector.get('$location').absUrl()
-      transaction = transactionStore.getRecentByUrl(url)
-    }
-
-    if (!transaction && options.traceBuffer && !options.traceBuffer.isLocked()) {
-      transaction = options.traceBuffer
-    }
-
-    if (transaction) {
-      // Instrument static functions
-      this.getObjectFunctions(object).forEach(function (funcScope) {
-        options.override = true
-        this.instrumentMethod(object, funcScope.property, transaction, options.type, options)
-      }.bind(this))
-    } else {
-      logger.log('%c -- instrumentObject.error.transaction.missing', 'color: #d78f00')
-    }
+    // Instrument static functions
+    this.getObjectFunctions(object).forEach(function (funcScope) {
+      options.override = true
+      this.instrumentMethod(object, funcScope.property, options.type, options)
+    }.bind(this))
 
     return object
   },
@@ -262,7 +239,12 @@ function instrumentMethodBefore (context) {
   args = args.slice(1)
 
   var name = context.traceName
-  var transaction = context.transaction
+  var transactionStore = context.transactionStore
+
+  var transaction = transactionStore.getRecentByUrl(window.location.href)
+  if (!transaction && context.traceBuffer && !context.traceBuffer.isLocked()) {
+    transaction = context.traceBuffer
+  }
 
   if (context.options.signatureFormatter) {
     name = context.options.signatureFormatter.apply(this, [context.fn, args, context.options])
