@@ -63,8 +63,9 @@ angular.module('app', ['ngOpbeat'])
       orgId: '<org id>', // Your Opbeat org id
       appId: '<app id>', // Your Opbeat app id
       libraryPathPattern: '(node_modules|bower_components|webpack)', // Regex pattern used to determine whether a file is a library file or not.
-      angularAppName: '' // The name of the angular app, if booted manually,
+      angularAppName: '' // Optional: The name of the angular app, if booted manually,
       performance: {
+        enable: true/false // Toggles performance monitoring
         enableStackFrames: true/false // Toggles whether stack frames should be generated for traces
       }
     })
@@ -75,8 +76,6 @@ angular.module('app', ['ngOpbeat'])
       id: 1,
       isSuperDuperAwesome: true
     });
-
-    $opbeatProvider.install()
   })
 ```
 
@@ -85,9 +84,9 @@ angular.module('app', ['ngOpbeat'])
 For Angular applications that aren't using the `ng-app` directive to boot, you need to pass in the app name via the config:
 
 ```
-    $opbeatProvider.config({
-      angularAppName: 'my app name'
-    })
+$opbeatProvider.config({
+  angularAppName: 'my app name'
+})
 ```
 
 #### Supported AngularJS versions
