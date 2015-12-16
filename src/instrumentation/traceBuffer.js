@@ -31,7 +31,6 @@ TraceBuffer.prototype._onTraceEnd = function (trace) {
   if (index > -1) {
     this.activetraces.splice(index, 1)
   }
-  // TODO: Buffer should probably be flushed at somepoint to save memory
 }
 
 TraceBuffer.prototype.setTransactionReference = function (transaction) {
@@ -52,8 +51,11 @@ TraceBuffer.prototype.setTransactionReference = function (transaction) {
     trace.transaction = this.traceTransactionReference
     trace.setParent(this.traceTransactionReference._rootTrace)
   }.bind(this))
+}
 
+TraceBuffer.prototype.flush = function () {
   this.traces = []
+  this.activetraces = []
 }
 
 TraceBuffer.prototype.lock = function () {
