@@ -9,6 +9,8 @@ var Trace = module.exports = function (transaction, signature, type, options) {
   this.type = type
   this.ended = false
   this._parent = null
+  this._diff = null
+  this._end = null
 
   // Start timers
   this._start = window.performance.now()
