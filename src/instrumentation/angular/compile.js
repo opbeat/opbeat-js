@@ -6,6 +6,7 @@ module.exports = function ($provide, traceBuffer) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'template.$compile',
       prefix: '$compile',
+      instrumentConstructor: true,
       traceBuffer: traceBuffer
     })
   }])
