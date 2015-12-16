@@ -26,6 +26,19 @@ var Transaction = function (queue, name, type, options) {
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
 }
 
+Transaction.prototype.startTrace = function (signature, type) {
+  var trace = new Trace(this, signature, type, this._options)
+  if (this._rootTrace) {
+    trace.setParent(this._rootTrace)
+  }
+
+  this._activeTraces[trace.getFingerprint()] = trace
+
+  logger.log('- %c  opbeat.instrumentation.transaction.startTrace', 'color: #3360A3', trace.signature)
+
+  return trace
+}
+
 Transaction.prototype.end = function () {
   if (this.ended) {
     return
@@ -91,19 +104,6 @@ Transaction.prototype._adjustDurationToLongestTrace = function () {
       this._rootTrace._diff = maxDuration
     }
   }
-}
-
-Transaction.prototype.startTrace = function (signature, type) {
-  var trace = new Trace(this, signature, type, this._options)
-  if (this._rootTrace) {
-    trace.setParent(this._rootTrace)
-  }
-
-  this._activeTraces[trace.getFingerprint()] = trace
-
-  logger.log('- %c  opbeat.instrumentation.transaction.startTrace', 'color: #3360A3', trace.signature)
-
-  return trace
 }
 
 Transaction.prototype._onTraceEnd = function (trace) {
