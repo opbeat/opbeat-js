@@ -33,6 +33,9 @@ angular.module('todomvc', ['ngRoute', 'ngResource', 'ngOpbeat'])
     $opbeatProvider.config({
       debug: true,
       orgId: 'b3eba3d11f6e4c3a9db52f477caa4fa2',
-      appId: 'a7971dbd71'
+      appId: 'a7971dbd71',
+      performance: {
+        enable: true
+      }
     })
   })
