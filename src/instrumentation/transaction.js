@@ -89,7 +89,9 @@ Transaction.prototype._adjustDurationToLongestTrace = function () {
 
 Transaction.prototype.startTrace = function (signature, type) {
   var trace = new Trace(this, signature, type, this._options)
-  trace.setParent(this._rootTrace)
+  if (this._rootTrace) {
+    trace.setParent(this._rootTrace)
+  }
 
   this._activeTraces[trace.getFingerprint()] = trace
 
