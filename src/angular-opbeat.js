@@ -68,6 +68,11 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
         return
       }
 
+      if (!config.get('performance.enable')) {
+        logger.log('- %c opbeat.instrumentation.disabled', 'color: #3360A3')
+        return
+      }
+
       var routeControllerName
       var routeController
       var transactionName
@@ -127,6 +132,12 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
       logger.log('opbeat.decorator.controller.ctor')
 
       var args = Array.prototype.slice.call(arguments)
+      var result = $delegate.apply(this, args)
+
+      if (!config.get('performance.enable')) {
+        logger.log('- %c opbeat.instrumentation.disabled', 'color: #3360A3')
+        return result
+      }
 
       var url = window.location.href
       var transaction = transactionStore.getRecentByUrl(url)
@@ -136,11 +147,8 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
       var controllerScope = controllerInfo.scope
       var isRouteController = controllerName && transaction && transaction.metadata.controllerName === controllerName
 
-      var result = $delegate.apply(this, args)
-
       var onViewFinished = function (argument) {
         logger.log('opbeat.angular.controller.$onViewFinished')
-
         transactionStore.getAllByUrl(url).forEach(function (trans) {
           transaction.end()
         })

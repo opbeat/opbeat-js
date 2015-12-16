@@ -29,6 +29,11 @@ module.exports = {
       return fn
     }
 
+    if (!config.get('performance.enable')) {
+      logger.log('- %c opbeat.instrumentation.instrumentMethodWithCallback.disabled', 'color: #3360A3')
+      return fn
+    }
+
     if (options.prefix) {
       if (typeof options.prefix === 'function') {
         var args = options.wrapper ? options.wrapper.args : []
@@ -105,6 +110,11 @@ module.exports = {
       return fn
     }
 
+    if (!config.get('performance.enable')) {
+      logger.log('- %c opbeat.instrumentation.instrumentMethod.disabled', 'color: #3360A3')
+      return fn
+    }
+
     var traceType
     if (typeof type === 'function') {
       traceType = type.call(options)
@@ -136,6 +146,11 @@ module.exports = {
 
     if (!config.get('isInstalled')) {
       logger.log('opbeat.instrumentation.instrumentModule.not.installed')
+      return $delegate
+    }
+
+    if (!config.get('performance.enable')) {
+      logger.log('- %c opbeat.instrumentation.instrumentModule.disabled', 'color: #3360A3')
       return $delegate
     }
 
@@ -171,6 +186,11 @@ module.exports = {
 
     if (!config.get('isInstalled')) {
       logger.log('opbeat.instrumentation.instrumentObject.not.installed')
+      return object
+    }
+
+    if (!config.get('performance.enable')) {
+      logger.log('- %c opbeat.instrumentation.instrumentObject.disabled', 'color: #3360A3')
       return object
     }
 
