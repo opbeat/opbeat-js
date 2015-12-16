@@ -91,7 +91,7 @@ module.exports = {
     }
 
     var name = nameParts.join('.')
-    var ref =  module[fn]
+    var ref = (typeof fn === 'function') ? fn : module[fn]
 
     if (!config.get('isInstalled')) {
       logger.log('opbeat.instrumentation.instrumentMethod.not.installed')
@@ -137,14 +137,22 @@ module.exports = {
 
     var opbeatInstrumentInstanceWrapperFunction = function () {
       var args = Array.prototype.slice.call(arguments)
-      var wrapper = $delegate.apply(this, args)
+
+      var wrapped = $delegate
+
+      // Instrument wrapped constructor
+      if(options.instrumentConstructor) {
+        var wrapped = self.instrumentMethod(null, $delegate, options.type, options)
+      }
+
+      var result = wrapped.apply(this, args)
 
       options.wrapper = {
         args: args
       }
 
-      self.instrumentObject(wrapper, $injector, options)
-      return wrapper
+      self.instrumentObject(result, $injector, options)
+      return result
     }
 
     // Copy all static properties over
