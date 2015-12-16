@@ -7,6 +7,7 @@ module.exports = function ($provide, traceBuffer) {
       type: 'ext.$http',
       prefix: '$http',
       traceBuffer: traceBuffer,
+      instrumentConstructor: true,
       signatureFormatter: function (key, args) {
         var text = ['$http']
         if (args.length) {
