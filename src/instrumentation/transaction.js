@@ -1,5 +1,6 @@
 var logger = require('../lib/logger')
 var Trace = require('./trace')
+var utils = require('../lib/utils')
 
 var Transaction = function (queue, name, type, options) {
   this.metadata = {}
@@ -9,6 +10,7 @@ var Transaction = function (queue, name, type, options) {
   this._markDoneAfterLastTrace = false
   this._isDone = false
   this._options = options
+  this.uuid = utils.generateUuid()
 
   this.traces = []
   this._activeTraces = {}
