@@ -8,6 +8,7 @@ module.exports = function ($provide, traceBuffer) {
         type: 'template.$templateRequest',
         prefix: '$templateRequest',
         traceBuffer: traceBuffer,
+        instrumentConstructor: true,
         signatureFormatter: function (key, args) {
           var text = ['$templateRequest', args[0]]
           return text.join(' ')
