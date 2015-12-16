@@ -147,13 +147,8 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
         transactionStore.clearByUrl(url)
       }
 
-      var onScopeDestroyed = function () {
-        logger.log('opbeat.angular.controller.destroy')
-      }
-
       if (isRouteController && controllerScope) {
         logger.log('opbeat.angular.controller', controllerName)
-        controllerScope.$on('$destroy', onScopeDestroyed)
         controllerScope.$on('$ionicView.enter', onViewFinished)
         controllerScope.$on('$viewContentLoaded', onViewFinished)
       }
