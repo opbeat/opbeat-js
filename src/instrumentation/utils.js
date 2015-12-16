@@ -1,4 +1,5 @@
 var logger = require('../lib/logger')
+var utils = require('../lib/utils')
 var config = require('../lib/config')
 var transactionStore = require('./transactionStore')
 
@@ -73,7 +74,7 @@ module.exports = {
     return wrappedMethod
   },
 
-  instrumentMethod: function (module, fn, type, options) {
+  instrumentMethod: function (fn, type, options) {
     options = options || {}
 
     var nameParts = []
@@ -86,16 +87,22 @@ module.exports = {
       nameParts.push(options.prefix)
     }
 
-    if (fn) {
-      nameParts.push(fn)
+    var fnName
+    if (typeof fn === 'function' && fn.name) {
+      fnName = fn.name
+    } else if (options.fnName) {
+      fnName = options.fnName
+    }
+
+    if (fnName) {
+      nameParts.push(fnName)
     }
 
     var name = nameParts.join('.')
-    var ref = (typeof fn === 'function') ? fn : module[fn]
 
     if (!config.get('isInstalled')) {
       logger.log('opbeat.instrumentation.instrumentMethod.not.installed')
-      return ref
+      return fn
     }
 
     var traceType
@@ -111,11 +118,12 @@ module.exports = {
       traceBuffer: options.traceBuffer,
       options: options,
       fn: fn,
+      fnName: fnName,
       transactionStore: transactionStore
     }
 
-    var wrappedMethod = this.wrapMethod(ref, instrumentMethodBefore, instrumentMethodAfter, context)
-    wrappedMethod.original = ref
+    var wrappedMethod = this.wrapMethod(fn, instrumentMethodBefore, instrumentMethodAfter, context)
+    wrappedMethod.original = fn
 
     // Copy all properties over
     _copyProperties(wrappedMethod.original, wrappedMethod)
@@ -138,7 +146,7 @@ module.exports = {
 
       // Instrument wrapped constructor
       if(options.instrumentConstructor) {
-        var wrapped = self.instrumentMethod(null, $delegate, options.type, options)
+        var wrapped = self.instrumentMethod($delegate, options.type, options)
       }
 
       var result = wrapped.apply(this, args)
@@ -168,7 +176,9 @@ module.exports = {
 
     // Instrument static functions
     this.getObjectFunctions(object).forEach(function (funcScope) {
-      object[funcScope.property] = this.instrumentMethod(object, funcScope.property, options.type, options)
+      var subOptions = utils.mergeObject(options, {})
+      subOptions.fnName = funcScope.property
+      object[funcScope.property] = this.instrumentMethod(funcScope.ref, options.type, subOptions)
     }.bind(this))
 
     return object
@@ -251,7 +261,7 @@ function instrumentMethodBefore (context) {
   }
 
   if (context.options.signatureFormatter) {
-    name = context.options.signatureFormatter.apply(this, [context.fn, args, context.options])
+    name = context.options.signatureFormatter.apply(this, [context.fnName, args, context.options])
   }
 
   if (transaction) {
