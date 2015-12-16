@@ -11,6 +11,7 @@ module.exports = function ($provide, traceBuffer) {
       if(controllerInfo.name) { // Only instrument controllers with a name
         return utils.instrumentModule($delegate, $injector, {
           traceBuffer: traceBuffer,
+          instrumentConstructor: true,
           type: 'app.$controller',
           prefix: '$controller.' + controllerInfo.name
         }).apply(this, arguments)
