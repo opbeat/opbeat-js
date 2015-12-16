@@ -136,7 +136,7 @@ module.exports = {
 
     if (!config.get('isInstalled')) {
       logger.log('opbeat.instrumentation.instrumentModule.not.installed')
-      return object
+      return $delegate
     }
 
     var opbeatInstrumentInstanceWrapperFunction = function () {
@@ -145,8 +145,8 @@ module.exports = {
       var wrapped = $delegate
 
       // Instrument wrapped constructor
-      if(options.instrumentConstructor) {
-        var wrapped = self.instrumentMethod($delegate, options.type, options)
+      if (options.instrumentConstructor) {
+        wrapped = self.instrumentMethod($delegate, options.type, options)
       }
 
       var result = wrapped.apply(this, args)
