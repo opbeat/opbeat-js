@@ -7,6 +7,14 @@ module.exports = {
     return logStack
   },
 
+  error: function(msg, data) {
+    return this.log('%c' + msg, 'color: red', data)
+  },
+
+  warning: function(msg, data) {
+    return this.log('%c' + msg, 'background-color: ffff00', data)
+  },
+
   log: function (message, data) {
     // Optimized copy of arguments (V8 https://github.com/GoogleChrome/devtools-docs/issues/53#issuecomment-51941358)
     var args = new Array(arguments.length)
