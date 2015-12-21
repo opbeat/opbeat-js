@@ -1,23 +1,18 @@
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 var config = require('./lib/config')
-var Instrumentation = require('./instrumentation')
 var Exceptions = require('./exceptions')
 var API = require('./lib/api')
 
 function Opbeat () {
-  this._instrumentation = new Instrumentation()
-  this._exceptions = new Exceptions()
   this._config = config
-
-  config.init()
+  this._config.init()
 
   var queuedCommands = []
   if (window._opbeat) {
     queuedCommands = window._opbeat.q
   }
   this.api = new API(this, queuedCommands)
-
   window._opbeat = this.api.push
 
   this.install()
@@ -73,8 +68,9 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  this._exceptions.install()
+  this._exceptions = new Exceptions()
 
+  this._exceptions.install()
   this._config.set('isInstalled', true)
 
   return this
@@ -144,10 +140,6 @@ Opbeat.prototype.setExtraContext = function (extra) {
   config.set('context.extra', extra)
 
   return this
-}
-
-Opbeat.prototype.startTransaction = function (name, type, options) {
-  return this._instrumentation.startTransaction(name, type, options)
 }
 
 module.exports = new Opbeat()
