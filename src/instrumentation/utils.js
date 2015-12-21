@@ -61,14 +61,16 @@ module.exports = {
       var args = Array.prototype.slice.call(arguments).slice(1)
       var callback = args[options.callbackIndex]
 
-      // Wrap callback
-      var wrappedCallback = this.wrapMethod(callback, function instrumentMethodWithCallbackBeforeCallback () {
-        instrumentMethodAfter.apply(this, [context])
-        return {}
-      }, null)
+      if(typeof callback === 'function') {
+        // Wrap callback
+        var wrappedCallback = this.wrapMethod(callback, function instrumentMethodWithCallbackBeforeCallback () {
+          instrumentMethodAfter.apply(this, [context])
+          return {}
+        }, null)
 
-      // Override callback with wrapped one
-      args[context.options.callbackIndex] = wrappedCallback
+        // Override callback with wrapped one
+        args[context.options.callbackIndex] = wrappedCallback
+      }
 
       // Call base
       return instrumentMethodBefore.apply(this, [context].concat(args))
@@ -314,7 +316,7 @@ function _extractNamedFunctionArgs (fn) {
   var fnText = fn.toString().replace(STRIP_COMMENTS, '')
   var argDecl = fnText.match(FN_ARGS)
 
-  if (argDecl.length === 2) {
+  if (argDecl && argDecl.length && argDecl.length === 2) {
     return argDecl[1].split(FN_ARG_SPLIT)
   }
 

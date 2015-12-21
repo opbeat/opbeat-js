@@ -36,7 +36,7 @@ Config.prototype.init = function () {
 }
 
 Config.prototype.get = function (key) {
-  return key.split('.').reduce(function (obj, i) {
+  return utils.arrayReduce(key.split('.'), function (obj, i) {
     return obj[i]
   }, this.config)
 }
@@ -46,7 +46,7 @@ Config.prototype.set = function (key, value) {
   var max_level = levels.length - 1
   var target = this.config
 
-  levels.some(function (level, i) {
+  utils.arraySome(levels, function (level, i) {
     if (typeof level === 'undefined') {
       return true
     }

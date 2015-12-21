@@ -26,6 +26,60 @@ module.exports = {
     return o3
   },
 
+  arrayReduce : function(arrayValue, callback, value) {
+    if (arrayValue == null) {
+      throw new TypeError('Array.prototype.reduce called on null or undefined')
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError(callback + ' is not a function')
+    }
+    var t = Object(arrayValue), len = t.length >>> 0, k = 0, value;
+
+    if (!value) {
+      while (k < len && !(k in t)) {
+        k++
+      }
+      if (k >= len) {
+        throw new TypeError('Reduce of empty array with no initial value')
+      }
+      value = t[k++]
+    }
+
+    for (; k < len; k++) {
+      if (k in t) {
+        value = callback(value, t[k], k, t);
+      }
+    }
+    return value
+  },
+
+  arraySome : function(value, callback, thisArg) {
+    'use strict';
+
+    if (value == null) {
+      throw new TypeError('Array.prototype.some called on null or undefined');
+    }
+
+    if (typeof callback !== 'function') {
+      throw new TypeError();
+    }
+
+    var t = Object(value)
+    var len = t.length >>> 0
+
+    if(!thisArg) {
+      thisArg = void 0
+    }
+
+    for (var i = 0; i < len; i++) {
+      if (i in t && callback.call(thisArg, t[i], i, t)) {
+        return true
+      }
+    }
+
+    return false
+  },
+
   getRandomInt: function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
   },
