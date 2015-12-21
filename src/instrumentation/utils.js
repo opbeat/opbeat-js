@@ -61,7 +61,7 @@ module.exports = {
       var args = Array.prototype.slice.call(arguments).slice(1)
       var callback = args[options.callbackIndex]
 
-      if(typeof callback === 'function') {
+      if (typeof callback === 'function') {
         // Wrap callback
         var wrappedCallback = this.wrapMethod(callback, function instrumentMethodWithCallbackBeforeCallback () {
           instrumentMethodAfter.apply(this, [context])

@@ -26,7 +26,7 @@ module.exports = {
     return o3
   },
 
-  arrayReduce: function(arrayValue, callback, value) {
+  arrayReduce: function (arrayValue, callback, value) {
     // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
     if (arrayValue == null) {
       throw new TypeError('Array.prototype.reduce called on null or undefined')
@@ -34,7 +34,9 @@ module.exports = {
     if (typeof callback !== 'function') {
       throw new TypeError(callback + ' is not a function')
     }
-    var t = Object(arrayValue), len = t.length >>> 0, k = 0, value;
+    var t = Object(arrayValue)
+    var len = t.length >>> 0
+    var k = 0
 
     if (!value) {
       while (k < len && !(k in t)) {
@@ -48,26 +50,26 @@ module.exports = {
 
     for (; k < len; k++) {
       if (k in t) {
-        value = callback(value, t[k], k, t);
+        value = callback(value, t[k], k, t)
       }
     }
     return value
   },
 
-  arraySome: function(value, callback, thisArg) {
+  arraySome: function (value, callback, thisArg) {
     // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
     if (value == null) {
-      throw new TypeError('Array.prototype.some called on null or undefined');
+      throw new TypeError('Array.prototype.some called on null or undefined')
     }
 
     if (typeof callback !== 'function') {
-      throw new TypeError();
+      throw new TypeError()
     }
 
     var t = Object(value)
     var len = t.length >>> 0
 
-    if(!thisArg) {
+    if (!thisArg) {
       thisArg = void 0
     }
 
@@ -79,7 +81,7 @@ module.exports = {
     return false
   },
 
-  arrayMap: function(arrayValue, callback, thisArg) {
+  arrayMap: function (arrayValue, callback, thisArg) {
     // Source https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Map
     var T, A, k
 
@@ -109,7 +111,7 @@ module.exports = {
     return A
   },
 
-  arrayIndexOf: function(arrayVal, searchElement, fromIndex) {
+  arrayIndexOf: function (arrayVal, searchElement, fromIndex) {
     // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
     var k
     if (arrayVal == null) {
@@ -144,16 +146,16 @@ module.exports = {
     return -1
   },
 
-  functionBind: function(func, oThis) {
+  functionBind: function (func, oThis) {
     // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
     var aArgs = Array.prototype.slice.call(arguments, 2)
-    var fNOP = function () {}
+    var FNOP = function () {}
     var fBound = function () {
       return func.apply(oThis, aArgs.concat(Array.prototype.slice.call(arguments)))
     }
 
-    fNOP.prototype = func.prototype
-    fBound.prototype = new fNOP()
+    FNOP.prototype = func.prototype
+    fBound.prototype = new FNOP()
     return fBound
   },
 

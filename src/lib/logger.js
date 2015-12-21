@@ -7,11 +7,11 @@ module.exports = {
     return logStack
   },
 
-  error: function(msg, data) {
+  error: function (msg, data) {
     return this.log('%c ' + msg, 'color: red', data)
   },
 
-  warning: function(msg, data) {
+  warning: function (msg, data) {
     return this.log('%c ' + msg, 'background-color: ffff00', data)
   },
 
@@ -31,10 +31,10 @@ module.exports = {
     })
 
     if (isDebugMode && hasConsole) {
-      if(typeof Function.prototype.bind === 'function') {
+      if (typeof Function.prototype.bind === 'function') {
         return window.console.log.apply(window.console, args)
       } else {
-        return Function.prototype.apply.call(window.console.log, window.console, args);
+        return Function.prototype.apply.call(window.console.log, window.console, args)
       }
     }
   }
