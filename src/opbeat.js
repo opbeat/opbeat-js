@@ -58,18 +58,18 @@ Opbeat.prototype.config = function (properties) {
  */
 
 Opbeat.prototype.install = function () {
-  if (!this.isPlatformSupport()) {
-    logger.log('opbeat.install.platform.unsupported')
+  if (!config.isValid()) {
+    logger.warning('opbeat.install.config.invalid')
     return this
   }
 
-  if (!config.isValid()) {
-    logger.log('opbeat.install.config.invalid')
+  if (!this.isPlatformSupport()) {
+    logger.warning('opbeat.install.platform.unsupported')
     return this
   }
 
   if (this._config.get('isInstalled')) {
-    logger.log('opbeat.install.already.installed')
+    logger.warning('opbeat.install.already.installed')
     return this
   }
 
@@ -101,11 +101,11 @@ Opbeat.prototype.uninstall = function () {
  */
 Opbeat.prototype.captureException = function (ex, options) {
   if (!this._config.get('isInstalled')) {
-    throw new Error("Can't capture exception. Opbeat isn't intialized")
+    logger.error("Can't capture exception. Opbeat isn't intialized")
   }
 
   if (!(ex instanceof Error)) {
-    throw new Error("Can't capture exception. Passed exception needs to be an instanceof Error")
+    logger.error("Can't capture exception. Passed exception needs to be an instanceof Error")
   }
 
   // TraceKit.report will re-raise any exception passed to it,
