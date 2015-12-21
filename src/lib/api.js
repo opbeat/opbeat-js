@@ -6,9 +6,10 @@ function api (opbeat, queuedCommands) {
   this.push = this.push.bind(this)
 
   if (queuedCommands) {
-    queuedCommands.forEach(function (cmd) {
-      this.push.apply(this, cmd)
-    }.bind(this))
+    for (var i = 0; i < queuedCommands.length; i++) {
+      var cmd = queuedCommands[i]
+      this.push(cmd)
+    }
   }
 }
 
