@@ -1,4 +1,6 @@
 var Opbeat = require('./opbeat')
+var Instrumentation = require('./instrumentation')
+
 var TraceBuffer = require('./instrumentation/traceBuffer')
 var transactionStore = require('./instrumentation/transactionStore')
 
@@ -52,6 +54,8 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
   var transactionOptions = {
     config: config
   }
+
+  var instrumentation = new Instrumentation()
 
   // Before controller intialize transcation
   var traceBuffer = new TraceBuffer('beforeControllerTransaction', transactionOptions)
@@ -108,7 +112,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
         return
       }
 
-      var transaction = Opbeat.startTransaction(transactionName, 'transaction', transactionOptions)
+      var transaction = instrumentation.startTransaction(transactionName, 'transaction', transactionOptions)
       transaction.metadata.controllerName = routeControllerName
 
       // Update transaction store
