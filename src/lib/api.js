@@ -1,9 +1,11 @@
+var utils = require('./utils')
+
 function api (opbeat, queuedCommands) {
   this.q = []
 
   this.opbeat = opbeat
-  this.execute = this.execute.bind(this)
-  this.push = this.push.bind(this)
+  this.execute = utils.functionBind(this.execute, this)
+  this.push = utils.functionBind(this.push, this)
 
   if (queuedCommands) {
     for (var i = 0; i < queuedCommands.length; i++) {

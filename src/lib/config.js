@@ -67,11 +67,11 @@ Config.prototype.setConfig = function (properties) {
 
 Config.prototype.isValid = function () {
   var requiredKeys = ['appId', 'orgId']
-  var values = requiredKeys.map(function (key) {
+  var values = utils.arrayMap(requiredKeys, utils.functionBind(function (key) {
     return (this.config[key] === null) || (this.config[key] === undefined)
-  }.bind(this))
+  }, this))
 
-  return values.indexOf(true) === -1
+  return utils.arrayIndexOf(values, true) === -1
 }
 
 function _generateUUID () {
@@ -104,7 +104,7 @@ function _getDataAttributesFromNode (node) {
         var key = attr.nodeName.match(dataRegex)[1]
 
         // camelCase key
-        key = key.split('-').map(function (group, index) {
+        key = utils.arrayMap(key.split('-'), function (group, index) {
           return index > 0 ? group.charAt(0).toUpperCase() + group.substring(1) : group
         }).join('')
 
