@@ -8,11 +8,11 @@ module.exports = {
   },
 
   error: function(msg, data) {
-    return this.log('%c' + msg, 'color: red', data)
+    return this.log('%c ' + msg, 'color: red', data)
   },
 
   warning: function(msg, data) {
-    return this.log('%c' + msg, 'background-color: ffff00', data)
+    return this.log('%c ' + msg, 'background-color: ffff00', data)
   },
 
   log: function (message, data) {
@@ -31,7 +31,11 @@ module.exports = {
     })
 
     if (isDebugMode && hasConsole) {
-      window.console.log.apply(window.console, args)
+      if(typeof Function.prototype.bind === 'function') {
+        return window.console.log.apply(window.console, args)
+      } else {
+        return Function.prototype.apply.call(window.console.log, window.console, args);
+      }
     }
   }
 }
