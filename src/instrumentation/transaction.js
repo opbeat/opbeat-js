@@ -45,6 +45,7 @@ Transaction.prototype.end = function () {
   }
 
   this.ended = true
+  this._rootTrace.end()
 
   logger.log('- %c opbeat.instrumentation.transaction.end', 'color: #3360A3', this.name, Object.keys(this._activeTraces).length)
 
@@ -75,8 +76,6 @@ Transaction.prototype._markAsDone = function () {
 
   Promise.all(whenAllTracesFinished).then(function () {
     logger.log('- %c opbeat.instrumentation.transaction.whenAllTracesFinished', 'color: #3360A3', this.name)
-
-    this._rootTrace.end()
 
     this._adjustStartToEarliestTrace()
     this._adjustDurationToLongestTrace()
@@ -119,18 +118,9 @@ Transaction.prototype._onTraceEnd = function (trace) {
   // Remove trace from _activeTraces
   delete this._activeTraces[trace.getFingerprint()]
 
-  if (this._markDoneAfterLastTrace && isActiveTraceRootTrace(this._activeTraces, this._rootTrace)) {
+  if (this._markDoneAfterLastTrace && Object.keys(this._activeTraces).length === 0) {
     this._markAsDone()
   }
-}
-
-function isActiveTraceRootTrace (activeTraces, rootTrace) {
-  if (Object.keys(activeTraces).length === 1) {
-    var key = Object.keys(activeTraces)[0]
-    return activeTraces[key] === rootTrace
-  }
-
-  return false
 }
 
 function getLongestTrace (traces) {
