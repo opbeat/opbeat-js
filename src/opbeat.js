@@ -9,7 +9,6 @@ function Opbeat () {
   this._instrumentation = new Instrumentation()
   this._exceptions = new Exceptions()
   this._config = config
-  this._config.set('isInstalled', false)
 
   config.init()
 
@@ -88,7 +87,7 @@ Opbeat.prototype.install = function () {
  */
 Opbeat.prototype.uninstall = function () {
   this._exceptions.uninstall()
-  this.isInstalled = false
+  this._config.set('isInstalled', false)
 
   return this
 }

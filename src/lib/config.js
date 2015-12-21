@@ -6,6 +6,7 @@ function Config () {
   this.defaults = {
     VERSION: '%%VERSION%%',
     apiHost: 'intake.opbeat.com',
+    isInstalled: false,
     orgId: null,
     appId: null,
     angularAppName: null,
