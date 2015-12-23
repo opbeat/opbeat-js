@@ -201,7 +201,7 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
   require('./instrumentation/angular/compile')($provide, traceBuffer)
   require('./instrumentation/angular/controller')($provide, traceBuffer)
   require('./instrumentation/angular/http')($provide, traceBuffer)
-  require('./instrumentation/angular/httpBackend')($provide, traceBuffer)
+  // require('./instrumentation/angular/httpBackend')($provide, traceBuffer)
   require('./instrumentation/angular/resource')($provide, traceBuffer)
   require('./instrumentation/angular/templateRequest')($provide, traceBuffer)
 }
