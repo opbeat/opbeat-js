@@ -24,6 +24,8 @@ Opbeat.prototype.isPlatformSupport = function () {
   return typeof Array.prototype.forEach === 'function' &&
   typeof JSON.stringify === 'function' &&
   typeof Function.bind === 'function' &&
+  window.performance &&
+  typeof window.performance.now === 'function' &&
   utils.isCORSSupported()
 }
 
