@@ -10,7 +10,7 @@ function api (opbeat, queuedCommands) {
   if (queuedCommands) {
     for (var i = 0; i < queuedCommands.length; i++) {
       var cmd = queuedCommands[i]
-      this.push(cmd)
+      this.push.apply(this, cmd)
     }
   }
 }
