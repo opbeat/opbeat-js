@@ -140,6 +140,9 @@ module.exports = {
     // Copy all properties over
     _copyProperties(wrappedMethod.original, wrappedMethod)
 
+    // Set original prototype
+    wrappedMethod.prototype = fn.prototype
+
     return wrappedMethod
   },
 
