@@ -9,6 +9,10 @@
   "scripts": {
     "test": "standard src/**/* && gulp test"
   },
+  "files": [
+    "dist/",
+    "src/"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/opbeat/opbeat-js.git"
