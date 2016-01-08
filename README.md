@@ -12,6 +12,16 @@ Include this `<script>` before your main application. Typically in your <head>
 ```html
 <script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>" async></script>
 ```
+Or install using npm
+
+```
+npm install opbeat-js
+```
+And include it in your application
+
+```
+<script src="node_modules/opbeat-js/dist/1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>" async></script>
+```
 
 ## Configuration
 
