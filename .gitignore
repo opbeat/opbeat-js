@@ -2,3 +2,5 @@ node_modules
 .DS_Store
 aws.json
 .awspublish-opbeat-js-cdn
+
+.vscode
