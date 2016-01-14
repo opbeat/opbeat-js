@@ -4,19 +4,20 @@ var fileFetcher = require('../lib/fileFetcher')
 
 module.exports = {
 
+  _findSourceMappingURL: function (source) {
+    var m = /\/\/[#@] ?sourceMappingURL=([^\s'"]+)[\s]*$/.exec(source)
+    if (m && m[1]) {
+      return m[1]
+    }
+    return null
+  },
+
   getFileSourceMapUrl: function (fileUrl) {
+    var self = this
     var fileBasePath
 
     if (!fileUrl) {
       return Promise.reject('no fileUrl')
-    }
-
-    function _findSourceMappingURL (source) {
-      var m = /\/\/[#@] ?sourceMappingURL=([^\s'"]+)$/.exec(source)
-      if (m && m[1]) {
-        return m[1]
-      }
-      return null
     }
 
     if (fileUrl.split('/').length > 1) {
@@ -27,7 +28,7 @@ module.exports = {
 
     return new Promise(function (resolve, reject) {
       fileFetcher.getFile(fileUrl).then(function (source) {
-        var sourceMapUrl = _findSourceMappingURL(source)
+        var sourceMapUrl = self._findSourceMappingURL(source)
         if (sourceMapUrl) {
           sourceMapUrl = fileBasePath + sourceMapUrl
           resolve(sourceMapUrl)
