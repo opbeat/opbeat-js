@@ -59,7 +59,8 @@
       "beforeEach",
       "it",
       "xit",
-      "expect"
+      "expect",
+      "fail"
     ]
   }
 }
