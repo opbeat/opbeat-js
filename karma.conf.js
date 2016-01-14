@@ -1,7 +1,8 @@
 module.exports = function(config) {
   config.set({
     files: [
-      'test/**/*.spec.js'
+      'test/**/*.spec.js',
+      { pattern: 'test/exceptions/data/*.js', included: false, watched: false }
     ],
     frameworks: ['browserify', 'jasmine'],
     preprocessors: {
