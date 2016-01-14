@@ -4,4 +4,6 @@ aws.json
 .awspublish-opbeat-js-cdn
 
 .vscode
+.idea
+
 dist
