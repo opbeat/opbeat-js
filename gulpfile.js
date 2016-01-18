@@ -1,3 +1,5 @@
+/*eslint-disable */
+
 var fs = require('fs')
 var gulp = require('gulp')
 var source = require('vinyl-source-stream')
@@ -12,6 +14,7 @@ var injectVersion = require('gulp-inject-version')
 var derequire = require('gulp-derequire');
 var es = require('event-stream')
 var karma = require('karma')
+var runSequence = require('run-sequence');
 
 require('gulp-release-tasks')(gulp);
 
@@ -39,10 +42,10 @@ gulp.task('build:release', function () {
     })
       .bundle()
       .pipe(source(entry))
-      .pipe(rename({dirname: ''}))
+      .pipe(rename({ dirname: '' }))
       .pipe(buffer())
       .pipe(injectVersion({
-        replace: new RegExp(RegExp.escape('%%VERSION%%'),'g')
+        replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
       }))
       .pipe(derequire())
       .pipe(gulp.dest(path))
@@ -65,10 +68,10 @@ gulp.task('build', function () {
     })
       .bundle()
       .pipe(source(entry))
-      .pipe(rename({dirname: ''}))
+      .pipe(rename({ dirname: '' }))
       .pipe(buffer())
       .pipe(injectVersion({
-        replace: new RegExp(RegExp.escape('%%VERSION%%'),'g')
+        replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
       }))
       .pipe(derequire())
       .pipe(gulp.dest('./dist/'))
@@ -82,10 +85,10 @@ gulp.task('watch', [], function (cb) {
   gulp.run(
     'build',
     'server'
-  )
-
+    )
+  
   // Watch JS files
-  gulp.watch(['libs/**', 'src/**'], ['build'])
+  gulp.watch(['libs/**', 'src/**'], runSequence('build', 'karma-run'))
   console.log('\nExample site running on http://localhost:7000/\n')
 })
 
@@ -110,16 +113,35 @@ gulp.task('deploy', ['build:release'], function () {
   }
 
   return gulp.src('dist/**')
-    // Gzip
+  // Gzip
     .pipe(awspublish.gzip())
-    // Publish files with headers
+  // Publish files with headers
     .pipe(publisher.publish(headers))
-    // Create a cache file to speed up consecutive uploads
+  // Create a cache file to speed up consecutive uploads
     .pipe(publisher.cache())
-    // Print upload updates to console
+  // Print upload updates to console
     .pipe(awspublish.reporter())
 })
 
+
+function runKarma(configFile, done) {
+  var exec = require('child_process').exec;
+
+  var cmd = process.platform === 'win32' ? 'node_modules\\.bin\\karma run ' :
+    'node node_modules/.bin/karma run ';
+  cmd += configFile;
+  exec(cmd, function (e, stdout) {
+    // ignore errors, we don't want to fail the build in the interactive (non-ci) mode
+    // karma server will print all test failures
+    done();
+  });
+}
+
+gulp.task('karma-run', function (done) {
+  // run the run command in a new process to avoid duplicate logging by both server and runner from
+  // a single process
+  runKarma('karma.conf.js', done);
+});
 
 gulp.task('test', function (done) {
   new karma.Server({

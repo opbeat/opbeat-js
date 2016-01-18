@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     files: [
       'test/**/*.spec.js',
@@ -8,6 +8,14 @@ module.exports = function(config) {
     preprocessors: {
       'test/**/*.spec.js': ['browserify']
     },
+    plugins: [
+      'karma-failed-reporter',
+      // 'karma-chrome-launcher',
+      'karma-phantomjs-launcher',
+      'karma-jasmine',
+      'karma-spec-reporter',
+      'karma-browserify'
+    ],
     browsers: ['PhantomJS'],
     reporters: ['spec', 'failed'],
     browserify: {
