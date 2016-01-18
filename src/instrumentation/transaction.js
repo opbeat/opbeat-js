@@ -78,10 +78,18 @@ Transaction.prototype._markAsDone = function () {
     logger.log('- %c opbeat.instrumentation.transaction.whenAllTracesFinished', 'color: #3360A3', this.name)
 
     this._adjustStartToEarliestTrace()
-    this._adjustDurationToLongestTrace()
+    this._adjustEndToLatestTrace()
 
     this._queue.add(this)
   }.bind(this))
+}
+
+Transaction.prototype._adjustEndToLatestTrace = function () {
+  var latestTrace = findLatestTrace(this.traces)
+  if (typeof latestTrace !== 'undefined') {
+    this._rootTrace._end = latestTrace._end
+    this._rootTrace.calcDiff()
+  }
 }
 
 Transaction.prototype._adjustStartToEarliestTrace = function () {
@@ -151,6 +159,21 @@ function getEarliestTrace (traces) {
   })
 
   return earliestTrace
+}
+
+function findLatestTrace (traces) {
+  var latestTrace = null
+
+  traces.forEach(function (trace) {
+    if (!latestTrace) {
+      latestTrace = trace
+    }
+    if (latestTrace && latestTrace._end < trace._end) {
+      latestTrace = trace
+    }
+  })
+
+  return latestTrace
 }
 
 module.exports = Transaction
