@@ -12,7 +12,6 @@ module.exports = function (config) {
       'karma-failed-reporter',
     // 'karma-chrome-launcher',
       'karma-firefox-launcher',
-      'karma-phantomjs2-launcher',
       'karma-jasmine',
       'karma-spec-reporter',
       'karma-browserify'
