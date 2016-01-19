@@ -7,3 +7,5 @@ aws.json
 .idea
 
 dist
+
+npm-debug.log
