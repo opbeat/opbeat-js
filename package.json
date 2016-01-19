@@ -7,7 +7,9 @@
   "homepage": "https://github.com/opbeat/opbeat-js",
   "main": "src/opbeat.js",
   "scripts": {
-    "test": "standard src/**/* && gulp test"
+    "build": "gulp build:release",
+    "test": "standard src/**/* && gulp test",
+    "prepublish": "npm run build"
   },
   "files": [
     "dist/",
