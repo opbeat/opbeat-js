@@ -62,7 +62,8 @@
       "it",
       "xit",
       "expect",
-      "fail"
+      "fail",
+      "spyOn"
     ]
   }
 }
