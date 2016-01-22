@@ -41,7 +41,7 @@ describe('instrumentation.transaction', function () {
       expect(transaction._rootTrace._end).toBe(lastTrace._end)
       expect(transaction._rootTrace._diff).toBe(lastTrace._end - firstTrace._start)
       done()
-    })
+    }, 10) // todo fix race condition
   })
 
   it('should adjust rootTrace to latest trace', function (done) {
