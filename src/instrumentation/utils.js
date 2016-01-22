@@ -3,13 +3,8 @@ var utils = require('../lib/utils')
 var config = require('../lib/config')
 var transactionStore = require('./transactionStore')
 
-var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
-var FN_ARG_SPLIT = /,/
-var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
-
 module.exports = {
   wrapMethod: function (_opbeatOriginalFunction, _opbeatBefore, _opbeatAfter, _opbeatContext) {
-    var namedArguments = _extractNamedFunctionArgs(_opbeatOriginalFunction).join(',')
     var context = {
       _opbeatOriginalFunction: _opbeatOriginalFunction,
       _opbeatBefore: _opbeatBefore,
@@ -17,7 +12,7 @@ module.exports = {
       _opbeatContext: _opbeatContext
     }
 
-    return _buildWrapperFunction(context, namedArguments)
+    return wrapFn(context)
   },
 
   instrumentMethodWithCallback: function (fn, fnName, type, options) {
@@ -315,52 +310,80 @@ function instrumentMethodAfter (context) {
   }
 }
 
-function _extractNamedFunctionArgs (fn) {
-  var fnText = fn.toString().replace(STRIP_COMMENTS, '')
-  var argDecl = fnText.match(FN_ARGS)
+function wrapFn (ctx) {
+  var _opbeatOriginalFunction = ctx['_opbeatOriginalFunction']
+  var _opbeatBefore = ctx['_opbeatBefore']
+  var _opbeatAfter = ctx['_opbeatAfter']
+  var _opbeatContext = ctx['_opbeatContext']
 
-  if (argDecl && argDecl.length && argDecl.length === 2) {
-    return argDecl[1].split(FN_ARG_SPLIT)
+  function opbeatFunctionWrapper () {
+    var args = new Array(arguments.length)
+    for (var i = 0, l = arguments.length; i < l; i++) {
+      args[i] = arguments[i]
+    }
+    // Before callback
+    if (typeof _opbeatBefore === 'function') {
+      var beforeData = _opbeatBefore.apply(this, [_opbeatContext].concat(args))
+      if (beforeData.args) {
+        args = beforeData.args
+      }
+    }
+    // Execute original function
+    var result = _opbeatOriginalFunction.apply(this, args)
+    // After callback
+    if (typeof _opbeatAfter === 'function') {
+      // After + Promise handling
+      if (result && typeof result.then === 'function') {
+        result.finally(function () {
+          _opbeatAfter.apply(this, [_opbeatContext].concat(args))
+        }.bind(this))
+      } else {
+        _opbeatAfter.apply(this, [_opbeatContext].concat(args))
+      }
+    }
+    return result
   }
 
-  return []
+  if (typeof _opbeatOriginalFunction.$inject === 'undefined') {
+    opbeatFunctionWrapper.$inject = getAnnotation(_opbeatOriginalFunction)
+  } else {
+    opbeatFunctionWrapper.$inject = _opbeatOriginalFunction.$inject
+  }
+  return opbeatFunctionWrapper
 }
 
-function _buildWrapperFunction (ctx, funcArguments) {
-  var funcBody = 'var args = new Array(arguments.length)\n' +
-    'for (var i = 0, l = arguments.length; i < l; i++) {\n' +
-    '  args[i] = arguments[i]\n' +
-    '}\n' +
-    '// Before callback\n' +
-    'if (typeof _opbeatBefore === "function") {\n' +
-    'var beforeData = _opbeatBefore.apply(this, [_opbeatContext].concat(args))\n' +
-    'if (beforeData.args) {\n' +
-    ' args = beforeData.args\n' +
-    '}\n' +
-    '}\n' +
-    '// Execute original function\n' +
-    'var result = _opbeatOriginalFunction.apply(this, args)\n' +
-    '// After callback\n' +
-    'if (typeof _opbeatAfter === "function") {\n' +
-    '  // After + Promise handling\n' +
-    '  if (result && typeof result.then === "function") {\n' +
-    '    result.finally(function () {\n' +
-    '      _opbeatAfter.apply(this, [_opbeatContext].concat(args))\n' +
-    '    }.bind(this))\n' +
-    '  } else {\n' +
-    '    _opbeatAfter.apply(this, [_opbeatContext].concat(args))\n' +
-    '  }\n' +
-    '}\n' +
-    'return result\n'
+// source: angular.js injector
 
-  var newBody = []
-  for (var k in ctx) {
-    var i = 'var ' + k + ' = ctx["' + k + '"];'
-    newBody.push(i)
+var ARROW_ARG = /^([^\(]+?)=>/
+var FN_ARGS = /^[^\(]*\(\s*([^\)]*)\)/m
+var FN_ARG_SPLIT = /,/
+var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/
+var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
+
+function extractArgs (fn) {
+  var fnText = fn.toString().replace(STRIP_COMMENTS, '')
+  var args = fnText.match(ARROW_ARG) || fnText.match(FN_ARGS)
+  return args
+}
+
+function getAnnotation (fn) {
+  var $inject
+  var argDecl
+
+  if (typeof fn === 'function') {
+    if (!($inject = fn.$inject)) {
+      $inject = []
+      if (fn.length) {
+        argDecl = extractArgs(fn)
+        argDecl[1].split(FN_ARG_SPLIT).forEach(function (arg) {
+          arg.replace(FN_ARG, function (all, underscore, name) {
+            $inject.push(name)
+          })
+        })
+      }
+    }
+  } else {
+    //    throw  'Argument is not a function'
   }
-
-  var res = 'return function opbeatFunctionWrapper(' + funcArguments + '){ ' + funcBody + ' }'
-  newBody.push(res)
-  var F = new Function('ctx', newBody.join('\n')) // eslint-disable-line no-new-func
-  return F(ctx)
+  return $inject
 }
