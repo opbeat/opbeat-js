@@ -2,9 +2,12 @@
   "name": "opbeat-js",
   "version": "1.2.6",
   "description": "Official JS client for logging exceptions and stacktraces to Opbeat",
-  "author": "Kenneth Auchenberg",
   "license": "MIT",
   "homepage": "https://github.com/opbeat/opbeat-js",
+  "contributors": [
+    "Hamidreza Jahtalab",
+    "Kenneth Auchenberg"
+  ],
   "main": "src/opbeat.js",
   "scripts": {
     "build": "gulp build:release",
