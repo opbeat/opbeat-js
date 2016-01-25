@@ -15,6 +15,8 @@ var derequire = require('gulp-derequire');
 var es = require('event-stream')
 var karma = require('karma')
 var runSequence = require('run-sequence');
+var webdriver = require('gulp-webdriver');
+var selenium = require('selenium-standalone');
 
 require('gulp-release-tasks')(gulp);
 
@@ -150,5 +152,29 @@ gulp.task('test', function (done) {
   }, done).start();
 });
 
+gulp.task('test:e2e', function(done) {
+  var stream = gulp.src('wdio.conf.js').pipe(webdriver());
+  stream.on('error',function(){})
+  done()
+})
+
+gulp.task('e2e-serve',function(done){
+  serve({
+    root: ['e2e_test', 'dist'],
+    port: 8000
+  })()
+  selenium.install({logger: console.log}, () => {
+    selenium.start(function(){
+    //  done() 
+    });
+  })
+  
+})
+
+gulp.task('watch:e2e',function(done){
+    gulp.watch(['e2e_test/**'], function(){
+      runSequence('test:e2e')
+    })
+})
 
 gulp.task('default', taskListing)
