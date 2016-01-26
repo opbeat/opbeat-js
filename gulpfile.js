@@ -11,14 +11,14 @@ var uglify = require('gulp-uglify')
 var taskListing = require('gulp-task-listing')
 var awspublish = require('gulp-awspublish')
 var injectVersion = require('gulp-inject-version')
-var derequire = require('gulp-derequire');
+var derequire = require('gulp-derequire')
 var es = require('event-stream')
 var karma = require('karma')
-var runSequence = require('run-sequence');
-var webdriver = require('gulp-webdriver');
-var selenium = require('selenium-standalone');
+var runSequence = require('run-sequence')
+var webdriver = require('gulp-webdriver')
+var selenium = require('selenium-standalone')
 
-require('gulp-release-tasks')(gulp);
+require('gulp-release-tasks')(gulp)
 
 var sourceTargets = [
   './src/opbeat.js',
@@ -32,7 +32,7 @@ gulp.task('server', serve({
 }))
 
 gulp.task('build:release', function () {
-  var version = require('./package').version;
+  var version = require('./package').version
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
   var path = './dist/' + majorVersion
@@ -87,10 +87,10 @@ gulp.task('watch', [], function (cb) {
   gulp.run(
     'build',
     'server'
-    )
-  
+  )
+
   // Watch JS files
-  gulp.watch(['libs/**', 'src/**'], runSequence('build', 'karma-run'))
+  gulp.watch(['libs/**', 'src/**'], function () { runSequence('build', 'karma-run')})
   console.log('\nExample site running on http://localhost:7000/\n')
 })
 
@@ -115,66 +115,65 @@ gulp.task('deploy', ['build:release'], function () {
   }
 
   return gulp.src('dist/**')
-  // Gzip
+    // Gzip
     .pipe(awspublish.gzip())
-  // Publish files with headers
+    // Publish files with headers
     .pipe(publisher.publish(headers))
-  // Create a cache file to speed up consecutive uploads
+    // Create a cache file to speed up consecutive uploads
     .pipe(publisher.cache())
-  // Print upload updates to console
+    // Print upload updates to console
     .pipe(awspublish.reporter())
 })
 
-
-function runKarma(configFile, done) {
-  var exec = require('child_process').exec;
+function runKarma (configFile, done) {
+  var exec = require('child_process').exec
 
   var cmd = process.platform === 'win32' ? 'node_modules\\.bin\\karma run ' :
-    'node node_modules/.bin/karma run ';
-  cmd += configFile;
+    'node node_modules/.bin/karma run '
+  cmd += configFile
   exec(cmd, function (e, stdout) {
     // ignore errors, we don't want to fail the build in the interactive (non-ci) mode
     // karma server will print all test failures
-    done();
-  });
+    done()
+  })
 }
 
 gulp.task('karma-run', function (done) {
   // run the run command in a new process to avoid duplicate logging by both server and runner from
   // a single process
-  runKarma('karma.conf.js', done);
-});
+  runKarma('karma.conf.js', done)
+})
 
 gulp.task('test', function (done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
-  }, done).start();
-});
+  }, done).start()
+})
 
-gulp.task('test:e2e', function(done) {
-  var stream = gulp.src('wdio.conf.js').pipe(webdriver());
-  stream.on('error',function(){})
+gulp.task('test:e2e', function (done) {
+  var stream = gulp.src('wdio.conf.js').pipe(webdriver())
+  stream.on('error', function () {})
   done()
 })
 
-gulp.task('e2e-serve',function(done){
+gulp.task('e2e-serve', function (done) {
   serve({
     root: ['e2e_test', 'dist'],
     port: 8000
   })()
   selenium.install({logger: console.log}, () => {
-    selenium.start(function(){
-    //  done() 
-    });
+    selenium.start(function () {
+      //  done() 
+    })
   })
-  
+
 })
 
-gulp.task('watch:e2e',function(done){
-    gulp.watch(['e2e_test/**'], function(){
-      runSequence('test:e2e')
-    })
+gulp.task('watch:e2e', function (done) {
+  gulp.watch(['e2e_test/**'], function () {
+    runSequence('test:e2e')
+  })
 })
 
 gulp.task('default', taskListing)
