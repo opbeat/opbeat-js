@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+
+<head>
+</head>
+
+<body ng-app="app">
+
+  <ng-view />
+  <script>
+    function setup () {
+        window.__httpInterceptor = {
+            requests: []
+        };
+        var _XHR = window.XMLHttpRequest;
+        window.XMLHttpRequest = function () {
+            var xhr = new _XHR();
+            var originalOpen = xhr.open;
+            var lastMethod;
+            var lastURL;
+            xhr.open = function () {
+                lastMethod = arguments[0];
+                lastURL = arguments[1];
+                originalOpen.apply(xhr, arguments);
+            };
+            
+            // var originalSend = xhr.send;
+            // xhr.send = function(){
+            //   return originalSend.apply(xhr, arguments);
+            // }
+            
+            xhr.addEventListener('load', function () {
+                window.__httpInterceptor.requests.push({
+                    requestedMethod: lastMethod.toUpperCase(),
+                    requestedURL: lastURL,
+                    xhr: this
+                });
+            });
+            return xhr;
+        };
+    }
+    setup()
+  </script>
+  <div ng-controler="appCtrl"></div>
+  <script src="/libs/angular/angular.js"></script>
+  <script src="/libs/angular-route/angular-route.js"></script>
+  <script src="/angular-opbeat.js"></script>
+  <script src="app.js"></script>
+
+</body>
+
+</html>
