@@ -9,11 +9,12 @@ exports.config = {
   // directory is where your package.json resides, so `wdio` will be called from there.
   //
   specs: [
-    './e2e_test/**/*.js'
+    './e2e_test/**/*.spec.js'
   ],
   // Patterns to exclude.
   exclude: [
-    // 'path/to/excluded/files'
+    './e2e_test/libs/**/*.*'
+  // 'path/to/excluded/files'
   ],
   //
   // ============
@@ -67,14 +68,14 @@ exports.config = {
   // WebdriverRTC: https://github.com/webdriverio/webdriverrtc
   // Browserevent: https://github.com/webdriverio/browserevent
   // plugins: {
-  //     webdrivercss: {
-  //         screenshotRoot: 'my-shots',
-  //         failedComparisonsRoot: 'diffs',
-  //         misMatchTolerance: 0.05,
-  //         screenWidth: [320,480,640,1024]
-  //     },
-  //     webdriverrtc: {},
-  //     browserevent: {}
+  // webdrivercss: {
+  //     screenshotRoot: 'my-shots',
+  //     failedComparisonsRoot: 'diffs',
+  //     misMatchTolerance: 0.05,
+  //     screenWidth: [320,480,640,1024]
+  // },
+  // webdriverrtc: {},
+  // browserevent: {}
   // },
   //
   // Framework you want to run your specs with.
