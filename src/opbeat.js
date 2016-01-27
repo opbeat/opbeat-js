@@ -99,7 +99,7 @@ Opbeat.prototype.uninstall = function () {
  */
 Opbeat.prototype.captureException = function (ex, options) {
   if (!this._config.get('isInstalled')) {
-    return logger.error('Can\'t capture exception. Opbeat isn\'t intialized')
+    logger.error('Can\'t capture exception. Opbeat isn\'t intialized')
     return this
   }
 

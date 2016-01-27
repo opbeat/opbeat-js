@@ -1,5 +1,4 @@
 var utils = require('../utils')
-var transactionStore = require('../transactionStore')
 
 module.exports = function ($provide, traceBuffer) {
   // Controller Instrumentation
@@ -8,7 +7,7 @@ module.exports = function ($provide, traceBuffer) {
       var args = Array.prototype.slice.call(arguments)
       var controllerInfo = utils.getControllerInfoFromArgs(args)
 
-      if(controllerInfo.name) { // Only instrument controllers with a name
+      if (controllerInfo.name) { // Only instrument controllers with a name
         return utils.instrumentModule($delegate, $injector, {
           traceBuffer: traceBuffer,
           instrumentConstructor: true,
