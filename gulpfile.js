@@ -3,7 +3,6 @@
 var fs = require('fs')
 var gulp = require('gulp')
 var source = require('vinyl-source-stream')
-var serve = require('gulp-serve')
 var rename = require('gulp-rename')
 var browserify = require('browserify')
 var buffer = require('vinyl-buffer')
@@ -18,6 +17,8 @@ var runSequence = require('run-sequence')
 var webdriver = require('gulp-webdriver')
 var selenium = require('selenium-standalone')
 
+var connect = require('gulp-connect')
+
 require('gulp-release-tasks')(gulp)
 
 var sourceTargets = [
@@ -26,10 +27,14 @@ var sourceTargets = [
 ]
 
 // Static file server
-gulp.task('server', serve({
-  root: ['examples', 'dist'],
-  port: 7000
-}))
+gulp.task('server', function () {
+  connect.server({
+    root: ['examples', 'dist'],
+    port: 7000,
+    livereload: false,
+    open: false,
+  })
+})
 
 gulp.task('build:release', function () {
   var version = require('./package').version
@@ -158,13 +163,23 @@ gulp.task('test:e2e', function (done) {
 })
 
 gulp.task('e2e-serve', function (done) {
-  serve({
+  connect.server({
     root: ['e2e_test', 'dist'],
-    port: 8000
-  })()
+    port: 8000,
+    livereload: false,
+    open: false,
+    middleware: function (connect, opt) {
+      var middlewares = []
+      middlewares.push(connect.favicon())
+      return middlewares
+    }
+  })
+  
   selenium.install({logger: console.log}, () => {
     selenium.start(function () {
-      //  done() 
+      gulp.run(
+        'watch:e2e'
+      )
     })
   })
 
