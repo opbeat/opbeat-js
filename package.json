@@ -11,7 +11,7 @@
   "main": "src/opbeat.js",
   "scripts": {
     "build": "gulp build:release",
-    "test": "standard src/**/* && gulp test",
+    "test": "node node_modules/standard/bin/cmd.js src/**/* && gulp test",
     "prepublish": "npm run build"
   },
   "files": [
