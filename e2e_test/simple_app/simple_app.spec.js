@@ -1,4 +1,7 @@
+var utils = require('../e2e/utils')
 describe('simple app', function () {
+  beforeEach(utils.verifyNoBrowserErrors)
+
   it('Inspect requests', function (done) {
     browser.url('/simple_app/index.html')
       // .setupInterceptor()
@@ -13,10 +16,11 @@ describe('simple app', function () {
             // console.log(requests[2])
             var intakeRequest = requests[2]
             expect(intakeRequest.requestedURL).toContain('https://intake.opbeat.com/api/')
-
             done()
           })
         }, 6000)
       })
   })
+
+  afterEach(utils.verifyNoBrowserErrors)
 })
