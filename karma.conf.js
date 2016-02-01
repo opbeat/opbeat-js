@@ -1,5 +1,5 @@
 module.exports = function (config) {
-  config.set({
+  var cfg = {
     files: [
       'test/**/*.spec.js',
       { pattern: 'test/exceptions/data/*.js', included: false, watched: false }
@@ -10,17 +10,25 @@ module.exports = function (config) {
     },
     plugins: [
       'karma-failed-reporter',
-    // 'karma-chrome-launcher',
-      'karma-phantomjs2-launcher',
-      'karma-firefox-launcher',
       'karma-jasmine',
       'karma-spec-reporter',
       'karma-browserify'
     ],
-    browsers: ['PhantomJS2'], // Chrome, Firefox, PhantomJS2
+    browsers: [], // Chrome, Firefox, PhantomJS2
     reporters: ['spec', 'failed'],
     browserify: {
       debug: true
     }
-  })
-};
+  }
+
+  if (process.env.TRAVIS) {
+    // 'karma-chrome-launcher',
+    cfg.plugins.push('karma-firefox-launcher')
+    cfg.browsers.push('Firefox')
+  } else {
+    cfg.plugins.push('karma-phantomjs2-launcher')
+    cfg.browsers.push('PhantomJS2')
+  }
+
+  config.set(cfg)
+}
