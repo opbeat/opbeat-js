@@ -17,7 +17,12 @@ module.exports = function (config) {
     browsers: [], // Chrome, Firefox, PhantomJS2
     reporters: ['spec', 'failed'],
     browserify: {
-      debug: true
+      debug: true,
+      configure: function (bundle) {
+        var proxyquire = require('proxyquireify')
+        bundle
+          .plugin(proxyquire.plugin)
+      }
     }
   }
 
