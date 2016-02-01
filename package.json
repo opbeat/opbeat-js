@@ -61,6 +61,10 @@
     "vinyl-source-stream": "^1.1.0",
     "webdriverio": "^3.4.0"
   },
+  "optionalDependencies": {
+    "karma-phantomjs2-launcher": "^0.4.0",
+    "phantomjs2": "^2.0.2"
+  },
   "standard": {
     "globals": [
       "jasmine",

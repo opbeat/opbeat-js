@@ -11,12 +11,13 @@ module.exports = function (config) {
     plugins: [
       'karma-failed-reporter',
     // 'karma-chrome-launcher',
+      'karma-phantomjs2-launcher',
       'karma-firefox-launcher',
       'karma-jasmine',
       'karma-spec-reporter',
       'karma-browserify'
     ],
-    browsers: ['Firefox'], // Chrome, Firefox, PhantomJS2
+    browsers: ['PhantomJS2'], // Chrome, Firefox, PhantomJS2
     reporters: ['spec', 'failed'],
     browserify: {
       debug: true
