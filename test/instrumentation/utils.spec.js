@@ -1,12 +1,68 @@
 var utils = require('../../src/instrumentation/utils')
+var Promise = require('es6-promise').Promise
 
-describe('instrumentation.utils', function () {
+describe('instrumentation.utils.wrapMethod', function () {
+  it('should create a new context for each function call', function (done) {
+    var callCount = 0
+
+    var queue = []
+    var ctx = {
+      ctxObj: 'ctxObj',
+      fn: function fn (timeout) {
+        var p = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            resolve()
+          }, timeout)
+        })
+        var callBack
+        p.finally = function (cb) {
+          callBack = cb
+        }
+        p.then(function () {
+          callBack()
+        })
+        return p
+      },
+      beforeFn: function beforeFn (c) {
+        expect(c.newProp).toBeUndefined()
+        c.newProp = 'newProp'
+        c.timeout = arguments[1]
+        expect(c.ctxObj).toEqual('ctxObj')
+        expect(c).not.toBe(ctx)
+        return {}
+      },
+      afterFn: function afterFn (c) {
+        expect(c.ctxObj).toEqual('ctxObj')
+        expect(c.newProp).toBe('newProp')
+        c.newProp = 'changed'
+        queue.push(c.timeout)
+        expect(c).not.toBe(ctx)
+        callCount++
+        if (callCount === 2) {
+          expect(queue).toEqual([10, 1000])
+          done()
+        }
+      }
+    }
+
+    spyOn(ctx, 'beforeFn').and.callThrough()
+    spyOn(ctx, 'fn').and.callThrough()
+    spyOn(ctx, 'afterFn').and.callThrough()
+
+    var wrappedFn = utils.wrapMethod(ctx.fn, ctx.beforeFn, ctx.afterFn, ctx)
+    wrappedFn(1000)
+    wrappedFn(10)
+
+    expect(ctx.beforeFn).toHaveBeenCalled()
+    expect(ctx.fn).toHaveBeenCalled()
+  })
+
   it('should not change arguments of the function', function () {
     function fn (i) {
       return Array.prototype.slice.call(arguments)
     }
 
-    var wrappedFn = utils.wrapMethod(fn)
+    var wrappedFn = utils.wrapMethod(fn, undefined, undefined, {})
     var sampleArg = [{ prop: 'this is prop' }]
 
     var result = wrappedFn.apply({}, sampleArg)

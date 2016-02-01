@@ -321,9 +321,10 @@ function wrapFn (ctx) {
     for (var i = 0, l = arguments.length; i < l; i++) {
       args[i] = arguments[i]
     }
+    var zone = Object.create(_opbeatContext) // new zone for every call
     // Before callback
     if (typeof _opbeatBefore === 'function') {
-      var beforeData = _opbeatBefore.apply(this, [_opbeatContext].concat(args))
+      var beforeData = _opbeatBefore.apply(this, [zone].concat(args))
       if (beforeData.args) {
         args = beforeData.args
       }
@@ -335,10 +336,10 @@ function wrapFn (ctx) {
       // After + Promise handling
       if (result && typeof result.then === 'function') {
         result.finally(function () {
-          _opbeatAfter.apply(this, [_opbeatContext].concat(args))
+          _opbeatAfter.apply(this, [zone].concat(args))
         }.bind(this))
       } else {
-        _opbeatAfter.apply(this, [_opbeatContext].concat(args))
+        _opbeatAfter.apply(this, [zone].concat(args))
       }
     }
     return result
