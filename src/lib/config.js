@@ -1,5 +1,4 @@
 var utils = require('./utils')
-var storage = require('./storage')
 
 function Config () {
   this.config = {}
@@ -16,9 +15,7 @@ function Config () {
     },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {
-      user: {
-        uuid: _generateUUID()
-      },
+      user: {},
       extra: null
     }
   }
@@ -72,18 +69,6 @@ Config.prototype.isValid = function () {
   }, this))
 
   return utils.arrayIndexOf(values, true) === -1
-}
-
-function _generateUUID () {
-  var key = 'opbeat-uuid'
-  var uuid = storage.get(key)
-
-  if (!uuid) {
-    uuid = utils.generateUuid()
-    storage.set(key, uuid)
-  }
-
-  return uuid
 }
 
 var _getConfigFromScript = function () {
