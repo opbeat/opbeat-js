@@ -99,12 +99,12 @@ Opbeat.prototype.uninstall = function () {
  */
 Opbeat.prototype.captureException = function (ex, options) {
   if (!this._config.get('isInstalled')) {
-    logger.error('Can\'t capture exception. Opbeat isn\'t intialized')
+    logger.error("Can't capture exception. Opbeat isn't intialized")
     return this
   }
 
   if (!(ex instanceof Error)) {
-    logger.error('Can\'t capture exception. Passed exception needs to be an instanceof Error')
+    logger.error("Can't capture exception. Passed exception needs to be an instanceof Error")
     return this
   }
 
@@ -126,9 +126,6 @@ Opbeat.prototype.captureException = function (ex, options) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setUserContext = function (user) {
-  // Get existing user UUID
-  user.uuid = config.get('context.user.uuid')
-
   config.set('context.user', user)
 
   return this
