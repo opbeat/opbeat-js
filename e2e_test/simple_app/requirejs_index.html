@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+
+<head>
+</head>
+
+<body >
+
+  <ng-view />
+  <script src="/e2e/browser_utils.js"></script>
+
+  <script src="/node_modules/requirejs/require.js"></script>
+  <script>
+    require.config ({
+        baseUrl: './',
+        paths: {
+          angular: '/node_modules/angular/angular',
+          'angular-route':'/node_modules/angular-route/angular-route',
+          opbeat: '/angular-opbeat',
+        },
+        shim: {
+          'angular-route':['angular'],
+          opbeat: ['angular'],
+          app: {
+            deps: [
+              'opbeat',
+              'angular-route'
+            ]
+          },
+        },
+        priority: ['angular'],
+      });
+
+      require([
+        'opbeat',
+        'angular',
+        'app',
+      ], function () {
+        angular.element(document).ready(function () {
+          angular.bootstrap(document, ['app']);
+        });
+      });
+  </script>
+  <div ng-controler="appCtrl"></div>
+  <!--<script src="/node_modules/angular/angular.js"></script>
+  <script src="/node_modules/angular-route/angular-route.js"></script>-->
+
+
+</body>
+
+</html>
