@@ -45,7 +45,8 @@ gulp.task('build:release', function () {
   var tasks = sourceTargets.map(function (entry) {
     return browserify({
       entries: [entry],
-      standalone: ''
+      standalone: '',
+      insertGlobalVars: {define: function () {return 'undefined';}}
     })
       .bundle()
       .pipe(source(entry))
@@ -71,7 +72,8 @@ gulp.task('build', function () {
   var tasks = sourceTargets.map(function (entry) {
     return browserify({
       entries: [entry],
-      standalone: ''
+      standalone: '',
+      insertGlobalVars: {define: function () {return 'undefined';}}
     })
       .bundle()
       .pipe(source(entry))
