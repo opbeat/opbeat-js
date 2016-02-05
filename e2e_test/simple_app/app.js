@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngOpbeat'])
+var app = angular.module('app', ['ngRoute', 'ngResource', 'ngOpbeat'])
 
 app.config(function ($routeProvider) {
   var routeConfig = {
@@ -24,8 +24,14 @@ app.config(function ($opbeatProvider) {
   })
 })
 
-app.controller('MainCtrl', function mainCtrl ($scope, $http) {
+app.controller('MainCtrl', function mainCtrl ($scope, $http, $resource) {
   $scope.test = 'passed'
+
+  var User = $resource('user/:userId', {userId: '@id'})
+  User.get({userId: 'user1'}, function (user) {
+    console.log(user)
+  // user.$save()
+  })
 
   $http.get('response.json').then(function () {
     $scope.done = 'done'
