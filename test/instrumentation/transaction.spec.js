@@ -22,6 +22,26 @@ describe('instrumentation.transaction', function () {
     instrumentationMock = new InstrumentationMock()
   })
 
+  xit('should contain correct number of traces in the end', function (done) {
+    var firstTrace = new Trace(this, 'first-trace-signature', 'first-trace', { config: config })
+    firstTrace.end()
+
+    var transaction = instrumentationMock.startTransaction('/', 'transaction', { config: config })
+    transaction.end()
+
+    firstTrace.transaction = transaction
+    firstTrace.setParent(transaction._rootTrace)
+    transaction.addEndedTraces([firstTrace])
+
+    var lastTrace = transaction.startTrace('last-trace-signature', 'last-trace')
+    lastTrace.end()
+
+    setTimeout(function () {
+      expect(transaction.traces.length).toBe(3)
+      done()
+    }, 100)
+  })
+
   it('should adjust rootTrace to earliest trace', function (done) {
     var firstTrace = new Trace(this, 'first-trace-signature', 'first-trace', { config: config })
     firstTrace.end()
@@ -41,7 +61,7 @@ describe('instrumentation.transaction', function () {
       expect(transaction._rootTrace._end).toBe(lastTrace._end)
       expect(transaction._rootTrace._diff).toBe(lastTrace._end - firstTrace._start)
       done()
-    }, 10) // todo fix race condition
+    }, 100) // todo fix race condition
   })
 
   it('should adjust rootTrace to latest trace', function (done) {
