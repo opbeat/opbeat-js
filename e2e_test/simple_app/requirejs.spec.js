@@ -10,12 +10,6 @@ describe('simple app - requirejs', function () {
           browser.execute(function () {
             return window.__httpInterceptor
           }).then(function testIt (ret) {
-            // var requests = browser.getRequest(2)
-            var requests = ret.value.requests
-
-            // console.log(requests[2])
-            var intakeRequest = requests[2]
-            expect(intakeRequest.requestedURL).toContain('https://intake.opbeat.com/api/')
             done()
           })
         }, 6000)
@@ -24,4 +18,3 @@ describe('simple app - requirejs', function () {
 
   afterEach(utils.verifyNoBrowserErrors)
 })
-

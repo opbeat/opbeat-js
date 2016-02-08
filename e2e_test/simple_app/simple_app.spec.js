@@ -13,9 +13,8 @@ describe('simple app', function () {
             // var requests = browser.getRequest(2)
             var requests = ret.value.requests
 
-            // console.log(requests[2])
-            var intakeRequest = requests[2]
-            expect(intakeRequest.requestedURL).toContain('https://intake.opbeat.com/api/')
+            console.log(requests)
+            expect(requests.length).toBe(4)
             done()
           })
         }, 6000)

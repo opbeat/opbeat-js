@@ -4,7 +4,7 @@
 <head>
 </head>
 
-<body >
+<body>
 
   <ng-view />
   <script src="/e2e/browser_utils.js"></script>
@@ -16,15 +16,18 @@
         paths: {
           angular: '/node_modules/angular/angular',
           'angular-route':'/node_modules/angular-route/angular-route',
+          'angular-resource':'/node_modules/angular-resource/angular-resource',
           opbeat: '/angular-opbeat',
         },
         shim: {
           'angular-route':['angular'],
+          'angular-resource':['angular'],
           opbeat: ['angular'],
           app: {
             deps: [
               'opbeat',
-              'angular-route'
+              'angular-route',
+              'angular-resource'
             ]
           },
         },
