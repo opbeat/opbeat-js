@@ -1,6 +1,9 @@
 module.exports = function (config) {
   var cfg = {
     files: [
+      'test/utils/polyfill.js',
+      'node_modules/angular/angular.js',
+      'node_modules/angular-resource/angular-resource.js',
       'test/**/*.spec.js',
       { pattern: 'test/exceptions/data/*.js', included: false, watched: false }
     ],
