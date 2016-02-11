@@ -12,6 +12,9 @@
     "angular": "^1.4.9",
     "angular-resource": "^1.4.9",
     "angular-route": "^1.4.9",
-    "requirejs": "^2.1.22"
+    "babel": "^6.5.1",
+    "requirejs": "^2.1.22",
+    "systemjs": "^0.19.20",
+    "traceur": "0.0.102"
   }
 }
