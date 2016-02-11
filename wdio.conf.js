@@ -13,7 +13,7 @@ exports.config = {
   ],
   // Patterns to exclude.
   exclude: [
-    './e2e_test/libs/**/*.*'
+    './e2e_test/node_modules/**/*.*'
   // 'path/to/excluded/files'
   ],
   //
