@@ -19,25 +19,11 @@ app.config(function ($opbeatProvider) {
     orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
     appId: '0a8757798e',
     performance: {
-      enable: true
+      enable: true,
+      enableStackFrames: true
     }
   })
 })
-
-app.controller('MainCtrl', function mainCtrl ($scope, $http, $resource) {
-  $scope.test = 'passed'
-
-  var User = $resource('user/:userId', {userId: '@id'})
-  User.get({userId: 'user1'}, function (user) {
-    console.log(user)
-  // user.$save()
-  })
-
-  $http.get('response.json').then(function () {
-    $scope.done = 'done'
-  })
-})
-
 app.directive('customDirective', function () {
   return {
     template: '<div ng-bind="test"></div>',
@@ -45,4 +31,20 @@ app.directive('customDirective', function () {
       scope.test = 'customDirective'
     }
   }
+})
+
+app.controller('MainCtrl', function mainCtrl ($scope, $http, $resource) {
+  $scope.confirmation = function (conf) {
+    $scope.confirmation = conf
+  }
+  var User = $resource('user/:userId', {userId: '@id'})
+  User.get({userId: 'user1'}, function (user) {
+    $scope.user = user
+  })
+
+  $http.get('confirmation.json').then(function (response) {
+    $scope.confirmation(response.data)
+  }, function () {
+    throw new Error('Confirmation failed.')
+  })
 })
