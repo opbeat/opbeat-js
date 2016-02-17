@@ -59,7 +59,8 @@ Config.prototype.set = function (key, value) {
 
 Config.prototype.setConfig = function (properties) {
   properties = properties || {}
-  this.config = utils.mergeObject(this.defaults, properties)
+  var prevCfg = utils.mergeObject(this.defaults, this.config)
+  this.config = utils.mergeObject(prevCfg, properties)
 }
 
 Config.prototype.isValid = function () {
