@@ -172,25 +172,12 @@ function $opbeatInstrumentationProvider ($provide, $opbeat) {
 
   $provide.decorator('$controller', ['$delegate', '$rootScope', '$rootElement', function ($delegate, $rootScope, $rootElement) {
     $rootScope._opbeatHasInstrumentedFactories = false
-    $rootScope._opbeatHasInstrumentedDirectives = false
-
-    var directivesInstrumentation = require('./instrumentation/angular/directives')($provide, traceBuffer)
 
     // Factory instrumentation
     if (!$rootScope._opbeatHasInstrumentedFactories) {
       var factories = utils.resolveAngularDependenciesByType($rootElement, 'factory')
       require('./instrumentation/angular/factories')($provide, traceBuffer).instrumentAll(factories)
       $rootScope._opbeatHasInstrumentedFactories = true
-    }
-
-    if (!$rootScope._opbeatHasInstrumentedDirectives) {
-      // Custom directive instrumentation
-      var directives = utils.resolveAngularDependenciesByType($rootElement, 'directive')
-      directivesInstrumentation.instrumentAll(directives)
-      $rootScope._opbeatHasInstrumentedDirectives = true
-
-      // Core directives instrumentation
-      directivesInstrumentation.instrumentCore()
     }
 
     return $delegate
