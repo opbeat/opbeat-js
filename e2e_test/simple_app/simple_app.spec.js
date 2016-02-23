@@ -13,7 +13,7 @@ describe('simple app', function () {
             // var requests = browser.getRequest(2)
             var requests = ret.value.requests
 
-            console.log(requests)
+            // console.log(requests)
             expect(requests.length).toBe(4)
             done()
           })
