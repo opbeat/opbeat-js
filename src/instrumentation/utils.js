@@ -194,6 +194,10 @@ module.exports = {
       return object
     }
 
+    if (options.instrumentObjectFunctions === false) {
+      return object
+    }
+
     // Instrument static functions
     this.getObjectFunctions(object).forEach(function (funcScope) {
       var subOptions = utils.mergeObject(options, {})
