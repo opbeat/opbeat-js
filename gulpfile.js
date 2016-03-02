@@ -166,7 +166,7 @@ gulp.task('test:e2e', function (done) {
 
 gulp.task('e2e-serve', function (done) {
   connect.server({
-    root: ['e2e_test', 'dist'],
+    root: ['e2e_test', 'dist', 'src'],
     port: 8000,
     livereload: false,
     open: false,
