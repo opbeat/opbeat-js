@@ -48,9 +48,15 @@ function patchExceptionHandler ($provide) {
 }
 
 var patchHttp = require('./httpPatch')
+var patchController = require('./controllerPatch')
+var patchCompile = require('./compilePatch')
+var patchTemplateRequest = require('./templateRequestPatch')
 function patchAll ($provide, transactionService) {
   patchExceptionHandler($provide)
   patchHttp($provide, transactionService)
+  patchController($provide, transactionService)
+  patchCompile($provide, transactionService)
+  patchTemplateRequest($provide, transactionService)
 }
 
 var logger = require('loglevel')
