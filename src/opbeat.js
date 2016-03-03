@@ -1,7 +1,7 @@
 var logger = require('./lib/logger')
 var utils = require('./lib/utils')
 var config = require('./lib/config')
-var Exceptions = require('./exceptions')
+var Exceptions = require('./exceptions/exceptions')
 var API = require('./lib/api')
 
 function Opbeat () {
