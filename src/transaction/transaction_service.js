@@ -84,21 +84,21 @@ TransactionService.prototype.startTransaction = function (name, type, options) {
   var tr = new Transaction(name, type, options)
   this.currentTransaction = tr
   var self = this
-  self.zone.log('transaction started')
+  self.zone.log('TransactionService.startTransaction', tr)
   self.zone.timeoutList.notify = function () {
     var notifier = this
     if (notifier.count() === 0) {
       self.zone.parent.setTimeoutUnpatched(function () {
         if (notifier.count() === 0) {
           tr.end()
-          self.zone.log('transaction ended')
+          self.zone.log('TransactionService transaction ended', tr)
         }
       }, 0)
     }
   }
 
   tr.donePromise.then(function (t) {
-    self.zone.log('transaction finished')
+    self.zone.log('TransactionService transaction finished', tr)
     self.add(tr)
   })
 
@@ -106,17 +106,21 @@ TransactionService.prototype.startTransaction = function (name, type, options) {
 }
 
 TransactionService.prototype.startTrace = function (signature, type) {
-  return this.currentTransaction.startTrace(signature, type)
+  if (this.currentTransaction !== null) {
+    return this.currentTransaction.startTrace(signature, type)
+  } else {
+    this._logger.debug('TransactionService.startTrace - can not start trace, currentTransaction is null')
+  }
 }
 
 // !!DEPRECATED!!
 TransactionService.prototype.isLocked = function () {
-  return this._isLocked
+  return false
 }
 
 TransactionService.prototype.add = function (transaction) {
   this._queue.push(transaction)
-  this._logger.debug(['transaction add ', transaction])
+  this._logger.debug('TransactionService.add', transaction)
 }
 
 TransactionService.prototype.getTransactions = function () {
