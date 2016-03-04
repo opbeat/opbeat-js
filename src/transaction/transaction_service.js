@@ -28,13 +28,13 @@ function TransactionService (zone, logger, options) {
       this.log('afterTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
     },
     '-onError': function () {
-      console.log('onError')
+      this.log('onError')
     },
     enqueueTask: function () {
       this.log('enqueueTask', arguments)
     },
     dequeueTask: function () {
-      console.log('dequeueTask')
+      this.log('dequeueTask', arguments)
     },
     $setTimeout: function (parentTimeout) {
       return function (timeoutFn, delay) {
@@ -60,16 +60,16 @@ function TransactionService (zone, logger, options) {
       this.log('clearTimeout', this.timeout)
     },
     '-setInterval': function () {
-      console.log('setInterval')
+      this.log('setInterval')
     },
     '-requestAnimationFrame': function () {
       this.log('requestAnimationFrame')
     },
     '-webkitRequestAnimationFrame': function () {
-      console.log('webkitRequestAnimationFrame')
+      this.log('webkitRequestAnimationFrame')
     },
     '-mozRequestAnimationFrame': function () {
-      console.log('mozRequestAnimationFrame')
+      this.log('mozRequestAnimationFrame')
     }
   }
   this.zone = zone.fork(zoneConfig)
