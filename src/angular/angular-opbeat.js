@@ -73,6 +73,7 @@ function initialize () {
 
   function moduleRun ($rootScope) {
     function onRouteChangeStart (event, current) {
+      logger.debug('Route change started')
       var transactionName
       if (current.$$route) { // ngRoute
         transactionName = current.$$route.originalPath
@@ -83,6 +84,13 @@ function initialize () {
       transactionService.startTransaction(transactionName, 'transaction', { config: config })
     }
     $rootScope.$on('$routeChangeStart', onRouteChangeStart) // ng-router
+    $rootScope.$on('$routeChangeSuccess', function () {
+      setTimeout(function () {
+        logger.debug('Route change success')
+        transactionService.endCurrentTransaction()
+      }, 0)
+    })
+
     $rootScope.$on('$stateChangeSuccess', onRouteChangeStart) // ui-router
   }
 
