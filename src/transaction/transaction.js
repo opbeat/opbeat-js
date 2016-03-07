@@ -13,6 +13,8 @@ var Transaction = function (name, type, options) {
   this.traces = []
   this._activeTraces = {}
 
+  this._scheduledTasks = {}
+
   Promise.call(this.donePromise = Object.create(Promise.prototype), function (resolve, reject) {
     this._resolve = resolve
     this._reject = reject
@@ -27,6 +29,7 @@ var Transaction = function (name, type, options) {
 }
 
 Transaction.prototype.startTrace = function (signature, type) {
+  // todo: should not accept more traces if the transaction is alreadyFinished
   var trace = new Trace(this, signature, type, this._options)
   if (this._rootTrace) {
     trace.setParent(this._rootTrace)
@@ -37,6 +40,12 @@ Transaction.prototype.startTrace = function (signature, type) {
   return trace
 }
 
+Transaction.prototype.isFinished = function () {
+  return (this.ended &&
+  Object.keys(this._scheduledTasks).length === 0 &&
+  Object.keys(this._activeTraces).length === 0)
+}
+
 Transaction.prototype.end = function () {
   if (this.ended) {
     return
@@ -45,10 +54,21 @@ Transaction.prototype.end = function () {
   this.ended = true
   this._rootTrace.end()
 
-  if (Object.keys(this._activeTraces).length > 0) {
-    this._markDoneAfterLastTrace = true
-  } else {
-    this._markAsDone()
+  if (this.isFinished() === true) {
+    this._finish()
+  }
+  return this.donePromise
+}
+
+Transaction.prototype.addTask = function (taskId) {
+  // todo: should not accept more tasks if the transaction is alreadyFinished
+  this._scheduledTasks[taskId] = taskId
+}
+
+Transaction.prototype.removeTask = function (taskId) {
+  delete this._scheduledTasks[taskId]
+  if (this.isFinished() === true) {
+    this._finish()
   }
 }
 
@@ -56,24 +76,27 @@ Transaction.prototype.addEndedTraces = function (existingTraces) {
   this.traces = this.traces.concat(existingTraces)
 }
 
-Transaction.prototype._markAsDone = function () {
-  if (this._isDone) {
+Transaction.prototype._onTraceEnd = function (trace) {
+  this.traces.push(trace)
+
+  // Remove trace from _activeTraces
+  delete this._activeTraces[trace.getFingerprint()]
+
+  if (this.isFinished() === true) {
+    this._finish()
+  }
+}
+
+Transaction.prototype._finish = function () {
+  if (this._alreadFinished === true) {
     return
   }
 
-  this._isDone = true
+  this._adjustStartToEarliestTrace()
+  this._adjustEndToLatestTrace()
 
-  var whenAllTracesFinished = this.traces.map(function (trace) {
-    return trace._isFinish
-  })
-
-  // todo: when this promise resolves other traces might have been added to activeTraces or traces
-  Promise.all(whenAllTracesFinished).then(function () {
-    this._adjustStartToEarliestTrace()
-    this._adjustEndToLatestTrace()
-
-    this.donePromise._resolve(this)
-  }.bind(this))
+  this._alreadFinished = true
+  this.donePromise._resolve(this)
 }
 
 Transaction.prototype._adjustEndToLatestTrace = function () {
@@ -94,17 +117,6 @@ Transaction.prototype._adjustStartToEarliestTrace = function () {
 
     this._startStamp = this._rootTrace._startStamp
     this._start = this._rootTrace._start
-  }
-}
-
-Transaction.prototype._onTraceEnd = function (trace) {
-  this.traces.push(trace)
-
-  // Remove trace from _activeTraces
-  delete this._activeTraces[trace.getFingerprint()]
-
-  if (this._markDoneAfterLastTrace && Object.keys(this._activeTraces).length === 0) {
-    this._markAsDone()
   }
 }
 

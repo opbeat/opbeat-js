@@ -2,16 +2,24 @@ var Transaction = require('./transaction')
 var Notifier = require('./notifier')
 var patchUtils = require('../patchUtils')
 
+var utils = require('../lib/utils')
+
 function TransactionService (zone, logger, options) {
-  this.currentTransaction = null
   this._queue = []
   this._logger = logger
+
+  this.transactions = {}
+  this.nextId = 1
+
+  this.currentTransactionId = null
+
+  this.taskMap = {}
 
   var zoneConfig = {
     log: function log (methodName, theRest) {
       var logText = 'Zone(' + this.$id + ') ' + methodName
       var logArray = [logText, this.timeoutList.count()]
-      if (typeof theRest !== 'undefined') {
+      if (!utils.isUndefined(theRest)) {
         logArray.push(theRest)
       }
       logger.debug.apply(logger, logArray)
@@ -43,11 +51,11 @@ function TransactionService (zone, logger, options) {
           var args = patchUtils.argumentsToArray(arguments)
           var tId
           args[0] = patchUtils.wrapAfter(timeoutFn, function () {
-            self.timeoutList.remove(tId)
+            self._removeTransactionTask(tId)
             self.log(' - setTimeout ', ' delay: ' + delay)
           })
           tId = parentTimeout.apply(this, args)
-          self.timeoutList.set(tId, false)
+          self._addTransactionTask(tId)
           self.log(' + setTimeout ', ' delay: ' + delay)
           return tId
         } else {
@@ -56,7 +64,7 @@ function TransactionService (zone, logger, options) {
       }
     },
     '-clearTimeout': function (id) {
-      this.timeoutList.remove(id)
+      this._removeTransactionTask(id)
       this.log('clearTimeout', this.timeout)
     },
     '-setInterval': function () {
@@ -73,7 +81,23 @@ function TransactionService (zone, logger, options) {
     }
   }
   this.zone = zone.fork(zoneConfig)
+  var trService = this
   this.zone.timeoutList = new Notifier()
+  this.zone._addTransactionTask = function (taskId) {
+    trService.taskMap[taskId] = trService.currentTransactionId
+    var tr = trService.transactions[trService.currentTransactionId]
+    if (!utils.isUndefined(tr)) {
+      tr.addTask(taskId)
+    }
+  }
+  this.zone._removeTransactionTask = function (taskId) {
+    var trId = trService.taskMap[taskId]
+    var tr = trService.transactions[trId]
+    if (!utils.isUndefined(tr)) {
+      tr.removeTask(taskId)
+    }
+    delete trService.taskMap[taskId]
+  }
   this._queue = []
 }
 
@@ -81,35 +105,38 @@ TransactionService.prototype.getCurrentTransaction = function () {}
 TransactionService.prototype.routeChangeStarted = function (routeName) {}
 
 TransactionService.prototype.startTransaction = function (name, type, options) {
-  var tr = new Transaction(name, type, options)
-  this.currentTransaction = tr
   var self = this
-  self.zone.log('TransactionService.startTransaction', tr)
-  self.zone.timeoutList.notify = function () {
-    var notifier = this
-    if (notifier.count() === 0) {
-      self.zone.parent.setTimeoutUnpatched(function () {
-        if (notifier.count() === 0) {
-          tr.end()
-          self.zone.log('TransactionService transaction ended', tr)
-        }
-      }, 0)
-    }
+  if (this.currentTransactionId != null) {
+    this.endCurrentTransaction()
   }
+  self.zone.log('TransactionService.startTransaction', tr)
 
-  tr.donePromise.then(function (t) {
+  var tr = new Transaction(name, type, options)
+  this.transactions[this.nextId] = tr
+  this.currentTransactionId = this.nextId
+
+  this.nextId++
+
+  return this.currentTransactionId
+}
+
+TransactionService.prototype.endCurrentTransaction = function () {
+  var self = this
+  var tr = self.transactions[this.currentTransactionId]
+  var p = tr.end()
+  p.then(function (t) {
     self.zone.log('TransactionService transaction finished', tr)
     self.add(tr)
   })
-
-  return tr
+  this.currentTransactionId = null
 }
 
 TransactionService.prototype.startTrace = function (signature, type) {
-  if (this.currentTransaction !== null) {
-    return this.currentTransaction.startTrace(signature, type)
+  var tr = this.transactions[this.currentTransactionId]
+  if (!utils.isUndefined(tr)) {
+    return tr.startTrace(signature, type)
   } else {
-    this._logger.debug('TransactionService.startTrace - can not start trace, currentTransaction is null')
+    this._logger.debug('TransactionService.startTrace - can not start trace, no active transaction')
   }
 }
 
