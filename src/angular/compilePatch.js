@@ -1,15 +1,26 @@
-var utils = require('../instrumentation/utils')
-
-module.exports = function ($provide, traceBuffer) {
-  // Template Compile Instrumentation
+var patchUtils = require('../patchUtils')
+var utils = require('../lib/utils')
+module.exports = function ($provide, transactionService) {
   $provide.decorator('$compile', ['$delegate', '$injector', function ($delegate, $injector) {
-    var options = {
-      type: 'template.$compile',
-      prefix: '$compile',
-      instrumentConstructor: true,
-      traceBuffer: traceBuffer,
-      instrumentObjectFunctions: false
+    var nameParts = ['$compile', 'compile']
+    var traceType = '$compile'
+
+    var traceName = nameParts.join('.')
+
+    function compile () {
+      var trace = transactionService.startTrace(traceName, traceType)
+      try {
+        var result = $delegate.apply(this, arguments)
+      } finally {
+        if (!utils.isUndefined(trace)) {
+          trace.end()
+        }
+      }
+      return result
     }
-    return utils.instrumentModule($delegate, $injector, options)
+
+    patchUtils._copyProperties($delegate, compile)
+
+    return compile
   }])
 }
