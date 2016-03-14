@@ -98,9 +98,6 @@ function initialize () {
 
   var opbeatBackend = new OpbeatBackend(transport, logger)
 
-  function flushTransactions () {
-    transactionService.clearTransactions()
-  }
   setInterval(function () {
     var transactions = transactionService.getTransactions()
 
@@ -110,7 +107,7 @@ function initialize () {
     logger.debug('Sending Transactions to opbeat.', transactions.length)
     // todo: if transactions are already being sent, should check
     opbeatBackend.sendTransactions(transactions)
-      .then(flushTransactions, flushTransactions)
+    transactionService.clearTransactions()
   }, 5000)
 
   window.angular.bootstrap = transactionService.zone.bind(window.angular.bootstrap)
