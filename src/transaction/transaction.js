@@ -1,5 +1,6 @@
 var Trace = require('./trace')
 var Promise = require('es6-promise').Promise
+var utils = require('../lib/utils')
 
 var Transaction = function (name, type, options) {
   this.metadata = {}
@@ -14,6 +15,8 @@ var Transaction = function (name, type, options) {
   this._activeTraces = {}
 
   this._scheduledTasks = {}
+
+  this.events = {}
 
   Promise.call(this.donePromise = Object.create(Promise.prototype), function (resolve, reject) {
     this._resolve = resolve
@@ -38,6 +41,18 @@ Transaction.prototype.startTrace = function (signature, type) {
   this._activeTraces[trace.getFingerprint()] = trace
 
   return trace
+}
+
+Transaction.prototype.recordEvent = function (e) {
+  var event = this.events[e.name]
+  if (utils.isUndefined(event)) {
+    event = { name: e.name, start: e.start, end: e.end, time: e.end - e.start, count: 0 }
+    this.events[event.name] = event
+  } else {
+    event.time += (e.end - e.start)
+    event.count++
+    event.end = e.end
+  }
 }
 
 Transaction.prototype.isFinished = function () {
@@ -92,10 +107,22 @@ Transaction.prototype._finish = function () {
     return
   }
 
+  this._alreadFinished = true
+
+  for (var key in this.events) {
+    var event = this.events[key]
+    var eventTrace = new Trace(this, key, key, this._options)
+    eventTrace.ended = true
+    eventTrace._start = event.start
+    eventTrace._diff = event.time
+    eventTrace._end = event.end
+    eventTrace.setParent(this._rootTrace)
+    this.traces.push(eventTrace)
+  }
+
   this._adjustStartToEarliestTrace()
   this._adjustEndToLatestTrace()
 
-  this._alreadFinished = true
   this.donePromise._resolve(this)
 }
 

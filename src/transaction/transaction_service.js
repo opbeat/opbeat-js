@@ -24,26 +24,26 @@ function TransactionService (zone, logger, options) {
       }
       logger.debug.apply(logger, logArray)
     },
-    onZoneCreated: function () {
-      this.log('onZoneCreated')
-    },
-    beforeTask: function () {
-      var sig = this.signature
-      this.log('beforeTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
-    },
-    afterTask: function () {
-      var sig = this.signature
-      this.log('afterTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
-    },
+    // onZoneCreated: function () {
+    //   this.log('onZoneCreated')
+    // },
+    // beforeTask: function () {
+    //   var sig = this.signature
+    //   this.log('beforeTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
+    // },
+    // afterTask: function () {
+    //   var sig = this.signature
+    //   this.log('afterTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
+    // },
     '-onError': function () {
       this.log('onError')
     },
-    enqueueTask: function () {
-      this.log('enqueueTask', arguments)
-    },
-    dequeueTask: function () {
-      this.log('dequeueTask', arguments)
-    },
+    // enqueueTask: function () {
+    //   this.log('enqueueTask', arguments)
+    // },
+    // dequeueTask: function () {
+    //   this.log('dequeueTask', arguments)
+    // },
     $setTimeout: function (parentTimeout) {
       return function (timeoutFn, delay) {
         var self = this
@@ -124,11 +124,14 @@ TransactionService.prototype.endCurrentTransaction = function () {
   var self = this
   var tr = self.transactions[this.currentTransactionId]
   var p = tr.end()
+  var trId = self.currentTransactionId
   p.then(function (t) {
     self.zone.log('TransactionService transaction finished', tr)
     self.add(tr)
+    if (trId === self.currentTransactionId) {
+      self.currentTransactionId = null
+    }
   })
-  this.currentTransactionId = null
 }
 
 TransactionService.prototype.startTrace = function (signature, type) {
@@ -152,6 +155,15 @@ TransactionService.prototype.add = function (transaction) {
 
 TransactionService.prototype.getTransactions = function () {
   return this._queue
+}
+
+TransactionService.prototype.recordEvent = function (event) {
+  var tr = this.transactions[this.currentTransactionId]
+  if (!utils.isUndefined(tr)) {
+    return tr.recordEvent(event)
+  } else {
+    this._logger.debug('TransactionService.recordEvent - can not record event, no active transaction')
+  }
 }
 
 TransactionService.prototype.clearTransactions = function () {
