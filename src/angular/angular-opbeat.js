@@ -80,7 +80,9 @@ function initialize () {
       } else if (current.url) { // UI Router
         transactionName = current.name // Use state name over URL
       }
-
+      if (transactionName === '') {
+        transactionName = 'Main page load'
+      }
       transactionService.startTransaction(transactionName, 'transaction', { config: config })
     }
     $rootScope.$on('$routeChangeStart', onRouteChangeStart) // ng-router
