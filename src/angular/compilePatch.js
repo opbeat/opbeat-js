@@ -3,7 +3,7 @@ var utils = require('../lib/utils')
 module.exports = function ($provide, transactionService) {
   $provide.decorator('$compile', ['$delegate', '$injector', function ($delegate, $injector) {
     var nameParts = ['$compile', 'compile']
-    var traceType = '$compile'
+    var traceType = 'template.$compile'
 
     var traceName = nameParts.join('.')
 
