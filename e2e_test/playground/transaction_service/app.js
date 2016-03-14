@@ -32,21 +32,30 @@ app.directive('customDirective', function () {
     }
   }
 })
+function exponentialize (seed, times) {
+  var res = seed
+  for (var j = 0; j < times; j++) {
+    res = res.concat(res)
+  }
+  return res
+}
 
 app.controller('MainCtrl', function mainCtrl ($scope, $http, $resource) {
   $scope.confirmation = function (conf) {
     $scope.confirmation = conf
   }
-  var i = 0
-  $scope.repeatArray = [10]
 
+  var repeatArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  $scope.repeatArray = repeatArray
   setTimeout(function () {
-    $scope.repeatArray.push(i++)
+    $scope.repeatArray.push(1)
     $scope.$apply()
   }, 0)
 
   $http.get('confirmation.json').then(function (response) {
     $scope.confirmation(response.data)
+    $scope.repeatArray = exponentialize(repeatArray, 8)
   }, function () {
     throw new Error('Confirmation failed.')
   })
