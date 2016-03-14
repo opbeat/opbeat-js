@@ -57,7 +57,7 @@ OpbeatBackend.prototype.getRawGroupedTracesTimings = function getRawGroupedTrace
 
     return index
   }
-
+  var self = this
   var groupedByTransaction = grouper(traces, function (trace) {
     return trace.transaction.name + '|' + trace.transaction._start
   })
@@ -73,11 +73,11 @@ OpbeatBackend.prototype.getRawGroupedTracesTimings = function getRawGroupedTrace
       var relativeTraceStart = trace._start - transaction._start
 
       if (relativeTraceStart > transaction.duration()) {
-        this._logger.debug('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.relativeTraceStartLargerThanTransactionDuration', 'color: #ff0000', relativeTraceStart, transaction._start, transaction.duration(), { trace: trace, transaction: transaction })
+        self._logger.debug('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.relativeTraceStartLargerThanTransactionDuration', 'color: #ff0000', relativeTraceStart, transaction._start, transaction.duration(), { trace: trace, transaction: transaction })
       } else if (relativeTraceStart < 0) {
-        this._logger.debug('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.negativeRelativeTraceStart!', 'color: #ff0000', relativeTraceStart, trace._start, transaction._start, trace)
+        self._logger.debug('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.negativeRelativeTraceStart!', 'color: #ff0000', relativeTraceStart, trace._start, transaction._start, trace)
       } else if (trace.duration() > transaction.duration()) {
-        this._logger.debug('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.traceDurationLargerThanTranscationDuration', 'color: #ff0000', trace.duration(), transaction.duration(), { trace: trace, transaction: transaction })
+        self._logger.debug('%c -- opbeat.instrumentation.getRawGroupedTracesTimings.error.traceDurationLargerThanTranscationDuration', 'color: #ff0000', trace.duration(), transaction.duration(), { trace: trace, transaction: transaction })
       } else {
         data.push([groupIndex, relativeTraceStart, trace.duration()])
       }
