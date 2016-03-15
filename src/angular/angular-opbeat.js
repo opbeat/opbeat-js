@@ -51,12 +51,14 @@ var patchHttp = require('./httpPatch')
 var patchController = require('./controllerPatch')
 var patchCompile = require('./compilePatch')
 var patchTemplateRequest = require('./templateRequestPatch')
+var patchRootScope = require('./rootScopePatch')
 function patchAll ($provide, transactionService) {
   patchExceptionHandler($provide)
   patchHttp($provide, transactionService)
   patchController($provide, transactionService)
   patchCompile($provide, transactionService)
   patchTemplateRequest($provide, transactionService)
+  patchRootScope($provide, transactionService)
 }
 
 var logger = require('loglevel')
