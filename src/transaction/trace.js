@@ -45,10 +45,7 @@ Trace.prototype.end = function () {
 
   this.calcDiff()
   this.ended = true
-
-  this._isFinish.then(function () {
-    this.transaction._onTraceEnd(this)
-  }.bind(this))
+  this.transaction._onTraceEnd(this)
 }
 
 Trace.prototype.duration = function () {

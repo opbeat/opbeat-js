@@ -123,7 +123,14 @@ Transaction.prototype._finish = function () {
   this._adjustStartToEarliestTrace()
   this._adjustEndToLatestTrace()
 
-  this.donePromise._resolve(this)
+  var self = this
+  var whenAllTracesFinished = self.traces.map(function (trace) {
+    return trace._isFinish
+  })
+
+  Promise.all(whenAllTracesFinished).then(function () {
+    self.donePromise._resolve(self)
+  })
 }
 
 Transaction.prototype._adjustEndToLatestTrace = function () {
