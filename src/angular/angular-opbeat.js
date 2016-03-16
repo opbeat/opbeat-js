@@ -85,15 +85,21 @@ function initialize () {
       }
       transactionService.startTransaction(transactionName, 'transaction', transactionOptions)
     }
-    $rootScope.$on('$routeChangeStart', onRouteChangeStart) // ng-router
-    $rootScope.$on('$routeChangeSuccess', function () {
+
+    function onRouteChangeSuccess () {
       setTimeout(function () {
         logger.debug('Route change success')
         transactionService.endCurrentTransaction()
       }, 0)
-    })
+    }
 
-    $rootScope.$on('$stateChangeSuccess', onRouteChangeStart) // ui-router
+    // ng-router
+    $rootScope.$on('$routeChangeStart', onRouteChangeStart)
+    $rootScope.$on('$routeChangeSuccess', onRouteChangeSuccess)
+
+    // ui-router
+    $rootScope.$on('$stateChangeStart', onRouteChangeStart)
+    $rootScope.$on('$stateChangeSuccess', onRouteChangeSuccess)
   }
 
   var opbeatBackend = new OpbeatBackend(transport, logger)
