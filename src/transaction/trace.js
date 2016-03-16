@@ -19,7 +19,7 @@ var Trace = module.exports = function (transaction, signature, type, options) {
     this._markFinishedFunc = resolve
   }.bind(this))
 
-  var shouldGenerateStackFrames = options.config.get('performance.enableStackFrames')
+  var shouldGenerateStackFrames = options['performance.enableStackFrames']
 
   if (shouldGenerateStackFrames) {
     this.getTraceStackFrames(function (frames) {

@@ -1,4 +1,4 @@
-var TransactionService = require('/transaction/transaction_service.js')
+var TransactionService = require('../transaction/transaction_service')
 
 var OpbeatBackend = require('../backend/opbeat_backend')
 var transport = require('../lib/transport')
@@ -65,13 +65,11 @@ var logger = require('loglevel')
 
 function initialize () {
   var config = Opbeat.config()
-  var transactionOptions = {
-    config: config
-  }
+  var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
 
   logger.setLevel('debug', false)
 
-  var transactionService = new TransactionService(window.zone, logger, transactionOptions)
+  var transactionService = new TransactionService(logger, transactionOptions)
 
   function moduleRun ($rootScope) {
     function onRouteChangeStart (event, current) {
@@ -85,7 +83,7 @@ function initialize () {
       if (transactionName === '') {
         transactionName = 'Main page load'
       }
-      transactionService.startTransaction(transactionName, 'transaction', { config: config })
+      transactionService.startTransaction(transactionName, 'transaction', transactionOptions)
     }
     $rootScope.$on('$routeChangeStart', onRouteChangeStart) // ng-router
     $rootScope.$on('$routeChangeSuccess', function () {
@@ -112,7 +110,13 @@ function initialize () {
     transactionService.clearTransactions()
   }, 5000)
 
-  window.angular.bootstrap = transactionService.zone.bind(window.angular.bootstrap)
+  // Ignoring zonejs for now
+  // var useZoneJS = false
+  // if (useZoneJS) {
+  //   var ZoneService = require('../transaction/zone_service')
+  //   var zoneService = new ZoneService(window.zone, transactionService, logger)
+  //   window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
+  // }
 
   function moduleConfig ($provide) {
     patchAll($provide, transactionService)
