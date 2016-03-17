@@ -1,5 +1,3 @@
-var patchUtils = require('../patchUtils')
-
 module.exports = function ($provide, transactionService) {
   $provide.decorator('$rootScope', ['$delegate', '$injector', function ($delegate, $injector) {
     return decorateRootScope($delegate, transactionService)
@@ -8,7 +6,7 @@ module.exports = function ($provide, transactionService) {
 
 function decorateRootScope ($delegate, transactionService) {
   var scopePrototype = ('getPrototypeOf' in Object)
-    ? Object.getPrototypeOf($delegate) : $delegate.__proto__
+    ? Object.getPrototypeOf($delegate) : $delegate.__proto__ // eslint-disable-line 
 
   var _digest = scopePrototype.$digest
   scopePrototype.$digest = function (fn) {
