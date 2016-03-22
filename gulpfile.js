@@ -179,13 +179,17 @@ gulp.task('e2e-serve', function (done) {
   done()
 })
 
-gulp.task('watch:e2e', ['e2e-serve'], function (done) {
+gulp.task('selenium-start', function (done) {
   selenium.install({logger: console.log}, () => {
     selenium.start(function () {
-      gulp.watch(['e2e_test/**'], function () {
-        runSequence('test:e2e')
-      })
+      done()
     })
+  })
+})
+
+gulp.task('watch:e2e', ['e2e-serve', 'selenium-start'], function (done) {
+  gulp.watch(['e2e_test/**'], function () {
+    runSequence('test:e2e')
   })
 })
 
