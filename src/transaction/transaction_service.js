@@ -37,9 +37,13 @@ TransactionService.prototype.startTransaction = function (name, type, options) {
 TransactionService.prototype.endCurrentTransaction = function () {
   var self = this
   var tr = self.transactions[this.currentTransactionId]
+  self.currentTransactionId = null
+  if (utils.isUndefined(tr)) {
+    return
+  }
+
   var p = tr.end()
   // var trId = self.currentTransactionId
-  self.currentTransactionId = null
   p.then(function (t) {
     self._logger.debug('TransactionService transaction finished', tr)
     self.add(tr)
