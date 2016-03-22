@@ -23,7 +23,7 @@ require('gulp-release-tasks')(gulp)
 
 var sourceTargets = [
   './src/opbeat.js',
-  './src/angular-opbeat.js'
+  './src/angular/angular-opbeat.js'
 ]
 
 // Static file server
@@ -83,7 +83,7 @@ gulp.task('build', function () {
         replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
       }))
       .pipe(derequire())
-      .pipe(gulp.dest('./dist/'))
+      .pipe(gulp.dest('./dist/dev/'))
   })
 
   return es.merge.apply(null, tasks)
