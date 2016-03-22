@@ -1,5 +1,6 @@
 var Transaction = require('./transaction')
 var utils = require('../lib/utils')
+var Subscription = require('../common/subscription')
 
 function TransactionService (logger, options) {
   this._queue = []
@@ -13,6 +14,8 @@ function TransactionService (logger, options) {
   this.taskMap = {}
 
   this._queue = []
+
+  this._subscription = new Subscription()
 }
 
 TransactionService.prototype.getCurrentTransaction = function () {}
@@ -47,6 +50,7 @@ TransactionService.prototype.endCurrentTransaction = function () {
   p.then(function (t) {
     self._logger.debug('TransactionService transaction finished', tr)
     self.add(tr)
+    self._subscription.applyAll(self, [tr])
   // if (trId === self.currentTransactionId) {
   //   self.currentTransactionId = null
   // }
@@ -105,4 +109,9 @@ TransactionService.prototype.removeTask = function (taskId) {
   }
   delete this.taskMap[taskId]
 }
+
+TransactionService.prototype.subscribe = function (fn) {
+  return this._subscription.subscribe(fn)
+}
+
 module.exports = TransactionService
