@@ -8,13 +8,13 @@ function init () {
   logger.setLevel('debug', false)
   var transactionService = new TransactionService(logger, {})
 
-  // Ignoring zonejs for now
-  // var useZoneJS = false
-  // if (useZoneJS) {
-  //   var ZoneService = require('../transaction/zone_service')
-  //   var zoneService = new ZoneService(window.zone, transactionService, logger)
-  //   window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
-  // }
+  if (typeof window.zone === 'undefined') {
+    require('zone.js')
+  }
+
+  var ZoneService = require('../transaction/zone_service')
+  var zoneService = new ZoneService(window.zone, transactionService, logger)
+  window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
 
   ngOpbeat(transactionService, logger)
 
