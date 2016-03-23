@@ -9,7 +9,7 @@ function TransactionService (logger, options) {
   this.transactions = {}
   this.nextId = 1
 
-  this.currentTransactionId = null
+  this.globalTransactionId = null
 
   this.taskMap = {}
 
@@ -18,51 +18,45 @@ function TransactionService (logger, options) {
   this._subscription = new Subscription()
 }
 
-TransactionService.prototype.getCurrentTransaction = function () {}
 TransactionService.prototype.routeChangeStarted = function (routeName) {}
 
-TransactionService.prototype.startTransaction = function (name, type, options) {
-  var self = this
-  if (this.currentTransactionId != null) {
-    this.endCurrentTransaction()
-  }
-  self._logger.debug('TransactionService.startTransaction', tr)
-
-  var tr = new Transaction(name, type, options)
-  this.transactions[this.nextId] = tr
-  this.currentTransactionId = this.nextId
-
-  this.nextId++
-
-  return this.currentTransactionId
+TransactionService.prototype.startGlobalTransaction = function (name, type, options) {
+  this.globalTransactionId = this.startTransaction(name, type, options)
+  return this.globalTransactionId
 }
 
-TransactionService.prototype.endCurrentTransaction = function () {
+TransactionService.prototype.startTransaction = function (name, type, options) {
+  var tr = new Transaction(name, type, options)
+  var id = this.nextId
+  this.transactions[id] = tr
+  this.nextId++
+  this._logger.debug('TransactionService.startTransaction', tr)
+  return id
+}
+
+TransactionService.prototype.endTransaction = function (trId) {
   var self = this
-  var tr = self.transactions[this.currentTransactionId]
-  self.currentTransactionId = null
-  if (utils.isUndefined(tr)) {
-    return
+  var tr = self.transactions[trId]
+  if (!utils.isUndefined(tr) && !tr.ended) {
+    var p = tr.end()
+    p.then(function (t) {
+      self._logger.debug('TransactionService transaction finished', tr)
+      self.add(tr)
+      self._subscription.applyAll(self, [tr])
+    })
   }
 
-  var p = tr.end()
-  // var trId = self.currentTransactionId
-  p.then(function (t) {
-    self._logger.debug('TransactionService transaction finished', tr)
-    self.add(tr)
-    self._subscription.applyAll(self, [tr])
-  // if (trId === self.currentTransactionId) {
-  //   self.currentTransactionId = null
-  // }
-  })
+  if (trId === this.globalTransactionId) {
+    this.globalTransactionId = null
+  }
 }
 
 TransactionService.prototype.startTrace = function (signature, type) {
-  var tr = this.transactions[this.currentTransactionId]
+  var tr = this.transactions[this.globalTransactionId]
   if (!utils.isUndefined(tr)) {
     return tr.startTrace(signature, type)
   } else {
-    this._logger.debug('TransactionService.startTrace - can not start trace, no active transaction')
+    this._logger.debug('TransactionService.startTrace - can not start trace, no active transaction ', signature, type)
   }
 }
 
@@ -81,7 +75,7 @@ TransactionService.prototype.getTransactions = function () {
 }
 
 TransactionService.prototype.recordEvent = function (event) {
-  var tr = this.transactions[this.currentTransactionId]
+  var tr = this.transactions[this.globalTransactionId]
   if (!utils.isUndefined(tr)) {
     return tr.recordEvent(event)
   } else {
@@ -94,8 +88,8 @@ TransactionService.prototype.clearTransactions = function () {
 }
 
 TransactionService.prototype.addTask = function (taskId) {
-  this.taskMap[taskId] = this.currentTransactionId
-  var tr = this.transactions[this.currentTransactionId]
+  this.taskMap[taskId] = this.globalTransactionId
+  var tr = this.transactions[this.globalTransactionId]
   if (!utils.isUndefined(tr)) {
     tr.addTask(taskId)
   }

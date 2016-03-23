@@ -61,6 +61,7 @@ function initialize (transactionService, logger) {
   var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
 
   function moduleRun ($rootScope) {
+    // onRouteChangeStart
     function onRouteChangeStart (event, current) {
       logger.debug('Route change started')
       var transactionName
@@ -72,23 +73,26 @@ function initialize (transactionService, logger) {
       if (transactionName === '') {
         transactionName = 'Main page load'
       }
-      transactionService.startTransaction(transactionName, 'transaction', transactionOptions)
-    }
+      var trId = transactionService.startGlobalTransaction(transactionName, 'transaction', transactionOptions)
 
-    function onRouteChangeSuccess () {
-      setTimeout(function () {
-        logger.debug('Route change success')
-        transactionService.endCurrentTransaction()
-      }, 0)
+      var ngRouterCancel = $rootScope.$on('$routeChangeSuccess', onRouteChangeSuccess)
+      var uiRouterCancel = $rootScope.$on('$stateChangeSuccess', onRouteChangeSuccess)
+
+      function onRouteChangeSuccess () {
+        setTimeout(function () {
+          logger.debug('Route change success')
+          transactionService.endTransaction(trId)
+          ngRouterCancel()
+          uiRouterCancel()
+        }, 0)
+      }
     }
 
     // ng-router
     $rootScope.$on('$routeChangeStart', onRouteChangeStart)
-    $rootScope.$on('$routeChangeSuccess', onRouteChangeSuccess)
 
     // ui-router
     $rootScope.$on('$stateChangeStart', onRouteChangeStart)
-    $rootScope.$on('$stateChangeSuccess', onRouteChangeSuccess)
   }
 
   function moduleConfig ($provide) {
