@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<body>
+
+  <script src="/e2e/browser_utils.js"></script>
+  <script src="/node_modules/systemjs/dist/system.src.js"></script>
+
+  <script src="/node_modules/angular/angular.js"></script>
+
+  <script>
+    window.System.config({
+      paths: {
+        '*': '/node_modules/*'
+      },
+      meta: {
+        './app.js': {
+          format: 'cjs'
+        }
+      },
+      packageConfigPaths: ['/node_modules/*/package.json'],
+      'defaultJSExtensions': true
+    })
+  </script>
+  <ng-view />
+</body>
+
+</html>
