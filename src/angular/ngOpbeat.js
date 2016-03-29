@@ -71,7 +71,7 @@ function initialize (transactionService, logger) {
         transactionName = current.name // Use state name over URL
       }
       if (transactionName === '') {
-        transactionName = 'Main page load'
+        transactionName = '/'
       }
       var trId = transactionService.startGlobalTransaction(transactionName, 'transaction', transactionOptions)
 
