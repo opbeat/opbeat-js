@@ -170,7 +170,9 @@ module.exports = {
         args: args
       }
 
-      self.instrumentObject(result, $injector, options)
+      if (!utils.isUndefined(result)) {
+        self.instrumentObject(result, $injector, options)
+      }
       return result
     }
 
