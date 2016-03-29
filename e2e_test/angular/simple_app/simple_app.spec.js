@@ -26,7 +26,7 @@ describe('angular.simple app', function () {
         expect(first.traces.groups.length).toBe(1)
         expect(first.traces.raw[0].length).toBe(2)
         expect(first.transactions.length).toBe(1)
-        expect(first.transactions[0].transaction).toBe('Main page load')
+        expect(first.transactions[0].transaction).toBe('/')
 
         var second = transactions[1]
         expect(second.traces.groups.length).toBe(7)
