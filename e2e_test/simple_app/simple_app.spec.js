@@ -1,5 +1,5 @@
 var utils = require('../e2e/utils')
-describe('simple app', function () {
+xdescribe('simple app', function () {
   beforeEach(utils.verifyNoBrowserErrors)
 
   it('Inspect requests', function (done) {
