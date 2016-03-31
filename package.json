@@ -78,7 +78,8 @@
       "expect",
       "fail",
       "spyOn",
-      "browser"
+      "browser",
+      "xdescribe"
     ]
   }
 }
