@@ -1,7 +1,5 @@
-var logger = require('loglevel')
-var ngOpbeat = require('./ngOpbeat')
-var TransactionService = require('../transaction/transaction_service')
 var OpbeatBackend = require('../backend/opbeat_backend')
+var ServiceContainer = require('./serviceContainer')
 
 var Subscription = require('../common/subscription')
 
@@ -20,10 +18,10 @@ TransportMock.prototype.subscribe = function (fn) {
 }
 
 function init () {
-  logger.setLevel('debug', false)
-  var transactionService = new TransactionService(logger, {})
+  var services = new ServiceContainer({logLevel: 'debug'}).services
+  var logger = services.logger
+  var transactionService = services.transactionService
 
-  ngOpbeat(transactionService, logger)
   var transportMock = new TransportMock()
   var opbeatBackend = new OpbeatBackend(transportMock, logger)
   transactionService.subscribe(function (tr) {

@@ -7,14 +7,15 @@ describe('angular.simple app', function () {
     browser.url('/angular/index.e2e.html')
       .timeoutsAsyncScript(5000)
       .executeAsync(function (cb) {
-        window.loadDependencies(['./angular-opbeat.e2e.js', 'angular-route'], function (modules) {
-          modules[0]()
-          window.e2e.getTransactions(function (trs) {
-            cb(trs)
-          }, 0, 2)
-          System.import('./simple_app/simple_app.js').then(function () {
-            window.angular.bootstrap(document, ['simple_app'])
-          })
+        window.runFixture('./simple_app/simple_app.js', ['./angular-opbeat.e2e.js', 'angular-route'], {
+          beforeInit: function (app, deps) {
+            deps[0]()
+            window.e2e.getTransactions(function (trs) {
+              cb(trs)
+            }, 0, 2)
+          },
+          useNgApp: false,
+          uiRouter: false
         })
       })
       .then(function (response) {

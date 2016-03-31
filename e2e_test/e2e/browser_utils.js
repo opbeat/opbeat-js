@@ -20,6 +20,33 @@ function setup () {
       var p = System.import(fixtureUrl).then(function () {}, logError)
       return p
     },
+    runFixture: function runFixture (path, deps, options) {
+      var div = document.createElement('div')
+      if (options.useNgApp) {
+        div.setAttribute('ng-app', options.appName)
+        window.name = 'NG_DEFER_BOOTSTRAP!' + window.name
+      }
+
+      if (options.uiRouter) {
+        div.innerHTML = '<div ui-view></div>'
+      } else {
+        div.innerHTML = '<div ng-view></div>'
+      }
+      document.body.appendChild(div)
+      System.import(path).then(function (module) {
+        utils.loadDependencies(deps, function (modules) {
+          if (options.beforeInit) {
+            options.beforeInit(module, modules)
+          }
+          module.init()
+          if (options.useNgApp) {
+            window.angular.resumeBootstrap()
+          } else {
+            module.bootstrap(document)
+          }
+        })
+      })
+    },
     getNextTransaction: function getNextTransaction (cb) {
       var cancelFn = window.e2e.transactionService.subscribe(function (tr) {
         cb(tr)
@@ -31,6 +58,7 @@ function setup () {
   window.loadDependencies = utils.loadDependencies
   window.loadFixture = utils.loadFixture
   window.getNextTransaction = utils.getNextTransaction
+  window.runFixture = utils.runFixture
 
   window.__httpInterceptor = {
     requests: []
