@@ -1,27 +1,15 @@
-var logger = require('loglevel')
-var ngOpbeat = require('./ngOpbeat')
-var TransactionService = require('../transaction/transaction_service')
 var OpbeatBackend = require('../backend/opbeat_backend')
 var transport = require('../lib/transport')
+var ServiceContainer = require('./serviceContainer')
 
 function init () {
-  logger.setLevel('debug', false)
-  var transactionService = new TransactionService(logger, {})
-
-  if (typeof window.zone === 'undefined') {
-    require('zone.js')
-  }
-
-  var ZoneService = require('../transaction/zone_service')
-  var zoneService = new ZoneService(window.zone, transactionService, logger)
-  window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
-
-  ngOpbeat(transactionService, logger)
+  var services = new ServiceContainer({logLevel: 'warn'}).services
+  var logger = services.logger
+  var transactionService = services.transactionService
 
   var opbeatBackend = new OpbeatBackend(transport, logger)
-
   setInterval(function () {
-    var transactions = transactionService.getTransactions()
+    var transactions = services.transactionService.getTransactions()
 
     if (transactions.length === 0) {
       return
