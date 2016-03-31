@@ -28,7 +28,7 @@ var resourcePatch = proxyquire('../../../src/instrumentation/angular/resource', 
   './transactionStore': transactionStore
 })
 
-describe('instrumentation.angular.resource', function () {
+xdescribe('instrumentation.angular.resource', function () {
   beforeEach(function () {
     jasmine.Ajax.install()
   })
