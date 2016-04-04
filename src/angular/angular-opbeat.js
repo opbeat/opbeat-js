@@ -2,10 +2,17 @@ var OpbeatBackend = require('../backend/opbeat_backend')
 var transport = require('../lib/transport')
 var ServiceContainer = require('./serviceContainer')
 
+var utils = require('../lib/utils')
+
 function init () {
   var services = new ServiceContainer({logLevel: 'warn'}).services
   var logger = services.logger
   var transactionService = services.transactionService
+
+  if (utils.isUndefined(window.opbeatApi)) {
+    window.opbeatApi = {}
+  }
+  window.opbeatApi.subscribeToTransactions = transactionService.subscribe.bind(transactionService)
 
   var opbeatBackend = new OpbeatBackend(transport, logger)
   setInterval(function () {
@@ -19,6 +26,17 @@ function init () {
     opbeatBackend.sendTransactions(transactions)
     transactionService.clearTransactions()
   }, 5000)
+
+  if (!utils.isUndefined(window.opbeatApi.onload)) {
+    var onOpbeatLoaded = window.opbeatApi.onload
+    onOpbeatLoaded.forEach(function (fn) {
+      try {
+        fn()
+      } catch (error) {
+        logger.error(error)
+      }
+    })
+  }
 }
 
 init()
