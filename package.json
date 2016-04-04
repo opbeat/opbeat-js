@@ -23,8 +23,7 @@
     "url": "https://github.com/opbeat/opbeat-js.git"
   },
   "dependencies": {
-    "error-stack-normalizer": "^1.0.2",
-    "error-stack-parser": "github:auchenberg/error-stack-parser#ie-anonymous-functions",
+    "error-stack-parser": "^1.3.5",
     "es6-promise": "^3.0.2",
     "event-stream": "^3.3.1",
     "loglevel": "^1.4.0",
