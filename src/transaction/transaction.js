@@ -31,9 +31,14 @@ var Transaction = function (name, type, options) {
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
 }
 
-Transaction.prototype.startTrace = function (signature, type) {
+Transaction.prototype.startTrace = function (signature, type, options) {
   // todo: should not accept more traces if the transaction is alreadyFinished
-  var trace = new Trace(this, signature, type, this._options)
+  var opts = this._options
+  if (!utils.isUndefined(options)) {
+    opts = utils.mergeObject(opts, options)
+  }
+
+  var trace = new Trace(this, signature, type, opts)
   if (this._rootTrace) {
     trace.setParent(this._rootTrace)
   }

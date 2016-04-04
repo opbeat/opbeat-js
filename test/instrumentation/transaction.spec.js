@@ -14,7 +14,7 @@ InstrumentationMock.prototype.startTransaction = function (name, type, options) 
   return new Transaction(this, name, type, options)
 }
 
-describe('instrumentation.transaction', function () {
+xdescribe('instrumentation.transaction', function () {
   var instrumentationMock
   var config = Config
   config.init()
