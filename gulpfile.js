@@ -40,7 +40,8 @@ gulp.task('build:release', function () {
   var version = require('./package').version
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
-  var path = './dist/' + majorVersion
+  var versionPath = './dist/' + majorVersion
+  var prodPath = './dist/prod'
 
   var tasks = sourceTargets.map(function (entry) {
     return browserify({
@@ -56,12 +57,14 @@ gulp.task('build:release', function () {
         replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
       }))
       .pipe(derequire())
-      .pipe(gulp.dest(path))
+      .pipe(gulp.dest(versionPath))
+      .pipe(gulp.dest(prodPath))
       .pipe(rename({
         extname: '.min.js'
       }))
       .pipe(uglify())
-      .pipe(gulp.dest(path))
+      .pipe(gulp.dest(versionPath))
+      .pipe(gulp.dest(prodPath))
   })
 
   return es.merge.apply(null, tasks)
