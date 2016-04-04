@@ -19,7 +19,7 @@ Subscription.prototype.applyAll = function (applyTo, applyWith) {
     try {
       fn.apply(applyTo, applyWith)
     } catch (error) {
-      console.log(error)
+      console.log(error, error.stack)
     }
   }, this)
 }
