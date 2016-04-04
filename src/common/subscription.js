@@ -18,7 +18,9 @@ Subscription.prototype.applyAll = function (applyTo, applyWith) {
   this.subscriptions.forEach(function (fn) {
     try {
       fn.apply(applyTo, applyWith)
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }, this)
 }
 
