@@ -1,8 +1,11 @@
 var Opbeat = require('../opbeat')
 
-function ngOpbeatProvider () {
+function NgOpbeatProvider (logger) {
   this.config = function config (properties) {
     Opbeat.config(properties)
+    if (properties.debug === true) {
+      logger.setLevel('debug', false)
+    }
   }
 
   this.install = function install () {
@@ -100,7 +103,7 @@ function initialize (transactionService, logger) {
   }
 
   window.angular.module('ngOpbeat', [])
-    .provider('$opbeat', ngOpbeatProvider)
+    .provider('$opbeat', new NgOpbeatProvider(logger))
     .config(['$provide', moduleConfig])
     .run(['$rootScope', moduleRun])
   window.angular.module('angular-opbeat', ['ngOpbeat'])
