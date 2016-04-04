@@ -1,6 +1,7 @@
 var Promise = require('es6-promise').Promise
 var frames = require('../exceptions/frames')
 var traceCache = require('../instrumentation/traceCache')
+var utils = require('../lib/utils')
 
 var Trace = module.exports = function (transaction, signature, type, options) {
   this.transaction = transaction
@@ -19,6 +20,9 @@ var Trace = module.exports = function (transaction, signature, type, options) {
     this._markFinishedFunc = resolve
   }.bind(this))
 
+  if (utils.isUndefined(options) || options == null) {
+    options = {}
+  }
   var shouldGenerateStackFrames = options['performance.enableStackFrames']
 
   if (shouldGenerateStackFrames) {
@@ -45,7 +49,9 @@ Trace.prototype.end = function () {
 
   this.calcDiff()
   this.ended = true
-  this.transaction._onTraceEnd(this)
+  if (!utils.isUndefined(this.transaction) && typeof this.transaction._onTraceEnd === 'function') {
+    this.transaction._onTraceEnd(this)
+  }
 }
 
 Trace.prototype.duration = function () {
