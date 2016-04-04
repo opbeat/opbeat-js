@@ -14,7 +14,7 @@ TransportMock.prototype.sendTransaction = function (transactions) {
 }
 
 TransportMock.prototype.subscribe = function (fn) {
-  this.subscription.subscribe(fn)
+  return this.subscription.subscribe(fn)
 }
 
 function init () {
