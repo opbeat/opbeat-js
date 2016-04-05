@@ -61,7 +61,6 @@ function patchAll ($provide, transactionService) {
 
 function initialize (transactionService, logger) {
   var config = Opbeat.config()
-  var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
 
   function moduleRun ($rootScope) {
     // onRouteChangeStart
@@ -76,6 +75,8 @@ function initialize (transactionService, logger) {
       if (transactionName === '') {
         transactionName = '/'
       }
+
+      var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
       var trId = transactionService.startGlobalTransaction(transactionName, 'transaction', transactionOptions)
 
       var ngRouterCancel = $rootScope.$on('$routeChangeSuccess', onRouteChangeSuccess)
