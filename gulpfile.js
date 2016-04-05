@@ -41,7 +41,7 @@ gulp.task('build:release', function () {
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
   var versionPath = './dist/' + majorVersion
-  var prodPath = './dist/prod'
+  var prodPath = './dist'
 
   var tasks = sourceTargets.map(function (entry) {
     return browserify({
