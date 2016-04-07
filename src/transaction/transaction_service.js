@@ -51,10 +51,10 @@ TransactionService.prototype.endTransaction = function (trId) {
   }
 }
 
-TransactionService.prototype.startTrace = function (signature, type) {
+TransactionService.prototype.startTrace = function (signature, type, options) {
   var tr = this.transactions[this.globalTransactionId]
   if (!utils.isUndefined(tr)) {
-    return tr.startTrace(signature, type)
+    return tr.startTrace(signature, type, options)
   } else {
     this._logger.debug('TransactionService.startTrace - can not start trace, no active transaction ', signature, type)
   }

@@ -9,8 +9,8 @@ function decorateRootScope ($delegate, transactionService) {
     ? Object.getPrototypeOf($delegate) : $delegate.__proto__ // eslint-disable-line 
 
   var _digest = scopePrototype.$digest
-  scopePrototype.$digest = function (fn) {
-    var trace = transactionService.startTrace('$scope.$digest', '$scope.$digest')
+  scopePrototype.$digest = function () {
+    var trace = transactionService.startTrace('$scope.$digest', 'app.$digest', {'performance.enableStackFrames': false})
     var ret = _digest.apply(this, arguments)
     if (trace) {
       trace.end()

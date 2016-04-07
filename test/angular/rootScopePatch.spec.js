@@ -18,6 +18,6 @@ describe('angular.rootScopePatch', function () {
 
     var rootScope = injector.get('$rootScope')
     rootScope.$digest()
-    expect(trService.startTrace).toHaveBeenCalledWith('$scope.$digest', '$scope.$digest')
+    expect(trService.startTrace).toHaveBeenCalledWith('$scope.$digest', 'app.$digest', { 'performance.enableStackFrames': false })
   })
 })
