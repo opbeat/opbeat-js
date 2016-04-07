@@ -1,12 +1,17 @@
 module.exports = OpbeatBackend
-function OpbeatBackend (transport, logger) {
+function OpbeatBackend (transport, logger, config) {
   this._logger = logger
   this._transport = transport
+  this._config = config
 }
 
 OpbeatBackend.prototype.sendTransactions = function (transactionList) {
-  var formatedTransactions = this._formatTransactions(transactionList)
-  return this._transport.sendTransaction(formatedTransactions)
+  if (this._config.isValid()) {
+    var formatedTransactions = this._formatTransactions(transactionList)
+    return this._transport.sendTransaction(formatedTransactions)
+  } else {
+    this._logger.warn('Config is not valid')
+  }
 }
 OpbeatBackend.prototype._formatTransactions = function (transactionList) {
   var transactions = this.groupTransactions(transactionList)

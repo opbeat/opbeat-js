@@ -1,6 +1,7 @@
 var OpbeatBackend = require('../backend/opbeat_backend')
 var transport = require('../lib/transport')
 var ServiceContainer = require('./serviceContainer')
+var opbeat = require('../opbeat')
 
 var utils = require('../lib/utils')
 
@@ -14,7 +15,8 @@ function init () {
   }
   window.opbeatApi.subscribeToTransactions = transactionService.subscribe.bind(transactionService)
 
-  var opbeatBackend = new OpbeatBackend(transport, logger)
+  var config = opbeat.config()
+  var opbeatBackend = new OpbeatBackend(transport, logger, config)
   setInterval(function () {
     var transactions = services.transactionService.getTransactions()
 
