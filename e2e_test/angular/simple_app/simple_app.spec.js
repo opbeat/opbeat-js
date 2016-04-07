@@ -13,6 +13,7 @@ describe('angular.simple app', function () {
             window.e2e.getTransactions(function (trs) {
               cb(trs)
             }, 0, 2)
+            app.init()
           },
           useNgApp: false,
           uiRouter: false

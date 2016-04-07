@@ -1,4 +1,4 @@
-function init () {
+function init (opbeatConfig) {
   var ctrl = require('../common/exponential_ctrl')
   var app = window.angular.module('ui_router_app', ['ui.router', 'ngOpbeat'])
 
@@ -16,18 +16,11 @@ function init () {
   })
 
   app.config(function ($opbeatProvider) {
-    $opbeatProvider.config({
-      debug: true,
-      orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
-      appId: '0a8757798e',
-      performance: {
-        enable: true,
-        enableStackFrames: true
-      }
-    })
+    $opbeatProvider.config(opbeatConfig)
   })
 
   app.controller('expCtrl', ctrl)
+  return app
 }
 
 function bootstrap (element) {

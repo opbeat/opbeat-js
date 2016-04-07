@@ -3,6 +3,8 @@ var ServiceContainer = require('./serviceContainer')
 
 var Subscription = require('../common/subscription')
 
+var opbeat = require('../opbeat')
+
 function TransportMock () {
   this.transactions = []
   this.subscription = new Subscription()
@@ -23,7 +25,8 @@ function init () {
   var transactionService = services.transactionService
 
   var transportMock = new TransportMock()
-  var opbeatBackend = new OpbeatBackend(transportMock, logger)
+  var config = opbeat.config()
+  var opbeatBackend = new OpbeatBackend(transportMock, logger, config)
   transactionService.subscribe(function (tr) {
     opbeatBackend.sendTransactions([tr])
   })

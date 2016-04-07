@@ -37,8 +37,9 @@ function setup () {
         utils.loadDependencies(deps, function (modules) {
           if (options.beforeInit) {
             options.beforeInit(module, modules)
+          } else {
+            module.init(options.opbeatConfig)
           }
-          module.init()
           if (options.useNgApp) {
             window.angular.resumeBootstrap()
           } else {
