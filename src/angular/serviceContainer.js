@@ -11,6 +11,13 @@ function ServiceContainer (config) {
     require('zone.js')
   }
 
+  function noop () {}
+  var zonePrototype = ('getPrototypeOf' in Object)
+    ? Object.getPrototypeOf(window.zone) : window.zone.__proto__ // eslint-disable-line 
+
+  zonePrototype.enqueueTask = noop
+  zonePrototype.dequeueTask = noop
+
   var ZoneService = require('../transaction/zone_service')
   var zoneService = this.services.zoneService = new ZoneService(window.zone, transactionService, logger)
 
