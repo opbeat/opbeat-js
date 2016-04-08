@@ -14,6 +14,10 @@ function exponentialCtrl ($scope, $http) {
   var repeatArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
   $scope.repeatArray = repeatArray
+  $scope.justAnObject = {key: 'value'}
+  $scope.returnArrayFn = function () {
+    return repeatArray
+  }
   setTimeout(function () {
     $scope.repeatArray.push(1)
     $scope.$apply()

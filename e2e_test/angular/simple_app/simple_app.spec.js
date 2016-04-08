@@ -31,8 +31,8 @@ describe('angular.simple app', function () {
         expect(first.transactions[0].transaction).toBe('/')
 
         var second = transactions[1]
-        expect(second.traces.groups.length).toBe(7)
-        expect(second.traces.raw[0].length).toBe(10)
+        expect(second.traces.groups.length).toBe(10)
+        expect(second.traces.raw[0].length).toBe(13)
         expect(second.transactions.length).toBe(1)
         expect(second.transactions[0].transaction).toBe('/')
 

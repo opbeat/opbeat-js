@@ -26,7 +26,24 @@
   }
 </style>
 <div>
+
+
+  <div ng-repeat="u in justUndefined">
+    <div ng-bind="u"></div>
+  </div>
+
+
+  <div ng-repeat="f in returnArrayFn()">
+    <div ng-bind="f"></div>
+  </div>
+
+  <div ng-repeat="o in justAnObject">
+    <div ng-bind="o"></div>
+  </div>
+
   <div class="animate-repeat" ng-repeat="n in repeatArray track by $index">
     <div ng-bind="'opbeat'+$index"></div>
   </div>
+
+
 </div>
