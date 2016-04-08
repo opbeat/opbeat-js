@@ -50,6 +50,7 @@ var patchController = require('./controllerPatch')
 var patchCompile = require('./compilePatch')
 var patchTemplateRequest = require('./templateRequestPatch')
 var patchRootScope = require('./rootScopePatch')
+
 function patchAll ($provide, transactionService) {
   patchExceptionHandler($provide)
   patchHttp($provide, transactionService)
@@ -57,6 +58,9 @@ function patchAll ($provide, transactionService) {
   patchCompile($provide, transactionService)
   patchTemplateRequest($provide, transactionService)
   patchRootScope($provide, transactionService)
+
+  var patchDirectives = require('./directivesPatch')
+  patchDirectives($provide, transactionService)
 }
 
 function initialize (transactionService, logger) {
