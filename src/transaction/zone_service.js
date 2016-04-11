@@ -23,9 +23,9 @@ module.exports = function ZoneService (zone, transactionService, logger) {
     //   var sig = this.signature
     //   this.log('afterTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
     // },
-    '-onError': function () {
-      this.log('onError')
-    },
+    // '-onError': function () {
+    //   this.log('onError')
+    // },
     // enqueueTask: function () {
     //   this.log('enqueueTask', arguments)
     // },
@@ -54,19 +54,19 @@ module.exports = function ZoneService (zone, transactionService, logger) {
     '-clearTimeout': function (id) {
       this._removeTransactionTask(id)
       this.log('clearTimeout', this.timeout)
-    },
-    '-setInterval': function () {
-      this.log('setInterval')
-    },
-    '-requestAnimationFrame': function () {
-      this.log('requestAnimationFrame')
-    },
-    '-webkitRequestAnimationFrame': function () {
-      this.log('webkitRequestAnimationFrame')
-    },
-    '-mozRequestAnimationFrame': function () {
-      this.log('mozRequestAnimationFrame')
     }
+    // '-setInterval': function () {
+    //   this.log('setInterval')
+    // },
+    // '-requestAnimationFrame': function () {
+    //   this.log('requestAnimationFrame')
+    // },
+    // '-webkitRequestAnimationFrame': function () {
+    //   this.log('webkitRequestAnimationFrame')
+    // },
+    // '-mozRequestAnimationFrame': function () {
+    //   this.log('mozRequestAnimationFrame')
+    // }
   }
   this.zone = zone.fork(zoneConfig)
 
