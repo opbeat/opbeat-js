@@ -68,11 +68,11 @@ gulp.task('build:release', function () {
   })
 
   return es.merge.apply(null, tasks)
-
 })
 
 gulp.task('build', function () {
-  var tasks = sourceTargets.map(function (entry) {
+  var sources = ['./e2e_test/angular/angular-opbeat.e2e.js'].concat(sourceTargets)
+  var tasks = sources.map(function (entry) {
     return browserify({
       entries: [entry],
       standalone: '',
@@ -86,6 +86,11 @@ gulp.task('build', function () {
         replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
       }))
       .pipe(derequire())
+      .pipe(gulp.dest('./dist/dev/'))
+      .pipe(rename({
+        extname: '.min.js'
+      }))
+      .pipe(uglify())
       .pipe(gulp.dest('./dist/dev/'))
   })
 
@@ -169,7 +174,7 @@ gulp.task('test:e2e', function (done) {
 
 gulp.task('e2e-serve', function (done) {
   connect.server({
-    root: ['e2e_test', 'src'],
+    root: ['e2e_test', 'src', './'],
     port: 8000,
     livereload: false,
     open: false,
