@@ -105,15 +105,18 @@ function groupTraces (traces) {
       startTime = 0
     }
 
+    var extra = {}
+    if (Array.isArray(trace.frames) && trace.frames.length > 0) {
+      extra._frames = trace.frames
+    }
+
     return {
       transaction: trace.transaction.name,
       signature: trace.signature,
       kind: trace.type,
       timestamp: trace._startStamp.toISOString(),
       parents: trace.ancestors(),
-      extra: {
-        _frames: trace.frames
-      },
+      extra: extra,
       _group: key
     }
   }).sort(function (a, b) {
