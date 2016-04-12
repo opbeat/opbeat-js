@@ -3,7 +3,7 @@ var frames = require('../exceptions/frames')
 var traceCache = require('../instrumentation/traceCache')
 var utils = require('../lib/utils')
 
-var Trace = module.exports = function (transaction, signature, type, options) {
+function Trace (transaction, signature, type, options) {
   this.transaction = transaction
   this.signature = signature
   this.type = type
