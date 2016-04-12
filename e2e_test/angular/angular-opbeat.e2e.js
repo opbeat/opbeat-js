@@ -1,9 +1,9 @@
-var OpbeatBackend = require('../backend/opbeat_backend')
-var ServiceContainer = require('./serviceContainer')
+var OpbeatBackend = require('../../src/backend/opbeat_backend')
+var ServiceContainer = require('../../src/angular/serviceContainer')
 
-var Subscription = require('../common/subscription')
+var Subscription = require('../../src/common/subscription')
 
-var opbeat = require('../opbeat')
+var opbeat = require('../../src/opbeat')
 
 function TransportMock () {
   this.transactions = []
@@ -19,7 +19,11 @@ TransportMock.prototype.subscribe = function (fn) {
   return this.subscription.subscribe(fn)
 }
 
+var initialized = false
 function init () {
+  if (initialized) {
+    return
+  }
   var services = new ServiceContainer({logLevel: 'debug'}).services
   var logger = services.logger
   var transactionService = services.transactionService
@@ -53,7 +57,9 @@ function init () {
     transportMock: transportMock,
     getTransactions: getTransactions
   }
+  initialized = true
   return transactionService
 }
 
 module.exports = init
+init()

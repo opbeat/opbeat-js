@@ -5,7 +5,6 @@ describe('webdriver.io test', function () {
         .then(function (title, err) {
           expect(err).toBeFalsy()
           expect(title).toBe('it works')
-          console.log(arguments)
           done()
         })
     })
