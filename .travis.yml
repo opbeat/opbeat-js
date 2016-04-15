@@ -3,8 +3,22 @@ language: node_js
 node_js:
 - '4'
 
+env:
+  global:
+    - SAUCE_USERNAME=opbeat
+    - SAUCE_ACCESS_KEY=de42e589-1450-41a2-8a44-90aa00c15168
+  matrix:
+    # Order: a slower build first, so that we don't occupy an idle travis worker waiting for others to complete.
+    - MODE=saucelabs_optional
+    - MODE=default
+
+matrix:
+  allow_failures:
+    - env: "MODE=saucelabs_optional"   
+
 addons:
   firefox: "38.0"
+  sauce_connect: true
 
 before_script:
   - export DISPLAY=:99.0
