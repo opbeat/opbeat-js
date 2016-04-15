@@ -4,31 +4,31 @@ var InstrumentationMock = require('../../utils/instrumentation_mock')
 var TransactionStoreMock = require('../../utils/transaction_store_mock')
 var proxyquire = require('proxyquireify')(require)
 
-var config = {
-  config: {isInstalled: true},
-  init: function () { this.setConfig({isInstalled: true}) },
-  '@runtimeGlobal': true
-}
-
-Object.setPrototypeOf(config, Config)
-
-config.init()
-
-var instrumentation = new InstrumentationMock()
-
-var transactionStore = new TransactionStoreMock(instrumentation)
-var mainTr = instrumentation.startTransaction('/', 'transaction', { config: config })
-transactionStore.setTransaction(mainTr)
-
-var resourcePatch = proxyquire('../../../src/instrumentation/angular/resource', {
-  './instrumentation': instrumentation,
-  './lib/config': config,
-  '../lib/config': config,
-  '../utils': {'@runtimeGlobal': true},
-  './transactionStore': transactionStore
-})
-
 xdescribe('instrumentation.angular.resource', function () {
+  var config = {
+    config: {isInstalled: true},
+    init: function () { this.setConfig({isInstalled: true}) },
+    '@runtimeGlobal': true
+  }
+
+  Object.setPrototypeOf(config, Config)
+
+  config.init()
+
+  var instrumentation = new InstrumentationMock()
+
+  var transactionStore = new TransactionStoreMock(instrumentation)
+  var mainTr = instrumentation.startTransaction('/', 'transaction', { config: config })
+  transactionStore.setTransaction(mainTr)
+
+  var resourcePatch = proxyquire('../../../src/instrumentation/angular/resource', {
+    './instrumentation': instrumentation,
+    './lib/config': config,
+    '../lib/config': config,
+    '../utils': {'@runtimeGlobal': true},
+    './transactionStore': transactionStore
+  })
+
   beforeEach(function () {
     jasmine.Ajax.install()
   })
