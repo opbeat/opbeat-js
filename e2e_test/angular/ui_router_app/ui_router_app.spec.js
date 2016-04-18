@@ -4,7 +4,6 @@ describe('angular.ui router app', function () {
 
   it('should have correct number of transactions and traces', function (done) {
     browser.url('/angular/index.e2e.html')
-      .timeoutsAsyncScript(5000)
       .executeAsync(function (cb) {
         window.runFixture('./ui_router_app/ui_router_app.js', ['./angular-opbeat.e2e.js', 'angular-ui-router'], {
           beforeInit: function (app, deps) {
@@ -45,7 +44,6 @@ describe('angular.ui router app', function () {
 
   it('should not send any transaction if config is not valid', function (done) {
     browser.url('/angular/index.e2e.html')
-      .timeoutsAsyncScript(5000)
       .executeAsync(function (cb) {
         window.runFixture('./ui_router_app/ui_router_app.js', ['./angular-opbeat.e2e.js', 'angular-ui-router'], {
           beforeInit: function (app, deps) {

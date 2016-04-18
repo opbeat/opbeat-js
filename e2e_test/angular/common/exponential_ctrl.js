@@ -19,7 +19,7 @@ function exponentialCtrl ($scope, $http) {
     return repeatArray
   }
   setTimeout(function () {
-    $scope.repeatArray.push(1)
+    $scope.repeatArray.push('new item')
     $scope.$apply()
   }, 0)
 

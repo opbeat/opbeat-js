@@ -5,7 +5,6 @@ describe('angular.simple app', function () {
 
   it('should have correct number of transactions and traces', function (done) {
     browser.url('/angular/index.e2e.html')
-      .timeoutsAsyncScript(5000)
       .executeAsync(function (cb) {
         window.runFixture('./simple_app/simple_app.js', ['./angular-opbeat.e2e.js', 'angular-route'], {
           beforeInit: function (app, deps) {
@@ -31,8 +30,8 @@ describe('angular.simple app', function () {
         expect(first.transactions[0].transaction).toBe('/')
 
         var second = transactions[1]
-        expect(second.traces.groups.length).toBe(10)
-        expect(second.traces.raw[0].length).toBe(13)
+        expect(second.traces.groups.length).toBe(9)
+        expect(second.traces.raw[0].length).toBe(12)
         expect(second.transactions.length).toBe(1)
         expect(second.transactions[0].transaction).toBe('/')
 

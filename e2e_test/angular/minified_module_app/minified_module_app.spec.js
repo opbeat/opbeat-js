@@ -4,7 +4,6 @@ describe('minified_module_app', function () {
 
   it('should have correct number of transactions and traces', function (done) {
     browser.url('/angular/index.e2e.html')
-      .timeoutsAsyncScript(5000)
       .executeAsync(function (cb) {
         window.runFixture('./minified_module_app/minified_module_app.js', ['../dist/dev/angular-opbeat.e2e.min.js', 'angular-ui-router'], {
           beforeInit: function (app, deps) {
@@ -38,8 +37,8 @@ describe('minified_module_app', function () {
 
         var first = transactions[0]
 
-        expect(first.traces.groups.length).toBe(6)
-        expect(first.traces.raw[0].length).toBe(9)
+        expect(first.traces.groups.length).toBe(12)
+        expect(first.traces.raw[0].length).toBe(15)
         expect(first.transactions.length).toBe(1)
         expect(first.transactions[0].transaction).toBe('exponentialstate')
 

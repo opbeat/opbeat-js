@@ -99,7 +99,7 @@ exports.config = {
   jasmineNodeOpts: {
     //
     // Jasmine default timeout
-    defaultTimeoutInterval: 10000,
+    defaultTimeoutInterval: 60000,
     //
     // The Jasmine framework allows it to intercept each assertion in order to log the state of the application
     // or website depending on the result. For example it is pretty handy to take a screenshot everytime
@@ -132,6 +132,7 @@ exports.config = {
   // Gets executed before test execution begins. At this point you will have access to all global
   // variables like `browser`. It is the perfect place to define custom commands.
   before: function () {
+    browser.timeoutsAsyncScript(15000)
     // do something
   },
   //
