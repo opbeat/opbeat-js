@@ -107,7 +107,12 @@ function groupTraces (traces) {
 
     var extra = {}
     if (Array.isArray(trace.frames) && trace.frames.length > 0) {
-      extra._frames = trace.frames
+      var frames = trace.frames.filter(function (f) {
+        return (Object.keys(f).length > 0)
+      })
+      if (frames.length > 0) {
+        extra._frames = frames
+      }
     }
 
     return {
