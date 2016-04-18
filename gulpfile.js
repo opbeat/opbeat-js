@@ -172,6 +172,58 @@ gulp.task('test:e2e', function (done) {
   done()
 })
 
+gulp.task('test.sauce.start', function (done) {
+  var sauceConnectLauncher = require('sauce-connect-launcher')
+
+  sauceConnectLauncher({
+    username: 'opbeat',
+    accessKey: 'de42e589-1450-41a2-8a44-90aa00c15168'
+  }, function (err, sauceConnectProcess) {
+    if (err) {
+      console.error(err.message)
+      return
+    }
+
+    console.log('Sauce Connect ready')
+
+  // sauceConnectProcess.close(function () {
+  //   console.log('Closed Sauce Connect process')
+  // })
+  })
+})
+
+gulp.task('test.e2e.sauce', function (done) {
+  var capabilities = [
+    {
+      browserName: 'chrome'
+    },
+    {
+      browserName: 'internet explorer'
+    }
+  ]
+
+  // if the e2e assets are available online
+  var extraConfig = {
+    user: 'opbeat',
+    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
+    host: 'ondemand.saucelabs.com',
+    port: 80,
+    baseUrl: 'http://10.0.1.152:8000',
+  }
+
+  var sauceConnectConfig = {
+    host: '127.0.0.1',
+    port: 4445,
+    user: 'opbeat',
+    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
+    capabilities: capabilities
+  }
+  var stream = gulp.src('wdio.conf.js').pipe(webdriver(sauceConnectConfig))
+
+  stream.on('error', function () {})
+  done()
+})
+
 gulp.task('e2e-serve', function (done) {
   connect.server({
     root: ['e2e_test', 'src', './'],
