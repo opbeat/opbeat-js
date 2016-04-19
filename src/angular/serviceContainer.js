@@ -1,6 +1,7 @@
 var logger = require('loglevel')
 var ngOpbeat = require('./ngOpbeat')
 var TransactionService = require('../transaction/transaction_service')
+var opbeat = require('../opbeat')
 
 function ServiceContainer (config) {
   this.services = { logger: logger }
@@ -35,7 +36,7 @@ function ServiceContainer (config) {
     resumeBootstrap()
   }
 
-  ngOpbeat(transactionService, logger)
+  ngOpbeat(transactionService, logger, opbeat.config())
 }
 
 module.exports = ServiceContainer

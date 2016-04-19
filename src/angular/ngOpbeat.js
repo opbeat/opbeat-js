@@ -61,12 +61,14 @@ function patchAll ($provide, transactionService) {
   patchDirectives($provide, transactionService)
 }
 
-function initialize (transactionService, logger) {
-  var config = Opbeat.config()
-
+function initialize (transactionService, logger, config) {
   function moduleRun ($rootScope) {
     // onRouteChangeStart
     function onRouteChangeStart (event, current) {
+      if (!config.get('performance.enable')) {
+        logger.debug('Performance monitoring is disable')
+        return
+      }
       logger.debug('Route change started')
       var transactionName
       if (current.$$route) { // ngRoute
