@@ -66,6 +66,7 @@ module.exports = function (config) {
       'karma-spec-reporter',
       'karma-browserify'
     ],
+    browserNoActivityTimeout: 60000,
     customLaunchers: customLaunchers,
     browsers: [], // Chrome, Firefox, PhantomJS2
     captureTimeout: 120000, // on saucelabs it takes some time to capture browser
