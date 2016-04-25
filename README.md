@@ -1,27 +1,29 @@
-# opbeat.js
+# Opbeat.js
 
 [![Build status](https://travis-ci.org/opbeat/opbeat-js.svg?branch=master)](https://travis-ci.org/opbeat/opbeat-js)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
 
-opbeat.js is the official JavaScript agent for Opbeat. This agent enables automatic exception collection and framework-specific code instrumentation of your front-end code.
+Opbeat.js is the official JavaScript module for Opbeat. This module enables framework-specific performance metrics of your client-side application and automatic exception collection.
 
 ## Installation
 
-Include this `<script>` before your main application. Typically in your <head>
+Include this `<script>` before your application:
 
 ```html
-<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>" async></script>
+<script src="https://d3tvtfb6518e3e.cloudfront.net/2/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
 ```
 Or install using npm
 
 ```
 npm install opbeat-js
 ```
-And include it in your application
+And include it in your application:
 
 ```
-<script src="node_modules/opbeat-js/dist/1/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>" async></script>
+<script src="node_modules/opbeat-js/dist/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
 ```
+
+Note: You can use module loader/bundler of your choosing.
 
 ## Configuration
 
@@ -31,38 +33,38 @@ Our default configuration is declarative by using data-attributes. For more adva
 
 
 ```html
-<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js" async></script>
+<script src="https://d3tvtfb6518e3e.cloudfront.net/2/opbeat.min.js"></script>
 <script>
 
-_opbeat = window._opbeat || function() {
-  (window._opbeat.q = window._opbeat.q || []).push(arguments)
-};
+    _opbeat = window._opbeat || function() {
+      (window._opbeat.q = window._opbeat.q || []).push(arguments)
+    };
 
-_opbeat('config', {
-  debug: true/false, // Toggles debug-mode, that outputs debug messages to the console
-  orgId: '<org id>', // Your Opbeat org id
-  appId: '<app id>', // Your Opbeat app id
-  libraryPathPattern: '(node_modules|bower_components|webpack)' // Regex pattern used to determine whether a file is a library file or not.
-});
+    _opbeat('config', {
+      debug: true/false, // Toggles debug-mode, that outputs debug messages to the console
+      orgId: '<ORGID>', // Your Opbeat org id
+      appId: '<APPID>', // Your Opbeat app id
+      libraryPathPattern: '(node_modules|bower_components|webpack)' // Regex pattern used to determine whether a file is a library file or not.
+    });
 
-// Optional: Pass user data to the reported exceptions
-_opbeat('setUserContext', {
-  email: 'vanja@opbeat.com',
-  id: 1,
-  isSuperDuperAwesome: true
-});
+    // Optional: Pass user data to the reported exceptions
+    _opbeat('setUserContext', {
+      email: 'vanja@opbeat.com',
+      id: 1,
+      isSuperDuperAwesome: true
+    });
 
 </script>
 ```
 
-## Framework specific code instrumentation
+## Framework-specific performance metrics
 
-In order to provide code instrumentation we have chosen a framework-specific approch. This means we'll provide builds of ``opbeat-js`` that include the specific hooks.
+We provide framework specific performance metrics. This means that you need to load opbeat-js build that is relevant to your framework. You can find framework-specific builds in our release
 
-### angular-opbeat
+### AngularJS integration
 
 ```html
-<script src="https://d3tvtfb6518e3e.cloudfront.net/1/angular-opbeat.min.js"></script>
+<script src="https://d3tvtfb6518e3e.cloudfront.net/2/angular-opbeat.min.js"></script>
 ```
 
 ```javascript
@@ -70,10 +72,9 @@ angular.module('app', ['ngOpbeat'])
   .config(function ($opbeatProvider) {
     $opbeatProvider.config({
       debug: true/false, // Toggles debug-mode, that outputs debug messages to the console
-      orgId: '<org id>', // Your Opbeat org id
-      appId: '<app id>', // Your Opbeat app id
+      orgId: '<ORGID>', // Your Opbeat org id
+      appId: '<APPID>', // Your Opbeat app id
       libraryPathPattern: '(node_modules|bower_components|webpack)', // Regex pattern used to determine whether a file is a library file or not.
-      angularAppName: '' // Optional: The name of the angular app, if booted manually,
       performance: {
         enable: true/false // Toggles performance monitoring
         enableStackFrames: true/false // Toggles whether stack frames should be generated for traces
@@ -89,19 +90,11 @@ angular.module('app', ['ngOpbeat'])
   })
 ```
 
-#### Pass in angular app name for manually booted applications
-
-For Angular applications that aren't using the `ng-app` directive to boot, you need to pass in the app name via the config:
-
-```
-$opbeatProvider.config({
-  angularAppName: 'my app name'
-})
-```
+Note: Currently we support ngRoute and ui.router for "Route Change" performance metric.
 
 #### Supported AngularJS versions
 
-Our angular-opbeat agent is tested with AngularJS 1.2.x, 1.3.x and 1.4.x releases.
+Our AngularJS agent is tested with AngularJS 1.2.x, 1.3.x and 1.4.x releases.
 
 
 ## License
