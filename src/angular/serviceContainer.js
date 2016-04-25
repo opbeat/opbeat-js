@@ -6,7 +6,7 @@ var opbeat = require('../opbeat')
 function ServiceContainer (config) {
   this.services = { logger: logger }
   logger.setLevel(config.logLevel, false)
-  var transactionService = this.services.transactionService = new TransactionService(logger, {})
+
   // todo: remove this when updating to new version of zone.js
   function noop () { }
   var _warn = console.warn
@@ -24,19 +24,24 @@ function ServiceContainer (config) {
   console.warn = _warn
 
   var ZoneService = require('../transaction/zone_service')
-  var zoneService = this.services.zoneService = new ZoneService(window.zone, transactionService, logger)
+  var zoneService = this.services.zoneService = new ZoneService(window.zone, logger)
 
+  var transactionService = this.services.transactionService = new TransactionService(zoneService, logger, {})
   // binding bootstrap to zone
 
-  window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
+  // window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
 
   window.name = 'NG_DEFER_BOOTSTRAP!' + window.name
-  window.angular.resumeDeferredBootstrap = function () {
-    var resumeBootstrap = zoneService.zone.bind(window.angular.resumeBootstrap)
+  window.angular.resumeDeferredBootstrap = zoneService.zone.bind(function () {
+    var tid = transactionService.startTransaction('bootstrap', 'transaction')
+    var tr = transactionService.getTransaction(tid)
+    tr.isBootstrap = true
+    window.zone.transaction = tr
+    var resumeBootstrap = window.angular.resumeBootstrap
     resumeBootstrap()
-  }
+  })
 
-  ngOpbeat(transactionService, logger, opbeat.config())
+  ngOpbeat(transactionService, logger, opbeat.config(), zoneService)
 }
 
 module.exports = ServiceContainer

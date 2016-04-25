@@ -17,7 +17,7 @@ describe('ngOpbeat', function () {
 
     var angular = window.angular
     angular.module('patchModule', ['ngOpbeat'])
-    var trService = new TransactionService(logger, {})
+    var trService = new TransactionService({}, logger, {})
     spyOn(trService, 'startTrace')
 
     ngOpbeat(trService, logger, config)

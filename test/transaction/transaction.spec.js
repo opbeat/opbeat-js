@@ -34,13 +34,11 @@ describe('transaction.Transaction', function () {
 
     var lastTrace = transaction.startTrace('last-trace-signature', 'last-trace')
 
-    transaction.end()
-
     lastTrace.end()
+    transaction.detectFinish()
 
     expect(transaction._rootTrace._start).toBe(firstTrace._start)
-    expect(transaction._rootTrace._end).toBe(lastTrace._end)
-    expect(transaction._rootTrace._diff).toBe(lastTrace._end - firstTrace._start)
+    expect(transaction._rootTrace._end).toBeGreaterThan(lastTrace._end)
     done()
   })
 
@@ -56,15 +54,13 @@ describe('transaction.Transaction', function () {
     var lastTrace = transaction.startTrace('last-trace-signature', 'last-trace')
     lastTrace.end()
 
-    transaction.end()
-
     setTimeout(function () {
       longTrace.end()
+      transaction.detectFinish()
 
       setTimeout(function () {
         expect(transaction._rootTrace._start).toBe(rootTraceStart)
-        expect(transaction._rootTrace._end).toBe(longTrace._end)
-        expect(transaction._rootTrace._diff).toBe(longTrace._end - rootTraceStart)
+        expect(transaction._rootTrace._end).toBeGreaterThan(longTrace._end)
         done()
       })
     }, 500)

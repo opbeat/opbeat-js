@@ -1,11 +1,31 @@
 var patchUtils = require('../patchUtils')
 
 var utils = require('../lib/utils')
+function ZoneService (zone, logger) {
+  function rafPatch (parentRaf) {
+    return function (rafFn) {
+      var self = this
+      var args = patchUtils.argumentsToArray(arguments)
+      var tId
+      args[0] = patchUtils.wrapAfter(rafFn, function () {
+        self._removeTransactionTask('raf' + tId)
+        self.log(' - requestAnimationFrame ')
+      })
+      tId = parentRaf.apply(this, args)
+      self._addTransactionTask('raf' + tId)
+      self.log(' + requestAnimationFrame ')
+      return tId
+    }
+  }
 
-module.exports = function ZoneService (zone, transactionService, logger) {
+  function cancelRafPatch (id) {
+    this._removeTransactionTask('setTimeout' + id)
+    this.log('clearTimeout', this.timeout)
+  }
+
   var zoneConfig = {
     log: function log (methodName, theRest) {
-      var logText = 'Zone(' + this.$id + ') ' + methodName
+      var logText = 'Zone(' + this.$id + ') parent(' + this.parent.$id + ') ' + methodName
       var logArray = [logText]
       if (!utils.isUndefined(theRest)) {
         logArray.push(theRest)
@@ -15,14 +35,15 @@ module.exports = function ZoneService (zone, transactionService, logger) {
     // onZoneCreated: function () {
     //   this.log('onZoneCreated')
     // },
-    // beforeTask: function () {
-    //   var sig = this.signature
-    //   this.log('beforeTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
-    // },
-    // afterTask: function () {
-    //   var sig = this.signature
-    //   this.log('afterTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
-    // },
+    beforeTask: function () {
+      var sig = this.signature
+      this.log('beforeTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
+    },
+    afterTask: function () {
+      var sig = this.signature
+      this.log('afterTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
+      this._detectFinish()
+    },
     // '-onError': function () {
     //   this.log('onError')
     // },
@@ -39,11 +60,11 @@ module.exports = function ZoneService (zone, transactionService, logger) {
           var args = patchUtils.argumentsToArray(arguments)
           var tId
           args[0] = patchUtils.wrapAfter(timeoutFn, function () {
-            self._removeTransactionTask(tId)
+            self._removeTransactionTask('setTimeout' + tId)
             self.log(' - setTimeout ', ' delay: ' + delay)
           })
           tId = parentTimeout.apply(this, args)
-          self._addTransactionTask(tId)
+          self._addTransactionTask('setTimeout' + tId)
           self.log(' + setTimeout ', ' delay: ' + delay)
           return tId
         } else {
@@ -52,28 +73,40 @@ module.exports = function ZoneService (zone, transactionService, logger) {
       }
     },
     '-clearTimeout': function (id) {
-      this._removeTransactionTask(id)
+      this._removeTransactionTask('setTimeout' + id)
       this.log('clearTimeout', this.timeout)
-    }
-    // '-setInterval': function () {
-    //   this.log('setInterval')
-    // },
-    // '-requestAnimationFrame': function () {
-    //   this.log('requestAnimationFrame')
-    // },
-    // '-webkitRequestAnimationFrame': function () {
-    //   this.log('webkitRequestAnimationFrame')
-    // },
-    // '-mozRequestAnimationFrame': function () {
-    //   this.log('mozRequestAnimationFrame')
-    // }
+    },
+    '$requestAnimationFrame': rafPatch,
+    '-cancelAnimationFrame': cancelRafPatch,
+
+    '$webkitRequestAnimationFrame': rafPatch,
+    '-webkitCancelAnimationFrame': cancelRafPatch,
+
+    '$mozRequestAnimationFrame': rafPatch,
+    '-mozCancelAnimationFrame': cancelRafPatch
   }
+
   this.zone = zone.fork(zoneConfig)
 
   this.zone._addTransactionTask = function (taskId) {
-    transactionService.addTask(taskId)
+    if (this.transaction) {
+      this.transaction.addTask(taskId)
+    }
   }
   this.zone._removeTransactionTask = function (taskId) {
-    transactionService.removeTask(taskId)
+    if (this.transaction) {
+      this.transaction.removeTask(taskId)
+    }
+  }
+  this.zone._detectFinish = function () {
+    if (this.transaction) {
+      this.transaction.detectFinish()
+    }
   }
 }
+
+ZoneService.prototype.getCurrentTransaction = function () {
+  return window.zone.transaction
+}
+
+module.exports = ZoneService

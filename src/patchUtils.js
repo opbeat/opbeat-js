@@ -20,6 +20,14 @@ module.exports = {
       return fn.apply(this, arguments)
     }
   },
+  wrap: function (fn, before, after) {
+    return function () {
+      before.apply(this, arguments)
+      var res = fn.apply(this, arguments)
+      after.apply(this, arguments)
+      return res
+    }
+  },
   argumentsToArray: function argumentsToArray (args) {
     var newArgs = []
     for (var i = 0; i < args.length; i++) {
@@ -28,4 +36,3 @@ module.exports = {
     return newArgs
   }
 }
-

@@ -6,7 +6,7 @@ describe('angular.rootScopePatch', function () {
   it('should call startTrace for $scope.$digest', function () {
     var angular = window.angular
     var app = angular.module('patchModule', ['ng'])
-    var trService = new TransactionService(logger, {})
+    var trService = new TransactionService({}, logger, {})
     spyOn(trService, 'startTrace')
 
     app.config(function ($provide) {

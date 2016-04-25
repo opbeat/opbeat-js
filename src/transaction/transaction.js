@@ -29,6 +29,7 @@ var Transaction = function (name, type, options) {
   this._start = this._rootTrace._start
 
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
+  this.nextId = 0
 }
 
 Transaction.prototype.startTrace = function (signature, type, options) {
@@ -39,11 +40,12 @@ Transaction.prototype.startTrace = function (signature, type, options) {
   }
 
   var trace = new Trace(this, signature, type, opts)
+  trace.traceId = this.nextId
+  this.nextId++
   if (this._rootTrace) {
     trace.setParent(this._rootTrace)
+    this._activeTraces[trace.traceId] = trace
   }
-
-  this._activeTraces[trace.getFingerprint()] = trace
 
   return trace
 }
@@ -61,9 +63,13 @@ Transaction.prototype.recordEvent = function (e) {
 }
 
 Transaction.prototype.isFinished = function () {
-  return (this.ended &&
+  return (
   Object.keys(this._scheduledTasks).length === 0 &&
   Object.keys(this._activeTraces).length === 0)
+}
+
+Transaction.prototype.detectFinish = function () {
+  if (this.isFinished()) this.end()
 }
 
 Transaction.prototype.end = function () {
@@ -87,9 +93,6 @@ Transaction.prototype.addTask = function (taskId) {
 
 Transaction.prototype.removeTask = function (taskId) {
   delete this._scheduledTasks[taskId]
-  if (this.isFinished() === true) {
-    this._finish()
-  }
 }
 
 Transaction.prototype.addEndedTraces = function (existingTraces) {
@@ -100,11 +103,7 @@ Transaction.prototype._onTraceEnd = function (trace) {
   this.traces.push(trace)
 
   // Remove trace from _activeTraces
-  delete this._activeTraces[trace.getFingerprint()]
-
-  if (this.isFinished() === true) {
-    this._finish()
-  }
+  delete this._activeTraces[trace.traceId]
 }
 
 Transaction.prototype._finish = function () {

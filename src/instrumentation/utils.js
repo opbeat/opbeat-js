@@ -129,7 +129,22 @@ module.exports = {
       transactionStore: transactionStore
     }
 
-    var wrappedMethod = this.wrapMethod(fn, instrumentMethodBefore, instrumentMethodAfter, context)
+    var beforeMethod = instrumentMethodBefore
+    var afterMethod = instrumentMethodAfter
+    if (options.before) {
+      beforeMethod = function (context) {
+        options.before(context)
+        return instrumentMethodBefore.apply(this, arguments)
+      }
+    }
+    if (options.after) {
+      afterMethod = function (context) {
+        instrumentMethodAfter.apply(this, arguments)
+        options.after(context)
+      }
+    }
+
+    var wrappedMethod = this.wrapMethod(fn, beforeMethod, afterMethod, context)
     wrappedMethod.original = fn
 
     // Copy all properties over

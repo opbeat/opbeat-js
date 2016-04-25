@@ -61,7 +61,7 @@ function patchAll ($provide, transactionService) {
   patchDirectives($provide, transactionService)
 }
 
-function initialize (transactionService, logger, config) {
+function initialize (transactionService, logger, config, zoneService) {
   function moduleRun ($rootScope) {
     // onRouteChangeStart
     function onRouteChangeStart (event, current) {
@@ -79,20 +79,17 @@ function initialize (transactionService, logger, config) {
       if (transactionName === '') {
         transactionName = '/'
       }
+      var gtr = window.zone.transaction
 
-      var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
-      var trId = transactionService.startGlobalTransaction(transactionName, 'transaction', transactionOptions)
-
-      var ngRouterCancel = $rootScope.$on('$routeChangeSuccess', onRouteChangeSuccess)
-      var uiRouterCancel = $rootScope.$on('$stateChangeSuccess', onRouteChangeSuccess)
-
-      function onRouteChangeSuccess () {
-        setTimeout(function () {
-          logger.debug('Route change success')
-          transactionService.endTransaction(trId)
-          ngRouterCancel()
-          uiRouterCancel()
-        }, 0)
+      if (gtr && gtr.isBootstrap) {
+        gtr.isBootstrap = false
+        gtr.name = transactionName
+      } else if (gtr && !gtr.ended) {
+        logger.debug('Route Change while transaction is still active')
+      } else {
+        var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
+        var tid = transactionService.startTransaction(transactionName, 'transaction', transactionOptions)
+        window.zone.transaction = transactionService.getTransaction(tid)
       }
     }
 
