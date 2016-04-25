@@ -11,7 +11,7 @@ describe('angular.simple app', function () {
             deps[0]()
             window.e2e.getTransactions(function (trs) {
               cb(trs)
-            }, 0, 2)
+            }, 0, 1)
             app.init()
           },
           useNgApp: false,
@@ -21,19 +21,13 @@ describe('angular.simple app', function () {
       .then(function (response) {
         var transactions = response.value
         // console.log('transactions', transactions)
-        expect(transactions.length).toBe(2)
+        expect(transactions.length).toBe(1)
 
         var first = transactions[0]
-        expect(first.traces.groups.length).toBe(1)
-        expect(first.traces.raw[0].length).toBe(2)
+        expect(first.traces.groups.length).toBe(8)
+        expect(first.traces.raw[0].length).toBe(12)
         expect(first.transactions.length).toBe(1)
         expect(first.transactions[0].transaction).toBe('/')
-
-        var second = transactions[1]
-        expect(second.traces.groups.length).toBe(9)
-        expect(second.traces.raw[0].length).toBe(12)
-        expect(second.transactions.length).toBe(1)
-        expect(second.transactions[0].transaction).toBe('/')
 
         done()
       }, function (error) {

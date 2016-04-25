@@ -18,10 +18,6 @@ function exponentialCtrl ($scope, $http) {
   $scope.returnArrayFn = function () {
     return repeatArray
   }
-  setTimeout(function () {
-    $scope.repeatArray.push('new item')
-    $scope.$apply()
-  }, 0)
 
   $http.get('common/confirmation.json').then(function (response) {
     $scope.confirmation(response.data)
