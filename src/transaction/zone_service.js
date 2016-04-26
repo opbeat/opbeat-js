@@ -19,8 +19,8 @@ function ZoneService (zone, logger) {
   }
 
   function cancelRafPatch (id) {
-    this._removeTransactionTask('setTimeout' + id)
-    this.log('clearTimeout', this.timeout)
+    this._removeTransactionTask('raf' + id)
+    this.log('cancelAnimationFrame')
   }
 
   var zoneConfig = {
