@@ -81,13 +81,15 @@ function initialize (transactionService, logger, config, zoneService) {
       }
       var gtr = window.zone.transaction
 
+      var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
+
       if (gtr && gtr.isBootstrap) {
         gtr.isBootstrap = false
         gtr.name = transactionName
+        gtr._options = transactionOptions
       } else if (gtr && !gtr.ended) {
         logger.debug('Route Change while transaction is still active')
       } else {
-        var transactionOptions = {'performance.enableStackFrames': config.get('performance.enableStackFrames')}
         var tid = transactionService.startTransaction(transactionName, 'transaction', transactionOptions)
         window.zone.transaction = transactionService.getTransaction(tid)
       }
