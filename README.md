@@ -19,7 +19,7 @@ npm install opbeat-js
 ```
 And include it in your application:
 
-```
+```html
 <script src="node_modules/opbeat-js/dist/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
 ```
 
@@ -80,18 +80,27 @@ angular.module('app', ['ngOpbeat'])
         enableStackFrames: true/false // Toggles whether stack frames should be generated for traces
       }
     })
-
-    // Optional: Pass user data to the reported exceptions
-    $opbeatProvider.setUserContext({
-      email: 'vanja@opbeat.com',
-      id: 1,
-      isSuperDuperAwesome: true
-    });
   })
 ```
 
-Note: Currently we support ngRoute and ui.router for "Route Change" performance metric.
+Note: Currently we support ngRoute and ui.router for "Route change" performance metric.
 
+### Adding user context
+
+You can add information about the logged in user to errors like this:
+
+```js
+angular.module('app', ['ngOpbeat'])
+  .run(function ($opbeat) {
+
+    $opbeat.setUserContext({
+        username: "{{ user_name }}",
+        email: "{{ user_email }}",
+        id: "{{ user_id }}"
+    })
+
+  })
+```
 #### Supported AngularJS versions
 
 Our AngularJS agent is tested with AngularJS 1.2.x, 1.3.x and 1.4.x releases.
