@@ -19,6 +19,10 @@ function init (opbeatConfig) {
     $opbeatProvider.config(opbeatConfig)
   })
 
+  app.run(function ($opbeat) {
+    $opbeat.setUserContext({test: 'test'})
+  })
+
   app.controller('expCtrl', ctrl)
   return app
 }
