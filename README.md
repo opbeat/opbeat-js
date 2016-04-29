@@ -66,6 +66,7 @@ We provide framework specific performance metrics. This means that you need to l
 ```html
 <script src="https://d3tvtfb6518e3e.cloudfront.net/2/angular-opbeat.min.js"></script>
 ```
+Note: Make sure that you include ‘angular-opbeat’ after AngularJS.
 
 ```javascript
 angular.module('app', ['ngOpbeat'])
