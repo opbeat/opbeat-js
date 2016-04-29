@@ -7,6 +7,10 @@ function ServiceContainer (config) {
   this.services = { logger: logger }
   logger.setLevel(config.logLevel, false)
 
+  if (typeof window.angular === 'undefined') {
+    throw new Error('AngularJS is not available. Please make sure you load angular-opbeat after AngularJS.')
+  }
+
   // todo: remove this when updating to new version of zone.js
   function noop () { }
   var _warn = console.warn

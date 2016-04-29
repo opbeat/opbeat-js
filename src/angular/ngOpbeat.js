@@ -76,7 +76,7 @@ function initialize (transactionService, logger, config, zoneService) {
       } else if (current.url) { // UI Router
         transactionName = current.name // Use state name over URL
       }
-      if (transactionName === '') {
+      if (transactionName === '' || typeof transactionName === 'undefined') {
         transactionName = '/'
       }
       var gtr = window.zone.transaction
