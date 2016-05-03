@@ -34,7 +34,7 @@ function ServiceContainer (config) {
   // binding bootstrap to zone
 
   // window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
-
+  var _resumeDeferred = window.angular.resumeDeferredBootstrap
   window.name = 'NG_DEFER_BOOTSTRAP!' + window.name
   window.angular.resumeDeferredBootstrap = zoneService.zone.bind(function () {
     var tid = transactionService.startTransaction('bootstrap', 'transaction')
@@ -42,6 +42,9 @@ function ServiceContainer (config) {
     tr.isBootstrap = true
     window.zone.transaction = tr
     var resumeBootstrap = window.angular.resumeBootstrap
+    if (typeof _resumeDeferred === 'function') {
+      resumeBootstrap = _resumeDeferred
+    }
     resumeBootstrap()
   })
 
