@@ -25,7 +25,7 @@ describe('angular.simple app', function () {
 
         var first = transactions[0]
         expect(first.traces.groups.length).toBe(8)
-        expect(first.traces.raw[0].length).toBe(12)
+        expect(first.traces.raw[0].length).toBe(13)
         expect(first.transactions.length).toBe(1)
         expect(first.transactions[0].transaction).toBe('/')
 
