@@ -5,6 +5,10 @@ var opbeat = require('../opbeat')
 
 function ServiceContainer (config) {
   this.services = { logger: logger }
+
+  if (config.debug === true) {
+    config.logLevel = 'debug'
+  }
   logger.setLevel(config.logLevel, false)
 
   if (typeof window.angular === 'undefined') {
@@ -30,7 +34,7 @@ function ServiceContainer (config) {
   var ZoneService = require('../transaction/zone_service')
   var zoneService = this.services.zoneService = new ZoneService(window.zone, logger)
 
-  var transactionService = this.services.transactionService = new TransactionService(zoneService, logger, {})
+  var transactionService = this.services.transactionService = new TransactionService(zoneService, logger, config)
   // binding bootstrap to zone
 
   // window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)

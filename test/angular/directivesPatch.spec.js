@@ -6,7 +6,7 @@ describe('angular.directivesPatch', function () {
   it('should call startTrace for ngRepeat $watchCollection action', function () {
     var angular = window.angular
     var app = angular.module('patchModule', ['ng'])
-    var trService = new TransactionService({}, logger, {})
+    var trService = new TransactionService({}, logger, {performance: {enableStackFrames: true}})
     spyOn(trService, 'startTrace')
 
     app.config(function ($provide) {
@@ -14,7 +14,7 @@ describe('angular.directivesPatch', function () {
     })
     var injector = angular.injector(['patchModule'])
 
-    trService.startTransaction('transaction', 'transaction', {})
+    trService.startTransaction('transaction', 'transaction')
 
     injector.invoke(function ($compile, $rootScope) {
       // an array
@@ -27,7 +27,7 @@ describe('angular.directivesPatch', function () {
       scope.$digest()
       expect(element.find('li').length).toEqual(2)
       expect(element.text()).toEqual('hamid;reza;')
-      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat items[2]', 'template.ngRepeat', { 'performance.enableStackFrames': false })
+      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat items[2]', 'template.ngRepeat', {performance: { 'enableStackFrames': false }})
 
       // a function
       element = $compile(
@@ -41,7 +41,7 @@ describe('angular.directivesPatch', function () {
       scope.$digest()
       expect(element.find('li').length).toEqual(2)
       expect(element.text()).toEqual('hamid;reza;')
-      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat arrayFn()[2]', 'template.ngRepeat', { 'performance.enableStackFrames': false })
+      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat arrayFn()[2]', 'template.ngRepeat', {performance: { 'enableStackFrames': false }})
 
       // an object
       element = $compile(
@@ -53,7 +53,7 @@ describe('angular.directivesPatch', function () {
       scope.$digest()
       expect(element.find('li').length).toEqual(2)
       expect(element.text()).toEqual('hamid;reza;')
-      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat obj', 'template.ngRepeat', { 'performance.enableStackFrames': false })
+      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat obj', 'template.ngRepeat', {performance: { 'enableStackFrames': false }})
 
       // undefined
       element = $compile(
@@ -64,7 +64,7 @@ describe('angular.directivesPatch', function () {
       scope.$digest()
       expect(element.find('li').length).toEqual(0)
       expect(element.text()).toEqual('')
-      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat justUndefined', 'template.ngRepeat', { 'performance.enableStackFrames': false })
+      expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat justUndefined', 'template.ngRepeat', {performance: { 'enableStackFrames': false }})
     })
   })
 })

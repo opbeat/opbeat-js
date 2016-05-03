@@ -2,7 +2,11 @@ var Transaction = require('./transaction')
 var utils = require('../lib/utils')
 var Subscription = require('../common/subscription')
 
-function TransactionService (zoneService, logger, options) {
+function TransactionService (zoneService, logger, config) {
+  this._config = config
+  if (typeof config === 'undefined') {
+    this._config = {}
+  }
   this._queue = []
   this._logger = logger
   this._zoneService = zoneService
@@ -21,8 +25,8 @@ TransactionService.prototype.getTransaction = function (id) {
   return this.transactions[id]
 }
 
-TransactionService.prototype.startTransaction = function (name, type, options) {
-  var tr = new Transaction(name, type, options)
+TransactionService.prototype.startTransaction = function (name, type) {
+  var tr = new Transaction(name, type, this._config.performance)
   var id = this.nextId
   this.transactions[id] = tr
   this.nextId++

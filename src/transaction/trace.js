@@ -23,7 +23,7 @@ function Trace (transaction, signature, type, options) {
   if (utils.isUndefined(options) || options == null) {
     options = {}
   }
-  var shouldGenerateStackFrames = options['performance.enableStackFrames']
+  var shouldGenerateStackFrames = options['enableStackFrames']
 
   if (shouldGenerateStackFrames) {
     this.getTraceStackFrames(function (frames) {

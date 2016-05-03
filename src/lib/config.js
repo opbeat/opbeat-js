@@ -6,6 +6,7 @@ function Config () {
     VERSION: '%%VERSION%%',
     apiHost: 'intake.opbeat.com',
     isInstalled: false,
+    logLevel: 'warn',
     orgId: null,
     appId: null,
     angularAppName: null,

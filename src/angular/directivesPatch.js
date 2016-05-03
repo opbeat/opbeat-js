@@ -25,7 +25,7 @@ module.exports = function ($provide, transactionService) {
 
               var traceName = 'ngRepeat ' + runtimeInfo
               var traceType = 'template.ngRepeat'
-              var trace = transactionService.startTrace(traceName, traceType, {'performance.enableStackFrames': false})
+              var trace = transactionService.startTrace(traceName, traceType, {performance: {'enableStackFrames': false}})
               var ret = reactionFunction.apply(this, arguments)
 
               if (!utils.isUndefined(trace)) {

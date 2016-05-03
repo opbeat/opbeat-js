@@ -1,5 +1,6 @@
 var Transaction = require('../../src/transaction/transaction')
 var Trace = require('../../src/transaction/trace')
+var Promise = require('es6-promise').Promise
 
 describe('transaction.Transaction', function () {
   beforeEach(function () {})
@@ -81,32 +82,45 @@ describe('transaction.Transaction', function () {
   })
 
   it('should generate stacktrace based on transaction options', function (done) {
-    var tr = new Transaction('/', 'transaction', {'performance.enableStackFrames': true})
+    var tr = new Transaction('/', 'transaction', {'enableStackFrames': true})
 
     var firstTrace = tr.startTrace('first-trace-signature', 'first-trace')
     firstTrace.end()
 
-    var secondTrace = tr.startTrace('second-trace', 'second-trace', {'performance.enableStackFrames': false})
+    var secondTrace = tr.startTrace('second-trace', 'second-trace', {'enableStackFrames': false})
     secondTrace.end()
 
     tr.donePromise.then(function () {
       expect(firstTrace.frames).not.toBeUndefined()
       expect(secondTrace.frames).toBeUndefined()
+    })
+
+    var noStackTrace = new Transaction('/', 'transaction', {'enableStackFrames': false})
+    var thirdTrace = noStackTrace.startTrace('third-trace', 'third-trace', {'enableStackFrames': true})
+    thirdTrace.end()
+
+    noStackTrace.donePromise.then(function () {
+      expect(thirdTrace.frames).toBeUndefined()
+    })
+
+    Promise.all([tr.donePromise, noStackTrace.donePromise]).then(function () {
       done()
     })
-    tr.end()
+
+    tr.detectFinish()
+    noStackTrace.detectFinish()
   })
   it('should not generate stacktrace if the option is not passed', function (done) {
     var tr = new Transaction('/', 'transaction')
 
-    var firstTrace = tr.startTrace('first-trace-signature', 'first-trace', {'performance.enableStackFrames': true})
+    var firstTrace = tr.startTrace('first-trace-signature', 'first-trace', {'enableStackFrames': true})
     firstTrace.end()
 
     var secondTrace = tr.startTrace('second-trace', 'second-trace')
     secondTrace.end()
 
     tr.donePromise.then(function () {
-      expect(firstTrace.frames).not.toBeUndefined()
+      expect(firstTrace.frames).toBeUndefined()
       expect(secondTrace.frames).toBeUndefined()
       done()
     })

@@ -10,6 +10,9 @@ var Transaction = function (name, type, options) {
   this._markDoneAfterLastTrace = false
   this._isDone = false
   this._options = options
+  if (typeof options === 'undefined') {
+    this._options = {}
+  }
 
   this.traces = []
   this._activeTraces = {}
@@ -34,10 +37,8 @@ var Transaction = function (name, type, options) {
 
 Transaction.prototype.startTrace = function (signature, type, options) {
   // todo: should not accept more traces if the transaction is alreadyFinished
-  var opts = this._options
-  if (!utils.isUndefined(options)) {
-    opts = utils.mergeObject(opts, options)
-  }
+  var opts = typeof options === 'undefined' ? {} : options
+  opts.enableStackFrames = this._options.enableStackFrames === true && opts.enableStackFrames !== false
 
   var trace = new Trace(this, signature, type, opts)
   trace.traceId = this.nextId
