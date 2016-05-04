@@ -109,4 +109,11 @@ ZoneService.prototype.getCurrentTransaction = function () {
   return window.zone.transaction
 }
 
+ZoneService.prototype.set = function (key, value) {
+  window.zone[key] = value
+}
+ZoneService.prototype.get = function (key) {
+  return window.zone[key]
+}
+
 module.exports = ZoneService
