@@ -27,7 +27,7 @@ var Transaction = function (name, type, options) {
   }.bind(this.donePromise))
 
   // A transaction should always have a root trace spanning the entire transaction.
-  this._rootTrace = this.startTrace('transaction', 'transaction', this._options)
+  this._rootTrace = this.startTrace('transaction', 'transaction', {enableStackFrames: false})
   this._startStamp = this._rootTrace._startStamp
   this._start = this._rootTrace._start
 

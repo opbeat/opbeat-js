@@ -9,7 +9,7 @@ function ServiceContainer (config) {
   if (config.debug === true) {
     config.logLevel = 'debug'
   }
-  logger.setLevel(config.logLevel, false)
+  logger.setLevel(config.get('logLevel'), false)
 
   if (typeof window.angular === 'undefined') {
     throw new Error('AngularJS is not available. Please make sure you load angular-opbeat after AngularJS.')
@@ -41,10 +41,6 @@ function ServiceContainer (config) {
   var _resumeDeferred = window.angular.resumeDeferredBootstrap
   window.name = 'NG_DEFER_BOOTSTRAP!' + window.name
   window.angular.resumeDeferredBootstrap = zoneService.zone.bind(function () {
-    var tid = transactionService.startTransaction('bootstrap', 'transaction')
-    var tr = transactionService.getTransaction(tid)
-    tr.isBootstrap = true
-    window.zone.transaction = tr
     var resumeBootstrap = window.angular.resumeBootstrap
     if (typeof _resumeDeferred === 'function') {
       resumeBootstrap = _resumeDeferred

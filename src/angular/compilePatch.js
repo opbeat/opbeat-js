@@ -8,7 +8,7 @@ module.exports = function ($provide, transactionService) {
     var traceName = nameParts.join('.')
 
     function compile () {
-      var trace = transactionService.startTrace(traceName, traceType)
+      var trace = transactionService.startTrace(traceName, traceType, {enableStackFrames: false})
       try {
         var result = $delegate.apply(this, arguments)
       } finally {

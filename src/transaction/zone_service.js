@@ -105,10 +105,6 @@ function ZoneService (zone, logger) {
   }
 }
 
-ZoneService.prototype.getCurrentTransaction = function () {
-  return window.zone.transaction
-}
-
 ZoneService.prototype.set = function (key, value) {
   window.zone[key] = value
 }

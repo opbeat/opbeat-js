@@ -1,14 +1,10 @@
 var TransactionService = require('../../src/transaction/transaction_service')
 var Transaction = require('../../src/transaction/transaction')
 
+var ZoneServiceMock = require('./zone_service_mock.js')
 var logger = require('loglevel')
 
-function ZoneServiceMock () {
-  this.transaction = undefined
-  this.getCurrentTransaction = function () {
-    return this.transaction
-  }
-}
+var Config = require('../../src/lib/config')
 
 describe('TransactionService', function () {
   var transactionService
@@ -16,9 +12,12 @@ describe('TransactionService', function () {
   beforeEach(function () {
     zoneServiceMock = new ZoneServiceMock()
 
-    spyOn(zoneServiceMock, 'getCurrentTransaction').and.callThrough()
+    spyOn(zoneServiceMock, 'get').and.callThrough()
     spyOn(logger, 'debug')
-    transactionService = new TransactionService(zoneServiceMock, logger, {})
+
+    var config = Object.create(Config)
+    config.init()
+    transactionService = new TransactionService(zoneServiceMock, logger, config)
   })
 
   it('should not start trace when there is no current transaction', function () {
@@ -29,8 +28,8 @@ describe('TransactionService', function () {
   it('should call startTrace on current Transaction', function () {
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startTrace').and.callThrough()
-    zoneServiceMock.transaction = tr
+    zoneServiceMock.zone.transaction = tr
     transactionService.startTrace('test-trace', 'test-trace')
-    expect(zoneServiceMock.transaction.startTrace).toHaveBeenCalledWith('test-trace', 'test-trace', undefined)
+    expect(zoneServiceMock.zone.transaction.startTrace).toHaveBeenCalledWith('test-trace', 'test-trace', undefined)
   })
 })

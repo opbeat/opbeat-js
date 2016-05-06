@@ -10,7 +10,7 @@ function decorateRootScope ($delegate, transactionService) {
 
   var _digest = scopePrototype.$digest
   scopePrototype.$digest = function () {
-    var trace = transactionService.startTrace('$scope.$digest', 'app.$digest', {'performance.enableStackFrames': false})
+    var trace = transactionService.startTrace('$scope.$digest', 'app.$digest', {'enableStackFrames': false})
     var ret = _digest.apply(this, arguments)
     if (trace) {
       trace.end()

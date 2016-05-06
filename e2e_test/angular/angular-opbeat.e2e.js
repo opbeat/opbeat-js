@@ -24,12 +24,13 @@ function init () {
   if (initialized) {
     return
   }
-  var services = new ServiceContainer({logLevel: 'debug'}).services
+  var config = opbeat.config()
+  config.logLevel = 'debug'
+  var services = new ServiceContainer(config).services
   var logger = services.logger
   var transactionService = services.transactionService
 
   var transportMock = new TransportMock()
-  var config = opbeat.config()
   var opbeatBackend = new OpbeatBackend(transportMock, logger, config)
   transactionService.subscribe(function (tr) {
     opbeatBackend.sendTransactions([tr])

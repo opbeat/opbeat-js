@@ -7,7 +7,7 @@ var utils = require('../lib/utils')
 
 function init () {
   var config = opbeat.config()
-  var services = new ServiceContainer(config.config).services
+  var services = new ServiceContainer(config).services
   var logger = services.logger
   var transactionService = services.transactionService
 
