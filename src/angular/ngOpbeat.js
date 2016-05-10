@@ -73,8 +73,8 @@ function initialize (transactionService, logger, config, zoneService) {
       var transactionName
       if (current.$$route) { // ngRoute
         transactionName = current.$$route.originalPath
-      } else if (current.url) { // UI Router
-        transactionName = current.name // Use state name over URL
+      } else { // UI Router
+        transactionName = current.name
       }
       if (transactionName === '' || typeof transactionName === 'undefined') {
         transactionName = '/'
