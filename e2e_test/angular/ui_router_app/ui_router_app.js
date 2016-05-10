@@ -4,15 +4,24 @@ function init (opbeatConfig) {
 
   app.config(function ($stateProvider, $urlRouterProvider) {
     var routeConfig = {
+      abstract: true,
       url: '/',
       controller: 'expCtrl',
-      templateUrl: 'common/exponential_ctrl.html'
+      templateUrl: 'common/exponential_ctrl.html',
+      deepStateRedirect: { default: 'exponentialstate.substate' }
     }
 
     $urlRouterProvider.otherwise('/')
 
     $stateProvider
       .state('exponentialstate', routeConfig)
+      .state('exponentialstate.substate', {
+        url: '',
+        controller: function ($scope) {
+          $scope.test = 'passed'
+        },
+        template: '<div ng-bind="test"></div>'
+      })
   })
 
   app.config(function ($opbeatProvider) {
@@ -20,7 +29,7 @@ function init (opbeatConfig) {
   })
 
   app.run(function ($opbeat) {
-    $opbeat.setUserContext({test: 'test'})
+    $opbeat.setUserContext({ test: 'test' })
   })
 
   app.controller('expCtrl', ctrl)

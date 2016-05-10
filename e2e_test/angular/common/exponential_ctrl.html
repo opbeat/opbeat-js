@@ -29,6 +29,7 @@
 
 
   <div>
+    <div ui-view></div>
     <button ng-click="fetchExtraData()">Fetch Extra</button>
     <div ng-repeat="o in extraData track by $index">
       <div ng-bind="o"></div>
