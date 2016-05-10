@@ -18,6 +18,7 @@
     "loglevel": "^1.4.0",
     "requirejs": "^2.1.22",
     "systemjs": "^0.19.20",
-    "traceur": "0.0.102"
+    "traceur": "0.0.102",
+    "zone.js": "^0.5.15"
   }
 }

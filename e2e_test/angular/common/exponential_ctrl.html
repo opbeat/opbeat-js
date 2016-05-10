@@ -28,6 +28,12 @@
 <div>
 
 
+  <div>
+    <button ng-click="fetchExtraData()">Fetch Extra</button>
+    <div ng-repeat="o in extraData track by $index">
+      <div ng-bind="o"></div>
+    </div>
+  </div>
   <div ng-repeat="u in justUndefined">
     <div ng-bind="u"></div>
   </div>
@@ -44,6 +50,5 @@
   <div class="animate-repeat" ng-repeat="n in repeatArray track by $index">
     <div ng-bind="'opbeat'+$index"></div>
   </div>
-
 
 </div>
