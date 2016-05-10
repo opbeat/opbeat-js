@@ -6,13 +6,14 @@ var ZoneServiceMock = require('../transaction/zone_service_mock')
 var Config = require('../../src/lib/config')
 
 describe('angular.directivesPatch', function () {
-  it('should call startTrace for ngRepeat $watchCollection action', function () {
-    var angular = window.angular
-    var app = angular.module('patchModule', ['ng'])
-
-    var config = Object.create(Config)
+  var angular, app, config
+  beforeEach(function () {
+    angular = window.angular
+    app = angular.module('patchModule', ['ng'])
+    config = Object.create(Config)
     config.init()
-
+  })
+  it('should call startTrace for ngRepeat $watchCollection action', function () {
     var trService = new TransactionService(new ZoneServiceMock(), logger, config)
     spyOn(trService, 'startTrace')
 
@@ -30,7 +31,7 @@ describe('angular.directivesPatch', function () {
         '<ul>' +
         '<li ng-repeat="item in items">{{item.name}};</li>' +
         '</ul>')(scope)
-      scope.items = [{name: 'hamid'}, {name: 'reza'}]
+      scope.items = [{ name: 'hamid' }, { name: 'reza' }]
       scope.$digest()
       expect(element.find('li').length).toEqual(2)
       expect(element.text()).toEqual('hamid;reza;')
@@ -56,7 +57,7 @@ describe('angular.directivesPatch', function () {
         '<li ng-repeat="item in obj">{{item}};</li>' +
         '</ul>')(scope)
 
-      scope.obj = {key1: 'hamid', key2: 'reza'}
+      scope.obj = { key1: 'hamid', key2: 'reza' }
       scope.$digest()
       expect(element.find('li').length).toEqual(2)
       expect(element.text()).toEqual('hamid;reza;')
@@ -74,4 +75,35 @@ describe('angular.directivesPatch', function () {
       expect(trService.startTrace).toHaveBeenCalledWith('ngRepeat justUndefined', 'template.ngRepeat', { 'enableStackFrames': false })
     })
   })
+
+  // it('should work for ngEvent', function () {
+  //   var trService = new TransactionService(new ZoneServiceMock(), logger, config)
+  //   spyOn(trService, 'startTransaction')
+
+  //   app.config(function ($provide) {
+  //     patchDirectives($provide, trService)
+  //   })
+  //   var injector = angular.injector(['patchModule'])
+  //   injector.invoke(function ($compile, $rootScope) {
+  //     var scope = $rootScope
+  //     scope.action = function () {}
+  //     var element = $compile('<div ng-click="action()"></div>')(scope)
+  //     scope.$digest()
+  //     // element.click()
+
+  //     // function pressed () {
+  //     //   return false
+  //     // }
+  //     var eventType = 'click'
+  //     var evnt = document.createEvent('MouseEvents')
+  //     var x = x || 0
+  //     var y = y || 0
+  //     evnt.initMouseEvent(eventType, true, true, window, 0, x, y, x, y, /* pressed('ctrl')*/ false,
+  //      /* pressed('alt')*/ false,/* pressed('shift')*/ false,/* pressed('meta')*/ false, 0, element[0])
+
+//     // expect(element.find('li').length).toEqual(2)
+//     // expect(element.text()).toEqual('hamid;reza;')
+//     expect(trService.startTransaction).toHaveBeenCalledWith('ngClick: action()', 'transaction')
+//   })
+// })
 })

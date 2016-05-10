@@ -1,4 +1,5 @@
 var patchUtils = require('../patchUtils')
+var Subscription = require('../common/subscription')
 
 var utils = require('../lib/utils')
 function ZoneService (zone, logger) {
@@ -22,6 +23,9 @@ function ZoneService (zone, logger) {
     this._removeTransactionTask('raf' + id)
     this.log('cancelAnimationFrame')
   }
+
+  this.events = new Subscription()
+  // var zoneService = this
 
   var zoneConfig = {
     log: function log (methodName, theRest) {
@@ -84,6 +88,23 @@ function ZoneService (zone, logger) {
 
     '$mozRequestAnimationFrame': rafPatch,
     '-mozCancelAnimationFrame': cancelRafPatch
+
+  // $addEventListener: function (parentAddEventListener) {
+  //   return function (type, listener) {
+  //     if (type === 'click') {
+  //       console.log('addEventListener', arguments)
+  //       var args = patchUtils.argumentsToArray(arguments)
+  //       args[1] = patchUtils.wrapAfter(listener, function () {
+  //         console.log('addEventListener callback')
+  //         zoneService.events.applyAll(this, arguments)
+  //       })
+  //       var result = parentAddEventListener.apply(this, args)
+  //       return result
+  //     } else {
+  //       return parentAddEventListener.apply(this, arguments)
+  //     }
+  //   }
+  // }
   }
 
   this.zone = zone.fork(zoneConfig)
