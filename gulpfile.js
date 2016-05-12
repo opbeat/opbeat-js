@@ -240,7 +240,7 @@ gulp.task('e2e-serve', function (done) {
 })
 
 gulp.task('selenium-start', function (done) {
-  selenium.install({logger: console.log}, () => {
+  selenium.install({logger: console.log}, function() {
     selenium.start(function () {
       done()
     })
