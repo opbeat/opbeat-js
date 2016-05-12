@@ -1,6 +1,6 @@
 {
   "name": "opbeat-js",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Official JS client for logging exceptions and stacktraces to Opbeat",
   "license": "MIT",
   "homepage": "https://github.com/opbeat/opbeat-js",
