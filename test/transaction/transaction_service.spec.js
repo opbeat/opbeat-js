@@ -9,13 +9,14 @@ var Config = require('../../src/lib/config')
 describe('TransactionService', function () {
   var transactionService
   var zoneServiceMock
+  var config
   beforeEach(function () {
     zoneServiceMock = new ZoneServiceMock()
 
     spyOn(zoneServiceMock, 'get').and.callThrough()
     spyOn(logger, 'debug')
 
-    var config = Object.create(Config)
+    config = Object.create(Config)
     config.init()
     transactionService = new TransactionService(zoneServiceMock, logger, config)
   })
@@ -31,5 +32,24 @@ describe('TransactionService', function () {
     zoneServiceMock.zone.transaction = tr
     transactionService.startTrace('test-trace', 'test-trace')
     expect(zoneServiceMock.zone.transaction.startTrace).toHaveBeenCalledWith('test-trace', 'test-trace', undefined)
+  })
+
+  it('should not start trace when performance monitoring is disabled', function () {
+    config.set('performance.enable', false)
+    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    var tr = new Transaction('transaction', 'transaction')
+    spyOn(tr, 'startTrace').and.callThrough()
+    zoneServiceMock.zone.transaction = tr
+    transactionService.startTrace('test-trace', 'test-trace')
+    expect(zoneServiceMock.zone.transaction.startTrace).not.toHaveBeenCalled()
+  })
+
+  it('should not start transaction when performance monitoring is disabled', function () {
+    config.set('performance.enable', false)
+    transactionService = new TransactionService(zoneServiceMock, logger, config)
+
+    var result = transactionService.startTransaction('transaction', 'transaction')
+
+    expect(result).toBeUndefined()
   })
 })
