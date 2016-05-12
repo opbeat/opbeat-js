@@ -29,14 +29,20 @@ TransactionService.prototype.createTransaction = function (name, type) {}
 
 TransactionService.prototype.startTransaction = function (name, type) {
   var self = this
+
+  var perfOptions = this._config.get('performance')
+  if (!perfOptions.enable) {
+    return
+  }
+
   var tr = this._zoneService.get('transaction')
   if (typeof tr === 'undefined' || tr.ended) {
-    tr = new Transaction(name, type, this._config.get('performance'))
+    tr = new Transaction(name, type, perfOptions)
     this._zoneService.set('transaction', tr)
   } else {
     tr.name = name
     tr.type = type
-    tr._options = this._config.get('performance')
+    tr._options = perfOptions
   }
 
   this._logger.debug('TransactionService.startTransaction', tr)
@@ -50,11 +56,15 @@ TransactionService.prototype.startTransaction = function (name, type) {
 }
 
 TransactionService.prototype.startTrace = function (signature, type, options) {
+  var perfOptions = this._config.get('performance')
+  if (!perfOptions.enable) {
+    return
+  }
   var tr = this._zoneService.get('transaction')
   if (!utils.isUndefined(tr) && !tr.ended) {
     this._logger.debug('TransactionService.startTrace', signature, type)
   } else {
-    tr = new Transaction('ZoneTransaction', 'transaction', this._config.get('performance'))
+    tr = new Transaction('ZoneTransaction', 'transaction', perfOptions)
     this._zoneService.set('transaction', tr)
     this._logger.debug('TransactionService.startTrace - ZoneTransaction', signature, type)
   }
@@ -67,6 +77,11 @@ TransactionService.prototype.isLocked = function () {
 }
 
 TransactionService.prototype.add = function (transaction) {
+  var perfOptions = this._config.get('performance')
+  if (!perfOptions.enable) {
+    return
+  }
+
   this._queue.push(transaction)
   this._logger.debug('TransactionService.add', transaction)
 }
