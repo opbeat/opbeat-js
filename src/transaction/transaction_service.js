@@ -11,7 +11,7 @@ function TransactionService (zoneService, logger, config) {
   this._logger = logger
   this._zoneService = zoneService
 
-  this.transactions = {}
+  this.transactions = []
   this.nextId = 1
 
   this.taskMap = {}
@@ -45,13 +45,22 @@ TransactionService.prototype.startTransaction = function (name, type) {
     tr._options = perfOptions
   }
 
-  this._logger.debug('TransactionService.startTransaction', tr)
-  var p = tr.donePromise
-  p.then(function (t) {
-    self._logger.debug('TransactionService transaction finished', tr)
-    self.add(tr)
-    self._subscription.applyAll(self, [tr])
-  })
+  if (this.transactions.indexOf(tr) === -1) {
+    this._logger.debug('TransactionService.startTransaction', tr)
+    var p = tr.donePromise
+    p.then(function (t) {
+      self._logger.debug('TransactionService transaction finished', tr)
+      self.add(tr)
+      self._subscription.applyAll(self, [tr])
+
+      var index = self.transactions.indexOf(tr)
+      if (index !== -1) {
+        self.transactions.splice(index, 1)
+      }
+    })
+    this.transactions.push(tr)
+  }
+
   return tr
 }
 
