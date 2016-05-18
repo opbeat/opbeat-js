@@ -107,4 +107,27 @@ TransactionService.prototype.subscribe = function (fn) {
   return this._subscription.subscribe(fn)
 }
 
+TransactionService.prototype.addTask = function (taskId) {
+  var tr = this._zoneService.get('transaction')
+  if (!utils.isUndefined(tr) && !tr.ended) {
+    tr.addTask(taskId)
+    this._logger.debug('TransactionService.addTask', taskId)
+  }
+}
+TransactionService.prototype.removeTask = function (taskId) {
+  var tr = this._zoneService.get('transaction')
+  if (!utils.isUndefined(tr) && !tr.ended) {
+    tr.removeTask(taskId)
+    this._logger.debug('TransactionService.removeTask', taskId)
+  }
+}
+
+TransactionService.prototype.detectFinish = function () {
+  var tr = this._zoneService.get('transaction')
+  if (!utils.isUndefined(tr) && !tr.ended) {
+    tr.detectFinish()
+    this._logger.debug('TransactionService.detectFinish')
+  }
+}
+
 module.exports = TransactionService

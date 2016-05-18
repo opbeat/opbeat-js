@@ -1,25 +1,21 @@
 var utils = require('../instrumentation/utils')
 
-module.exports = function ($provide, traceBuffer) {
+module.exports = function ($provide, transactionService) {
   // HTTP Instrumentation
   var nextId = 0
   $provide.decorator('$http', ['$delegate', '$injector', function ($delegate, $injector) {
     return utils.instrumentModule($delegate, $injector, {
       type: 'ext.$http',
       prefix: '$http',
-      traceBuffer: traceBuffer,
+      traceBuffer: transactionService,
       instrumentConstructor: true,
       before: function (context) {
         context.taskId = 'http' + nextId
-        if (window.zone.transaction) {
-          window.zone.transaction.addTask(context.taskId)
-        }
+        transactionService.addTask(context.taskId)
         nextId++
       },
       after: function (context) {
-        if (window.zone.transaction) {
-          window.zone.transaction.removeTask(context.taskId)
-        }
+        transactionService.removeTask(context.taskId)
       },
       signatureFormatter: function (key, args) {
         var text = ['$http']
