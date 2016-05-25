@@ -20,7 +20,8 @@ function Config () {
       enable: true,
       enableStackFrames: false,
       groupSimilarTraces: true,
-      similarTraceThreshold: 0.05
+      similarTraceThreshold: 0.05,
+      captureInteractions: false
     },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {
@@ -124,11 +125,11 @@ Config.prototype.VERSION = '%%VERSION%%'
 
 Config.prototype.isPlatformSupported = function () {
   return typeof Array.prototype.forEach === 'function' &&
-  typeof JSON.stringify === 'function' &&
-  typeof Function.bind === 'function' &&
-  window.performance &&
-  typeof window.performance.now === 'function' &&
-  utils.isCORSSupported()
+    typeof JSON.stringify === 'function' &&
+    typeof Function.bind === 'function' &&
+    window.performance &&
+    typeof window.performance.now === 'function' &&
+    utils.isCORSSupported()
 }
 
 module.exports = new Config()

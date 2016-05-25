@@ -98,6 +98,10 @@ TransactionService.prototype.startTransaction = function (name, type) {
     return
   }
 
+  if (type === 'interaction' && !perfOptions.captureInteractions) {
+    return
+  }
+
   var tr = this._zoneService.get('transaction')
   if (!this.getCurrentTransaction()) {
     tr = this.createTransaction(name, type, perfOptions)

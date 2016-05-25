@@ -13,7 +13,8 @@
           appId: '0a8757798e',
           performance: {
             enable: true,
-            enableStackFrames: true
+            enableStackFrames: true,
+            captureInteractions: true
           }
         }
       }

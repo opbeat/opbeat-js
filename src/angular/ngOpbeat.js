@@ -3,6 +3,7 @@ var patchCompile = require('./patches/compilePatch')
 var patchRootScope = require('./patches/rootScopePatch')
 var patchDirectives = require('./patches/directivesPatch')
 var patchExceptionHandler = require('./patches/exceptionHandlerPatch')
+var patchInteractions = require('./patches/interactionsPatch')
 
 function NgOpbeatProvider (logger, configService, exceptionHandler) {
   this.config = function config (properties) {
@@ -56,6 +57,7 @@ function patchAll ($provide, transactionService) {
   patchCompile($provide, transactionService)
   patchRootScope($provide, transactionService)
   patchDirectives($provide, transactionService)
+  patchInteractions($provide, transactionService)
 }
 
 function noop () {}
