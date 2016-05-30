@@ -31,10 +31,10 @@ describe('angular.ui router app', function () {
 
         var first = transactions[0]
 
-        expect(first.traces.groups.length).toBe(11)
-        expect(first.traces.raw[0].length).toBe(15)
+        expect(first.traces.groups.length).toBe(12)
+        expect(first.traces.raw[0].length).toBe(17)
         expect(first.transactions.length).toBe(1)
-        expect(first.transactions[0].transaction).toBe('exponentialstate')
+        expect(first.transactions[0].transaction).toBe('exponentialstate.substate')
 
         done()
       }, function (error) {
