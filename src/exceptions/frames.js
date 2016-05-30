@@ -3,6 +3,7 @@ var Promise = require('es6-promise').Promise
 var logger = require('../lib/logger')
 var config = require('../lib/config')
 var transport = require('../lib/transport')
+var backendUtils = require('../backend/backend_utils')
 var utils = require('../lib/utils')
 var context = require('./context')
 var stackTrace = require('./stacktrace')
@@ -19,7 +20,6 @@ var promiseSequence = function (tasks) {
 }
 
 module.exports = {
-
   getFramesForCurrent: function () {
     return stackTrace.get().then(function (frames) {
       var tasks = frames.map(function (frame) {
@@ -168,6 +168,7 @@ module.exports = {
       data.extra = utils.mergeObject(data.extra, config.get('context.extra'))
     }
 
+    data.stacktrace.frames = backendUtils.createValidFrames(data.stacktrace.frames)
     logger.log('opbeat.exceptions.processOpbeatException', data)
     transport.sendError(data)
   },

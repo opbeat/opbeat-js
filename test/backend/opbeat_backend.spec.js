@@ -21,6 +21,7 @@ describe('backend.OpbeatBackend', function () {
     transportMock = new TransportMock()
     spyOn(transportMock, 'sendTransaction').and.callThrough()
     spyOn(logger, 'warn')
+    spyOn(logger, 'debug')
     opbeatBackend = new OpbeatBackend(transportMock, logger, config)
   })
 
@@ -35,7 +36,7 @@ describe('backend.OpbeatBackend', function () {
   it('should not send any transactions if the config is not valid', function () {
     expect(config.isValid()).toBe(false)
     opbeatBackend.sendTransactions([])
-    expect(logger.warn).toHaveBeenCalledWith('Config is not valid')
+    expect(logger.debug).toHaveBeenCalledWith('Config is not valid')
     expect(transportMock.sendTransaction).not.toHaveBeenCalled()
   })
 

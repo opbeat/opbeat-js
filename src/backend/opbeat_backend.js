@@ -1,8 +1,13 @@
+var backendUtils = require('./backend_utils')
 module.exports = OpbeatBackend
 function OpbeatBackend (transport, logger, config) {
   this._logger = logger
   this._transport = transport
   this._config = config
+}
+OpbeatBackend.prototype.sendError = function (errorData) {
+  errorData.stacktrace.frames = backendUtils.createValidFrames(errorData.stacktrace.frames)
+  this._transport.sendError(errorData)
 }
 
 OpbeatBackend.prototype.sendTransactions = function (transactionList) {
@@ -10,7 +15,7 @@ OpbeatBackend.prototype.sendTransactions = function (transactionList) {
     var formatedTransactions = this._formatTransactions(transactionList)
     return this._transport.sendTransaction(formatedTransactions)
   } else {
-    this._logger.warn('Config is not valid')
+    this._logger.debug('Config is not valid')
   }
 }
 OpbeatBackend.prototype._formatTransactions = function (transactionList) {
@@ -106,13 +111,9 @@ function groupTraces (traces) {
     }
 
     var extra = {}
-    if (Array.isArray(trace.frames) && trace.frames.length > 0) {
-      var frames = trace.frames.filter(function (f) {
-        return (Object.keys(f).length > 0)
-      })
-      if (frames.length > 0) {
-        extra._frames = frames
-      }
+    var frames = backendUtils.createValidFrames(trace.frames)
+    if (frames.length > 0) {
+      extra._frames = frames
     }
 
     return {
