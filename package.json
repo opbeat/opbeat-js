@@ -1,6 +1,6 @@
 {
   "name": "opbeat-js",
-  "version": "2.1.8",
+  "version": "3.0.0",
   "description": "Official JS client for logging exceptions and stacktraces to Opbeat",
   "license": "MIT",
   "homepage": "https://github.com/opbeat/opbeat-js",
@@ -41,6 +41,7 @@
     "gulp-derequire": "^2.1.0",
     "gulp-inject-version": "^1.0.0",
     "gulp-jasmine-phantom": "^2.0.1",
+    "gulp-json-editor": "^2.2.1",
     "gulp-livereload": "^3.8.1",
     "gulp-release-tasks": "0.0.3",
     "gulp-rename": "^1.2.2",

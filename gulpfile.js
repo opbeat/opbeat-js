@@ -21,10 +21,7 @@ var connect = require('gulp-connect')
 
 require('gulp-release-tasks')(gulp)
 
-var sourceTargets = [
-  './src/opbeat.js',
-  './src/angular/angular-opbeat.js'
-]
+var jeditor = require('gulp-json-editor')
 
 // Static file server
 gulp.task('server', function () {
@@ -36,47 +33,92 @@ gulp.task('server', function () {
   })
 })
 
+function createBuildStream(mainFilePath) {
+  return browserify({
+    entries: [mainFilePath],
+    standalone: '',
+    insertGlobalVars: { define: function () { return 'undefined'; } }
+  })
+    .bundle()
+    .pipe(source(mainFilePath))
+    .pipe(rename({ dirname: '' }))
+    .pipe(buffer())
+    .pipe(injectVersion({
+      replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
+    }))
+    .pipe(derequire())
+}
+
+function writeToDestinations(stream, dests) {
+  var tasks = dests.map(function (destPath) {
+    return stream.pipe(gulp.dest(versionPath))
+  })
+  return es.merge.apply(null, tasks)
+}
+
+
+function getMajorVersion() {
+  var version = require('./package').version
+  var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
+  return majorVersion
+}
+
 gulp.task('build:release', function () {
   var version = require('./package').version
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
   var versionPath = './dist/' + majorVersion
-  var prodPath = './dist'
+  var prodPath = './dist/'
 
-  var tasks = sourceTargets.map(function (entry) {
-    return browserify({
-      entries: [entry],
-      standalone: '',
-      insertGlobalVars: {define: function () {return 'undefined';}}
-    })
-      .bundle()
-      .pipe(source(entry))
-      .pipe(rename({ dirname: '' }))
-      .pipe(buffer())
-      .pipe(injectVersion({
-        replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
-      }))
-      .pipe(derequire())
+  var integrations = [
+    { name: 'opbeat-angular', entry: './src/angular/opbeat-angular.js', description: 'Official AngularJS client for logging exceptions, stacktraces and performance data to Opbeat' },
+    { name: 'opbeat-js', entry: './src/opbeat.js', description: 'This is the official frontend JavaScript module for Opbeat' }
+  ]
+
+  var tasks = integrations.map(function (integration) {
+    var mainStream = createBuildStream(integration.entry)
       .pipe(gulp.dest(versionPath))
       .pipe(gulp.dest(prodPath))
+      .pipe(gulp.dest(prodPath + integration.name))
       .pipe(rename({
         extname: '.min.js'
       }))
       .pipe(uglify())
       .pipe(gulp.dest(versionPath))
       .pipe(gulp.dest(prodPath))
+      .pipe(gulp.dest(prodPath + integration.name))
+
+    var filename = integration.entry.split('/')
+    filename = filename[filename.length - 1]
+
+    var packagejson = gulp.src(['./release/*.json'])
+      .pipe(jeditor({
+        'name': integration.name,
+        'version': version,
+        'main': filename,
+        'description': integration.description
+      }))
+      .pipe(gulp.dest(prodPath + integration.name))
+
+
+    return es.merge.apply(null, [mainStream, packagejson, gulp.src(['./README.md', 'LICENSE']).pipe(gulp.dest(prodPath + integration.name))])
   })
 
   return es.merge.apply(null, tasks)
 })
 
 gulp.task('build', function () {
-  var sources = ['./e2e_test/angular/angular-opbeat.e2e.js'].concat(sourceTargets)
-  var tasks = sources.map(function (entry) {
+  var sourceTargets = [
+    './src/opbeat.js',
+    './src/angular/opbeat-angular.js',
+    './e2e_test/angular/opbeat-angular.e2e.js'
+  ]
+
+  var tasks = sourceTargets.map(function (entry) {
     return browserify({
       entries: [entry],
       standalone: '',
-      insertGlobalVars: {define: function () {return 'undefined';}}
+      insertGlobalVars: { define: function () { return 'undefined'; } }
     })
       .bundle()
       .pipe(source(entry))
@@ -105,7 +147,7 @@ gulp.task('watch', [], function (cb) {
   )
 
   // Watch JS files
-  gulp.watch(['libs/**', 'src/**'], function () { runSequence('build', 'karma-run')})
+  gulp.watch(['libs/**', 'src/**'], function () { runSequence('build', 'karma-run') })
   console.log('\nExample site running on http://localhost:7000/\n')
 })
 
@@ -129,7 +171,13 @@ gulp.task('deploy', ['build:release'], function () {
     'Cache-Control': 'max-age=1800, public'
   }
 
-  return gulp.src('dist/**')
+
+  var version = require('./package').version
+  var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
+
+  var versionPath = './dist/' + majorVersion + '/*.js'
+
+  return gulp.src([versionPath])
     // Gzip
     .pipe(awspublish.gzip())
     // Publish files with headers
@@ -140,7 +188,7 @@ gulp.task('deploy', ['build:release'], function () {
     .pipe(awspublish.reporter())
 })
 
-function runKarma (configFile, done) {
+function runKarma(configFile, done) {
   var exec = require('child_process').exec
 
   var cmd = process.platform === 'win32' ? 'node_modules\\.bin\\karma run ' :
@@ -168,7 +216,7 @@ gulp.task('test', function (done) {
 
 gulp.task('test:e2e', function (done) {
   var stream = gulp.src('wdio.conf.js').pipe(webdriver())
-  stream.on('error', function () {})
+  stream.on('error', function () { })
   done()
 })
 
@@ -186,9 +234,9 @@ gulp.task('test.sauce.start', function (done) {
 
     console.log('Sauce Connect ready')
 
-  // sauceConnectProcess.close(function () {
-  //   console.log('Closed Sauce Connect process')
-  // })
+    // sauceConnectProcess.close(function () {
+    //   console.log('Closed Sauce Connect process')
+    // })
   })
 })
 
@@ -220,7 +268,7 @@ gulp.task('test.e2e.sauce', function (done) {
   }
   var stream = gulp.src('wdio.conf.js').pipe(webdriver(sauceConnectConfig))
 
-  stream.on('error', function () {})
+  stream.on('error', function () { })
   done()
 })
 
@@ -240,7 +288,7 @@ gulp.task('e2e-serve', function (done) {
 })
 
 gulp.task('selenium-start', function (done) {
-  selenium.install({logger: console.log}, function() {
+  selenium.install({ logger: console.log }, function () {
     selenium.start(function () {
       done()
     })
