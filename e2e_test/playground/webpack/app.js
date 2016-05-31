@@ -2,7 +2,7 @@ var angular = require('angular')
 require('angular-route')
 require('angular-resource')
 
-require('angular-opbeat')
+require('opbeat-angular')
 var app = angular.module('app', ['ngRoute', 'ngResource', 'ngOpbeat'])
 
 app.config(['$routeProvider', function ($routeProvider) {

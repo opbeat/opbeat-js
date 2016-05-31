@@ -34,7 +34,7 @@
   function logError(e){
     console.log(e)
   }
-  var p = System.import('/angular/angular-opbeat.js').then(function(){
+  var p = System.import('/angular/opbeat-angular.js').then(function(){
       System.import('./app.js').then(function(){},logError);
   },logError);
   </script>

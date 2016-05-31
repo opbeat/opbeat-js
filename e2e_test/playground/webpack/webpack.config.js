@@ -6,7 +6,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'angular-opbeat': '../../../dist/angular-opbeat.js'
+      'opbeat-angular': '../../../dist/opbeat-angular.js'
     }
   },
   devtool: 'source-map'
