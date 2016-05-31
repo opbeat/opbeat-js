@@ -98,7 +98,7 @@ function initialize (transactionService, logger, config, zoneService) {
     .provider('$opbeat', new NgOpbeatProvider(logger))
     .config(['$provide', moduleConfig])
     .run(['$rootScope', moduleRun])
-  window.angular.module('angular-opbeat', ['ngOpbeat'])
+  window.angular.module('opbeat-angular', ['ngOpbeat'])
 }
 
 module.exports = initialize
