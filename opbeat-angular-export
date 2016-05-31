@@ -1,2 +1,0 @@
-#!/bin/bash
-./export-build ../bower-opbeat-angular/ ./dist/angular-opbeat{.js,.min.js}

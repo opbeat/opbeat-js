@@ -1,2 +1,0 @@
-#!/bin/bash
-./export-build ../bower-opbeat-js/ ./dist/opbeat{.js,.min.js}

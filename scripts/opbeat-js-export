@@ -1,0 +1,2 @@
+#!/bin/bash
+./scripts/export-build ../opbeat-js-release/ ./dist/opbeat-js/*

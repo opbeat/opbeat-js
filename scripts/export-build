@@ -10,7 +10,7 @@ FILES_TO_COPY=""
 for ((i=2; i <= $#; i++)) do FILES_TO_COPY="$FILES_TO_COPY ${!i}"; done
 
 BASE_WORKING_DIR=`pwd`
-DISTRIBUTION_DIR="./dist/"
+# DISTRIBUTION_DIR="./dist/"
 TARGET_REPO_DIR="$1"
 DISTRIBUTION_VERSION=`node -e "console.log(require('./package.json').version);"`
 TAG_NAME="v$DISTRIBUTION_VERSION"
@@ -79,9 +79,10 @@ read -r -p "Are these changes OK? [y/N] " RESPONSE
 echo " "
 if [[ $RESPONSE =~ ^([yY][eE][sS]|[yY])$ ]]
 then
+    git add -A
     git commit -am "Export of $TAG_NAME"
     git tag "$TAG_NAME"
-    git push 
+    git push origin master
     git push origin tag "$TAG_NAME"
     echo -e "\nAll done. ($TAG_NAME)"
 else
