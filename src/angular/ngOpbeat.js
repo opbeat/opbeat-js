@@ -1,15 +1,15 @@
-var Opbeat = require('../opbeat')
+var opbeat = require('../opbeat')
 
 function NgOpbeatProvider (logger) {
   this.config = function config (properties) {
-    Opbeat.config(properties)
+    opbeat.config(properties)
     if (properties.debug === true) {
       logger.setLevel('debug', false)
     }
   }
 
   this.install = function install () {
-    Opbeat.install()
+    opbeat.install()
   }
 
   this.version = '%%VERSION%%'
@@ -18,18 +18,18 @@ function NgOpbeatProvider (logger) {
     function () {
       return {
         getConfig: function config () {
-          return Opbeat.config()
+          return opbeat.config()
         },
         captureException: function captureException (exception, cause) {
-          Opbeat.captureException(exception, cause)
+          opbeat.captureException(exception, cause)
         },
 
         setUserContext: function setUser (user) {
-          Opbeat.setUserContext(user)
+          opbeat.setUserContext(user)
         },
 
         setExtraContext: function setExtraContext (data) {
-          Opbeat.setExtraContext(data)
+          opbeat.setExtraContext(data)
         }
       }
     }
@@ -63,6 +63,9 @@ function patchAll ($provide, transactionService) {
 
 function initialize (transactionService, logger, config, zoneService) {
   function moduleRun ($rootScope) {
+    if (!opbeat.isPlatformSupport()) {
+      return
+    }
     // onRouteChangeStart
     function onRouteChangeStart (event, current) {
       if (!config.get('performance.enable')) {
@@ -91,6 +94,9 @@ function initialize (transactionService, logger, config, zoneService) {
   }
 
   function moduleConfig ($provide) {
+    if (!opbeat.isPlatformSupport()) {
+      return
+    }
     patchAll($provide, transactionService)
   }
 
