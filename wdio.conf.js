@@ -16,6 +16,8 @@ exports.config = {
     './e2e_test/node_modules/**/*.*'
   // 'path/to/excluded/files'
   ],
+  maxInstances: 1,
+
   //
   // ============
   // Capabilities
@@ -35,8 +37,27 @@ exports.config = {
     //   'phantomjs.binary.path': require('phantomjs').path
     // },
     {
+      maxInstances: 1,
       browserName: 'chrome'
     }
+    // {
+    //   maxInstances: 1,
+    //   browserName: 'internet explorer'
+    // },
+    // {
+    //   browserName: 'internet explorer',
+    //   maxInstances: 1,
+    //   'platform': 'Windows 7',
+    //   'version': '9.0',
+    //   specs: [
+    //     '/e2e_test/**/*.ie9.spec.js'
+    //   ],
+    //   baseUrl: 'http://localhost:8000',
+    //   initialBrowserUrl: 'about:blank',
+    //   before: function () {
+    //     browser.timeoutsAsyncScript(15000)
+    //   }
+    // }
   ],
   //
   // ===================
@@ -133,7 +154,7 @@ exports.config = {
   // variables like `browser`. It is the perfect place to define custom commands.
   before: function () {
     browser.timeoutsAsyncScript(15000)
-    // do something
+  // do something
   },
   //
   // Gets executed after all tests are done. You still have access to all global variables from
