@@ -284,6 +284,7 @@ gulp.task('selenium-start', function (done) {
 })
 
 gulp.task('e2e-start', ['e2e-serve', 'selenium-start'])
+gulp.task('e2e-sauce-start', ['e2e-serve', 'test.sauce.start'])
 
 gulp.task('watch:e2e', ['e2e-serve', 'selenium-start'], function (done) {
   gulp.watch(['e2e_test/**'], function () {
