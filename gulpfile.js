@@ -37,7 +37,7 @@ function createBuildStream(mainFilePath) {
   return browserify({
     entries: [mainFilePath],
     standalone: '',
-    insertGlobalVars: { define: function () { return 'undefined'; } }
+    insertGlobalVars: { define: function () { return 'undefined'; }, process: function () { return 'undefined'; } }
   })
     .bundle()
     .pipe(source(mainFilePath))
@@ -115,19 +115,7 @@ gulp.task('build', function () {
   ]
 
   var tasks = sourceTargets.map(function (entry) {
-    return browserify({
-      entries: [entry],
-      standalone: '',
-      insertGlobalVars: { define: function () { return 'undefined'; } }
-    })
-      .bundle()
-      .pipe(source(entry))
-      .pipe(rename({ dirname: '' }))
-      .pipe(buffer())
-      .pipe(injectVersion({
-        replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
-      }))
-      .pipe(derequire())
+    return createBuildStream(entry)
       .pipe(gulp.dest('./dist/dev/'))
       .pipe(rename({
         extname: '.min.js'
