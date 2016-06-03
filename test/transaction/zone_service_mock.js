@@ -2,9 +2,9 @@ function ZoneServiceMock () {
   function noop () { }
 
   this.spec = {
-    onAddTask: noop,
-    onRemoveTask: noop,
-    onDetectFinish: noop
+    onScheduleTask: noop,
+    onInvokeTask: noop,
+    onCancelTask: noop
   }
 
   this.zone = {}

@@ -1,136 +1,126 @@
-var patchUtils = require('../patching/patchUtils')
 var Subscription = require('../common/subscription')
+var patchUtils = require('../patching/patchUtils')
+var opbeatTaskSymbol = patchUtils.opbeatSymbol('taskData')
 
-var utils = require('../lib/utils')
+var urlSympbol = patchUtils.opbeatSymbol('url')
+var methodSymbol = patchUtils.opbeatSymbol('method')
+
+var XMLHttpRequest_send = 'XMLHttpRequest.send'
+var XHR = window.XMLHttpRequest
+
 function ZoneService (zone, logger) {
-  function rafPatch (parentRaf) {
-    return function (rafFn) {
-      var self = this
-      var args = patchUtils.argumentsToArray(arguments)
-      var tId
-      args[0] = patchUtils.wrapAfter(rafFn, function () {
-        self._removeTransactionTask('raf' + tId)
-        self.log(' - requestAnimationFrame ')
-      })
-      tId = parentRaf.apply(this, args)
-      self._addTransactionTask('raf' + tId)
-      self.log(' + requestAnimationFrame ')
-      return tId
-    }
-  }
+  this.events = new Subscription()
 
-  function cancelRafPatch (id) {
-    this._removeTransactionTask('raf' + id)
-    this.log('cancelAnimationFrame')
-  }
+  var nextId = 0
 
   this.events = new Subscription()
   // var zoneService = this
   function noop () { }
   var spec = this.spec = {
-    onAddTask: noop,
-    onRemoveTask: noop,
-    onDetectFinish: noop
+    onScheduleTask: noop,
+    onBeforeInvokeTask: noop,
+    onInvokeTask: noop,
+    onCancelTask: noop,
+    onHandleError: noop
   }
 
-  var zoneConfig = {
-    log: function log (methodName, theRest) {
-      var logText = 'Zone(' + this.$id + ') parent(' + this.parent.$id + ') ' + methodName
-      var logArray = [logText]
-      if (!utils.isUndefined(theRest)) {
-        logArray.push(theRest)
-      }
-      logger.debug.apply(logger, logArray)
-    },
-    // onZoneCreated: function () {
-    //   this.log('onZoneCreated')
-    // },
-    beforeTask: function () {
-      var sig = this.signature
-      this.log('beforeTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
-    },
-    afterTask: function () {
-      var sig = this.signature
-      this.log('afterTask', (typeof sig === 'undefined' ? undefined : ' signature: ' + sig))
-      this._detectFinish()
-    },
-    // '-onError': function () {
-    //   this.log('onError')
-    // },
-    // enqueueTask: function () {
-    //   this.log('enqueueTask', arguments)
-    // },
-    // dequeueTask: function () {
-    //   this.log('dequeueTask', arguments)
-    // },
-    $setTimeout: function (parentTimeout) {
-      return function (timeoutFn, delay) {
-        var self = this
-        if (delay === 0 && typeof timeoutFn === 'function') {
-          var args = patchUtils.argumentsToArray(arguments)
-          var tId
-          args[0] = patchUtils.wrapAfter(timeoutFn, function () {
-            self._removeTransactionTask('setTimeout' + tId)
-            self.log(' - setTimeout ', ' delay: ' + delay)
-          })
-          tId = parentTimeout.apply(this, args)
-          self._addTransactionTask('setTimeout' + tId)
-          self.log(' + setTimeout ', ' delay: ' + delay)
-          return tId
-        } else {
-          return parentTimeout.apply(this, arguments)
+  this.zone = zone.fork({
+    onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
+      var taskId = nextId++
+      if (task.type === 'macroTask') {
+        var opbeatTask = {
+          taskId: taskId,
+          source: task.source,
+          type: task.type,
+          data: {
+            target: task.data.target
+          }
+        }
+
+        if (task.source === 'setTimeout') {
+          if (task.data.args[1] === 0) {
+            task[opbeatTaskSymbol] = opbeatTask
+            spec.onScheduleTask(opbeatTask)
+          }
+        } else if (task.source === 'requestAnimationFrame') {
+          task[opbeatTaskSymbol] = opbeatTask
+          spec.onScheduleTask(opbeatTask)
+        } else if (task.source === XMLHttpRequest_send) {
+          /*
+                  "XMLHttpRequest.addEventListener:load"
+                  "XMLHttpRequest.addEventListener:error"
+                  "XMLHttpRequest.addEventListener:abort"
+                  "XMLHttpRequest.send"
+                  "XMLHttpRequest.addEventListener:readystatechange"
+          */
+          opbeatTask['XHR'] = {
+            'load': false,
+            'readystatechange': false,
+            'send': false,
+            url: task.data.target[urlSympbol],
+            method: task.data.target[methodSymbol]
+          }
+
+          task[opbeatTaskSymbol] = task.data.target[opbeatTaskSymbol] = opbeatTask
+
+          spec.onScheduleTask(opbeatTask)
         }
       }
+
+      var delegateTask = parentZoneDelegate.scheduleTask(targetZone, task)
+      return delegateTask
     },
-    '-clearTimeout': function (id) {
-      this._removeTransactionTask('setTimeout' + id)
-      this.log('clearTimeout', this.timeout)
+    onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
+      var result
+      if (task.data.target && XHR === task.data.target.constructor) {
+        var opbeatTask = task.data.target[opbeatTaskSymbol]
+
+        if (opbeatTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === XHR.DONE) {
+          opbeatTask.XHR['readystatechange'] = true
+          spec.onBeforeInvokeTask(opbeatTask)
+        } else if (opbeatTask && task.data.eventName === 'load') {
+          opbeatTask.XHR['load'] = true
+        } else if (opbeatTask && task.source === XMLHttpRequest_send) {
+          opbeatTask.XHR['send'] = true
+        }
+
+        result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
+        if (opbeatTask && opbeatTask.XHR['load'] && opbeatTask.XHR['readystatechange'] && opbeatTask.XHR['send']) {
+          spec.onInvokeTask(opbeatTask)
+        }
+      } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
+        result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
+        spec.onInvokeTask(task[opbeatTaskSymbol])
+      } else {
+        result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
+      }
+      return result
     },
-    '$requestAnimationFrame': rafPatch,
-    '-cancelAnimationFrame': cancelRafPatch,
-
-    '$webkitRequestAnimationFrame': rafPatch,
-    '-webkitCancelAnimationFrame': cancelRafPatch,
-
-    '$mozRequestAnimationFrame': rafPatch,
-    '-mozCancelAnimationFrame': cancelRafPatch
-
-  // $addEventListener: function (parentAddEventListener) {
-  //   return function (type, listener) {
-  //     if (type === 'click') {
-  //       console.log('addEventListener', arguments)
-  //       var args = patchUtils.argumentsToArray(arguments)
-  //       args[1] = patchUtils.wrapAfter(listener, function () {
-  //         console.log('addEventListener callback')
-  //         zoneService.events.applyAll(this, arguments)
-  //       })
-  //       var result = parentAddEventListener.apply(this, args)
-  //       return result
-  //     } else {
-  //       return parentAddEventListener.apply(this, arguments)
-  //     }
-  //   }
+    onCancelTask: function (parentZoneDelegate, currentZone, targetZone, task) {
+      var opbeatTask
+      if (task.type === 'macroTask') {
+        if (task.source === XMLHttpRequest_send) {
+          opbeatTask = task.data.target[opbeatTaskSymbol]
+          spec.onCancelTask(opbeatTask)
+        } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
+          opbeatTask = task[opbeatTaskSymbol]
+          spec.onCancelTask(opbeatTask)
+        }
+      }
+      return parentZoneDelegate.cancelTask(targetZone, task)
+    }
+  // onHandleError: function (parentZoneDelegate, currentZone, targetZone, error) {
+  //   spec.onHandleError(error)
+  //   parentZoneDelegate.handleError(targetZone, error)
   // }
-  }
-
-  this.zone = zone.fork(zoneConfig)
-
-  this.zone._addTransactionTask = function (taskId) {
-    spec.onAddTask(taskId)
-  }
-  this.zone._removeTransactionTask = function (taskId) {
-    spec.onRemoveTask(taskId)
-  }
-  this.zone._detectFinish = function () {
-    spec.onDetectFinish()
-  }
+  })
 }
 
 ZoneService.prototype.set = function (key, value) {
-  window.zone[key] = value
+  window.Zone.current._properties[key] = value
 }
 ZoneService.prototype.get = function (key) {
-  return window.zone[key]
+  return window.Zone.current.get(key)
 }
 
 ZoneService.prototype.getCurrentZone = function () {

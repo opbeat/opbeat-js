@@ -5,11 +5,18 @@ describe('ngOpbeat', function () {
   var logger = require('loglevel')
   var TransactionService = require('../../src/transaction/transaction_service')
   var ngOpbeat = require('../../src/angular/ngOpbeat')
+  var ZoneServiceMock = require('../transaction/zone_service_mock.js')
+
   var config
+
+  var zoneServiceMock
+
   beforeEach(function () {
     config = Object.create(Config)
     config.init()
     spyOn(logger, 'debug')
+
+    zoneServiceMock = new ZoneServiceMock()
   })
 
   it('should not start transactions if performance is disable', function () {
@@ -19,7 +26,7 @@ describe('ngOpbeat', function () {
 
     var angular = window.angular
     angular.module('patchModule', ['ngOpbeat'])
-    var trService = new TransactionService(new ZoneServiceMock(), logger, {})
+    var trService = new TransactionService(zoneServiceMock, logger, {})
     spyOn(trService, 'startTrace')
 
     ngOpbeat(trService, logger, config)

@@ -21,17 +21,23 @@ function TransactionService (zoneService, logger, config) {
   this._subscription = new Subscription()
 
   var transactionService = this
-  zoneService.spec.onAddTask = function (taskId) {
-    transactionService.addTask(taskId)
-  }
 
-  zoneService.spec.onRemoveTask = function (taskId) {
-    transactionService.removeTask(taskId)
+  function onScheduleTask (task) {
+    transactionService.addTask(task.taskId)
   }
+  zoneService.spec.onScheduleTask = onScheduleTask
 
-  zoneService.spec.onDetectFinish = function () {
+  function onInvokeTask (task) {
+    transactionService.removeTask(task.taskId)
     transactionService.detectFinish()
   }
+  zoneService.spec.onInvokeTask = onInvokeTask
+
+  function onCancelTask (task) {
+    transactionService.removeTask(task.taskId)
+    transactionService.detectFinish()
+  }
+  zoneService.spec.onCancelTask = onCancelTask
 }
 
 TransactionService.prototype.getTransaction = function (id) {

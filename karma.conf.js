@@ -52,6 +52,7 @@ module.exports = function (config) {
       'test/utils/polyfill.js',
       'node_modules/angular/angular.js',
       'node_modules/angular-resource/angular-resource.js',
+      'node_modules/zone.js/dist/zone.js',
       'test/**/*.spec.js',
       { pattern: 'test/exceptions/data/*.js', included: false, watched: false }
     ],
@@ -109,8 +110,10 @@ module.exports = function (config) {
     cfg.browsers.push('Firefox')
   } else {
     buildId = 'OpbeatJS@' + version
-    cfg.plugins.push('karma-phantomjs2-launcher')
-    cfg.browsers.push('PhantomJS2')
+    cfg.plugins.push('karma-chrome-launcher')
+    cfg.browsers.push('Chrome')
+  // cfg.plugins.push('karma-phantomjs2-launcher')
+  // cfg.browsers.push('PhantomJS2')
   }
 
   if (isSauce) {
