@@ -1,4 +1,4 @@
-var logger = require('loglevel')
+var Logger = require('loglevel')
 var ngOpbeat = require('./ngOpbeat')
 var TransactionService = require('../transaction/transaction_service')
 var opbeat = require('../opbeat')
@@ -14,11 +14,11 @@ function ServiceContainer () {
   var configService = opbeat.config()
   this.services.configService = configService
 
-  this.services.logger = this.createLogger()
+  var logger = this.services.logger = this.createLogger()
 
   var zoneService = this.services.zoneService = this.createZoneService()
 
-  var transactionService = this.services.transactionService = new TransactionService(zoneService, logger, configService)
+  var transactionService = this.services.transactionService = new TransactionService(zoneService, this.services.logger, configService)
 
   if (!opbeat.isPlatformSupport()) {
     ngOpbeat(transactionService, this.services.logger, configService, zoneService)
@@ -65,14 +65,15 @@ function ServiceContainer () {
 }
 
 ServiceContainer.prototype.createLogger = function () {
-  if (this.services.configService.debug === true) {
-    this.services.configService.logLevel = 'debug'
+  if (this.services.configService.get('debug') === true) {
+    this.services.configService.config.logLevel = 'debug'
   }
-  logger.setLevel(this.services.configService.get('logLevel'), false)
-  return logger
+  Logger.setLevel(this.services.configService.get('logLevel'), false)
+  return Logger
 }
 
 ServiceContainer.prototype.createZoneService = function () {
+  var logger = this.services.logger
   // todo: remove this when updating to new version of zone.js
   function noop () { }
   var _warn = console.warn
@@ -94,6 +95,8 @@ ServiceContainer.prototype.createZoneService = function () {
 }
 
 ServiceContainer.prototype.createOpbeatBackend = function () {
+  var logger = this.services.logger
+
   var opbeatBackend = new OpbeatBackend(transport, this.services.logger, this.services.configService)
   var serviceContainer = this
 
