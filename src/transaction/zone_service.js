@@ -1,4 +1,4 @@
-var patchUtils = require('../patchUtils')
+var patchUtils = require('../patching/patchUtils')
 var Subscription = require('../common/subscription')
 
 var utils = require('../lib/utils')
