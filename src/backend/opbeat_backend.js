@@ -10,8 +10,53 @@ OpbeatBackend.prototype.sendError = function (errorData) {
   this._transport.sendError(errorData)
 }
 
+OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transaction) {
+  var transDuration = transaction.duration()
+  var traces = []
+  var lastCount = 1
+  var threshold = 0.05
+  transaction.traces.sort(function (traceA, traceB) {
+    return traceA._start - traceB._start
+  })
+    .forEach(function (trace, index) {
+      if (traces.length === 0) {
+        traces.push(trace)
+      } else {
+        var lastTrace = traces[traces.length - 1]
+
+        var isContinuouslySimilar = lastTrace.type === trace.type &&
+          lastTrace.signature === trace.signature &&
+          trace.duration() / transDuration < threshold &&
+          (trace._start - lastTrace._end) / transDuration < threshold
+
+        var isLastTrace = transaction.traces.length === index + 1
+
+        if (isContinuouslySimilar) {
+          lastCount++
+          lastTrace._end = trace._end
+          lastTrace.calcDiff()
+        }
+
+        if (lastCount > 1 && (!isContinuouslySimilar || isLastTrace)) {
+          lastTrace.signature = lastCount + 'x ' + lastTrace.signature
+          lastCount = 1
+        }
+
+        if (!isContinuouslySimilar && !isLastTrace) {
+          traces.push(trace)
+        }
+      }
+    })
+  transaction.traces = traces
+  return traces
+}
+
 OpbeatBackend.prototype.sendTransactions = function (transactionList) {
   if (this._config.isValid()) {
+    if (this._config.get('performance.groupSimilarTraces')) {
+      transactionList.forEach(this.groupSmallContinuouslySimilarTraces)
+    }
+
     var formatedTransactions = this._formatTransactions(transactionList)
     return this._transport.sendTransaction(formatedTransactions)
   } else {

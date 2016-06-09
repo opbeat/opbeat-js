@@ -26,7 +26,7 @@ describe('backend.OpbeatBackend', function () {
   })
 
   it('should call sendTransctions', function () {
-    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    config.setConfig({ appId: 'test', orgId: 'test', isInstalled: true })
     expect(config.isValid()).toBe(true)
     opbeatBackend.sendTransactions([])
     expect(transportMock.sendTransaction).toHaveBeenCalledWith(Object({ transactions: [], traces: Object({ groups: [], raw: [] }) }))
@@ -41,10 +41,10 @@ describe('backend.OpbeatBackend', function () {
   })
 
   it('should not send frames with length === 0', function (done) {
-    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    config.setConfig({ appId: 'test', orgId: 'test', isInstalled: true })
     expect(config.isValid()).toBe(true)
 
-    var tr = new Transaction('transaction', 'transaction', {'performance.enableStackFrames': true})
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
     tr.startTrace().end()
     tr.end()
 
@@ -59,5 +59,32 @@ describe('backend.OpbeatBackend', function () {
       })
       done()
     })
+  })
+
+  it('should group small continuously similar traces', function (done) {
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    tr.startTrace('signature', 'type').end()
+    tr.startTrace('signature', 'type').end()
+    tr.startTrace('signature', 'type').end()
+    tr.startTrace('signature', 'type').end()
+    setTimeout(function () {
+      tr.end()
+      var grouped = opbeatBackend.groupSmallContinuouslySimilarTraces(tr)
+      expect(grouped.length).toBe(2)
+      expect(grouped[1].signature).toBe('4x signature')
+      done()
+    })
+  })
+
+  it('should not group small similar traces by default', function () {
+    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    expect(config.isValid()).toBe(true)
+    expect(config.get('performance.groupSimilarTraces')).toBe(false)
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    tr.startTrace('signature', 'type').end()
+    spyOn(opbeatBackend, 'groupSmallContinuouslySimilarTraces')
+    tr.end()
+    opbeatBackend.sendTransactions([tr])
+    expect(opbeatBackend.groupSmallContinuouslySimilarTraces).not.toHaveBeenCalled()
   })
 })

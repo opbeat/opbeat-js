@@ -12,7 +12,8 @@ function Config () {
     angularAppName: null,
     performance: {
       enable: true,
-      enableStackFrames: false
+      enableStackFrames: false,
+      groupSimilarTraces: false
     },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {
