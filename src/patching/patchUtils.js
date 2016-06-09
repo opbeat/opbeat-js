@@ -63,7 +63,7 @@ function patchMethod (target, name, patchFn) {
 
 function createNamedFn (name, delegate) {
   try {
-    return (Function('f', 'return function ' + name + '(){return f(this, arguments)}'))(delegate)
+    return (Function('f', 'return function ' + name + '(){return f(this, arguments)}'))(delegate) // eslint-disable-line
   } catch (e) {
     // if we fail, we must be CSP, just return delegate.
     return function () {
