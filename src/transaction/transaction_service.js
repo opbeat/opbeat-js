@@ -19,6 +19,19 @@ function TransactionService (zoneService, logger, config) {
   this._queue = []
 
   this._subscription = new Subscription()
+
+  var transactionService = this
+  zoneService.spec.onAddTask = function (taskId) {
+    transactionService.addTask(taskId)
+  }
+
+  zoneService.spec.onRemoveTask = function (taskId) {
+    transactionService.removeTask(taskId)
+  }
+
+  zoneService.spec.onDetectFinish = function () {
+    transactionService.detectFinish()
+  }
 }
 
 TransactionService.prototype.getTransaction = function (id) {
@@ -77,7 +90,10 @@ TransactionService.prototype.startTrace = function (signature, type, options) {
     this._zoneService.set('transaction', tr)
     this._logger.debug('TransactionService.startTrace - ZoneTransaction', signature, type)
   }
-  return tr.startTrace(signature, type, options)
+  var trace = tr.startTrace(signature, type, options)
+  // var zone = this._zoneService.getCurrentZone()
+  // trace._zone = 'Zone(' + zone.$id + ') ' // parent(' + zone.parent.$id + ') '
+  return trace
 }
 
 // !!DEPRECATED!!

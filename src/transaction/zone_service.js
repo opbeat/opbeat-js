@@ -26,6 +26,12 @@ function ZoneService (zone, logger) {
 
   this.events = new Subscription()
   // var zoneService = this
+  function noop () { }
+  var spec = this.spec = {
+    onAddTask: noop,
+    onRemoveTask: noop,
+    onDetectFinish: noop
+  }
 
   var zoneConfig = {
     log: function log (methodName, theRest) {
@@ -110,19 +116,13 @@ function ZoneService (zone, logger) {
   this.zone = zone.fork(zoneConfig)
 
   this.zone._addTransactionTask = function (taskId) {
-    if (this.transaction) {
-      this.transaction.addTask(taskId)
-    }
+    spec.onAddTask(taskId)
   }
   this.zone._removeTransactionTask = function (taskId) {
-    if (this.transaction) {
-      this.transaction.removeTask(taskId)
-    }
+    spec.onRemoveTask(taskId)
   }
   this.zone._detectFinish = function () {
-    if (this.transaction) {
-      this.transaction.detectFinish()
-    }
+    spec.onDetectFinish()
   }
 }
 
@@ -131,6 +131,10 @@ ZoneService.prototype.set = function (key, value) {
 }
 ZoneService.prototype.get = function (key) {
   return window.zone[key]
+}
+
+ZoneService.prototype.getCurrentZone = function () {
+  return window.zone
 }
 
 module.exports = ZoneService

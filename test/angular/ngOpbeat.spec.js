@@ -1,3 +1,5 @@
+var ZoneServiceMock = require('../transaction/zone_service_mock')
+
 describe('ngOpbeat', function () {
   var Config = require('../../src/lib/config')
   var logger = require('loglevel')
@@ -17,7 +19,7 @@ describe('ngOpbeat', function () {
 
     var angular = window.angular
     angular.module('patchModule', ['ngOpbeat'])
-    var trService = new TransactionService({}, logger, {})
+    var trService = new TransactionService(new ZoneServiceMock(), logger, {})
     spyOn(trService, 'startTrace')
 
     ngOpbeat(trService, logger, config)

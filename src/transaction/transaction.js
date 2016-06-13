@@ -102,7 +102,7 @@ Transaction.prototype.addEndedTraces = function (existingTraces) {
 
 Transaction.prototype._onTraceEnd = function (trace) {
   this.traces.push(trace)
-
+  trace._scheduledTasks = Object.keys(this._scheduledTasks)
   // Remove trace from _activeTraces
   delete this._activeTraces[trace.traceId]
 }

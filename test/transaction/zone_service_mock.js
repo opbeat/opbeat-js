@@ -1,4 +1,12 @@
 function ZoneServiceMock () {
+  function noop () { }
+
+  this.spec = {
+    onAddTask: noop,
+    onRemoveTask: noop,
+    onDetectFinish: noop
+  }
+
   this.zone = {}
   this.get = function (key) {
     return this.zone[key]
