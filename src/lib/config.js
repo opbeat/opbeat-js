@@ -103,4 +103,15 @@ function _getDataAttributesFromNode (node) {
   return dataAttrs
 }
 
+Config.prototype.VERSION = '%%VERSION%%'
+
+Config.prototype.isPlatformSupport = function () {
+  return typeof Array.prototype.forEach === 'function' &&
+  typeof JSON.stringify === 'function' &&
+  typeof Function.bind === 'function' &&
+  window.performance &&
+  typeof window.performance.now === 'function' &&
+  utils.isCORSSupported()
+}
+
 module.exports = new Config()

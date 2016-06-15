@@ -1,7 +1,7 @@
 var Logger = require('loglevel')
 var ngOpbeat = require('./ngOpbeat')
 var TransactionService = require('../transaction/transaction_service')
-var opbeat = require('../opbeat')
+var Config = require('../lib/config')
 
 var OpbeatBackend = require('../backend/opbeat_backend')
 var transport = require('../lib/transport')
@@ -11,7 +11,8 @@ var utils = require('../lib/utils')
 function ServiceContainer () {
   this.services = {}
 
-  var configService = opbeat.config()
+  Config.init()
+  var configService = Config
   this.services.configService = configService
 
   var logger = this.services.logger = this.createLogger()
@@ -20,7 +21,7 @@ function ServiceContainer () {
 
   var transactionService = this.services.transactionService = new TransactionService(zoneService, this.services.logger, configService)
 
-  if (!opbeat.isPlatformSupport()) {
+  if (!configService.isPlatformSupport()) {
     ngOpbeat(transactionService, this.services.logger, configService, zoneService)
     this.services.logger.debug('Platform is not supported.')
     return

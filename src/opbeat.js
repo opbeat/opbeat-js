@@ -1,5 +1,4 @@
 var logger = require('./lib/logger')
-var utils = require('./lib/utils')
 var config = require('./lib/config')
 var Exceptions = require('./exceptions/exceptions')
 var API = require('./lib/api')
@@ -21,12 +20,7 @@ function Opbeat () {
 Opbeat.prototype.VERSION = '%%VERSION%%'
 
 Opbeat.prototype.isPlatformSupport = function () {
-  return typeof Array.prototype.forEach === 'function' &&
-  typeof JSON.stringify === 'function' &&
-  typeof Function.bind === 'function' &&
-  window.performance &&
-  typeof window.performance.now === 'function' &&
-  utils.isCORSSupported()
+  return this._config.isPlatformSupport()
 }
 
 /*
