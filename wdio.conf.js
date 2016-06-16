@@ -38,7 +38,8 @@ exports.config = {
     // },
     {
       maxInstances: 1,
-      browserName: 'chrome'
+      browserName: 'chrome',
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
     }
     // {
     //   maxInstances: 1,

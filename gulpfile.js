@@ -203,8 +203,14 @@ gulp.task('test', function (done) {
 })
 
 gulp.task('test:e2e', function (done) {
-  var stream = gulp.src('wdio.conf.js').pipe(webdriver())
-  stream.on('error', function () { })
+  var stream = gulp.src('wdio.conf.js').pipe(webdriver({
+    host: 'ondemand.saucelabs.com',
+    port: 80
+  }))
+
+  stream.on('error', function () { 
+    return process.exit(1)
+  })
   done()
 })
 
