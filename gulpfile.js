@@ -67,7 +67,7 @@ gulp.task('build:release', function () {
   var version = require('./package').version
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
-  var versionPath = './dist/' + majorVersion
+  var versionPath = './dist/cdn/' + majorVersion
   var prodPath = './dist/'
 
   var integrations = [
@@ -163,7 +163,7 @@ gulp.task('deploy', ['build:release'], function () {
   var version = require('./package').version
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
-  var versionPath = './dist/' + majorVersion + '/*.js'
+  var versionPath = './dist/cdn/**'
 
   return gulp.src([versionPath])
     // Gzip
