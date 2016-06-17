@@ -10,28 +10,6 @@ It enables error logging for frontend applications and performance monitoring fo
 
 If you are looking for a module for your Node.js applications, please see [Opbeat for Node.js](https://github.com/opbeat/opbeat-node) on GitHub.
 
-
-## Quick start
-
-Load the module from our CDN *before* your application code:
-
-```html
-<script src="https://d3tvtfb6518e3e.cloudfront.net/2/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
-```
-Or install the module using npm:
-
-```
-npm install opbeat-js
-```
-And include it in your application:
-
-```html
-<script src="node_modules/opbeat-js/dist/opbeat.min.js" data-app-id="<APPID>" data-org-id="<ORGID>"></script>
-```
-
-**Note:** You can use module loader/bundler of your choosing.
-
-
 ## Documentation
 
 - [Documentation overview](https://opbeat.com/docs/topics/javascript/)
