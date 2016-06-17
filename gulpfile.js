@@ -202,75 +202,60 @@ gulp.task('test', function (done) {
   }, done).start()
 })
 
-gulp.task('test:e2e', function (done) {
-  var stream = gulp.src('wdio.conf.js').pipe(webdriver({
-    user: 'opbeat',
-    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
-    host: 'ondemand.saucelabs.com',
-    port: 80,
-    baseUrl: 'http://localhost:8000'
-  }))
 
-  stream.on('error', function () { 
-    return process.exit(1)
-  })
-  done()
+// Run end-to-end tests on the local machine using webdriver configuration
+gulp.task('test:e2e', function (done) {
+  gulp.src('wdio.conf.js')
+    .pipe(webdriver())
+    .on('error', function () {
+      return process.exit(1)
+    })
+    .on('end', function () {
+      return process.exit(0)
+    })
 })
 
-gulp.task('test.sauce.start', function (done) {
+// Run end-to-end tests remotely in saucelabs using webdriver configuration
+gulp.task('test:e2e:sauceconnect', function () {
+  return gulp.src('wdio.conf.js')
+    .pipe(webdriver({
+      user: 'opbeat',
+      key: 'de42e589-1450-41a2-8a44-90aa00c15168',
+      host: 'ondemand.saucelabs.com',
+      port: 80,
+      baseUrl: 'http://localhost:8000'
+    }))
+    .on('error', function () {
+      console.log('Exiting process with status 1')
+      process.exit(1)
+    })
+    .on('end', function () {
+      console.log('Tests complete')
+    })
+})
+
+// Launch sauce connect and connect
+gulp.task('test:e2e:launchsauceconnect', function (done) {
   var sauceConnectLauncher = require('sauce-connect-launcher')
 
   sauceConnectLauncher({
     username: 'opbeat',
-    accessKey: 'de42e589-1450-41a2-8a44-90aa00c15168'
+    accessKey: 'de42e589-1450-41a2-8a44-90aa00c15168',
+    logger: console.log
   }, function (err, sauceConnectProcess) {
     if (err) {
       console.error(err.message)
-      return
+      return process.exit(1)
     }
 
     console.log('Sauce Connect ready')
-
-    // sauceConnectProcess.close(function () {
-    //   console.log('Closed Sauce Connect process')
-    // })
+    done()
   })
 })
 
-gulp.task('test.e2e.sauce', function (done) {
-  var capabilities = [
-    {
-      browserName: 'chrome'
-    },
-    {
-      browserName: 'internet explorer'
-    }
-  ]
-
-  // if the e2e assets are available online
-  var extraConfig = {
-    user: 'opbeat',
-    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
-    host: 'ondemand.saucelabs.com',
-    port: 80,
-    baseUrl: 'http://10.0.1.152:8000',
-  }
-
-  var sauceConnectConfig = {
-    host: '127.0.0.1',
-    port: 4445,
-    user: 'opbeat',
-    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
-    capabilities: capabilities
-  }
-  var stream = gulp.src('wdio.conf.js').pipe(webdriver(sauceConnectConfig))
-
-  stream.on('error', function () { })
-  done()
-})
-
-gulp.task('e2e-serve', function (done) {
-  connect.server({
+// Serve test application
+gulp.task('test:e2e:serve', function () {
+  return connect.server({
     root: ['e2e_test', 'src', './'],
     port: 8000,
     livereload: false,
@@ -281,10 +266,10 @@ gulp.task('e2e-serve', function (done) {
       return middlewares
     }
   })
-  done()
 })
 
-gulp.task('selenium-start', function (done) {
+// Install and start selenium
+gulp.task('test:e2e:selenium', function (done) {
   selenium.install({ logger: console.log }, function () {
     selenium.start(function () {
       done()
@@ -292,9 +277,14 @@ gulp.task('selenium-start', function (done) {
   })
 })
 
-gulp.task('e2e-start', ['e2e-serve', 'selenium-start'])
-gulp.task('e2e-sauce-start', ['e2e-serve', 'test.sauce.start'])
-gulp.task('e2e-travis', ['build', 'e2e-serve', 'test:e2e'])
+// Run all required tasks to perform remote end-to-end testing
+gulp.task('test:e2e:start', function (done) {
+  runSequence('build', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function () {
+    console.log('All tasks completed.')
+    done()
+    process.exit(0)
+  });
+})
 
 gulp.task('watch:e2e', ['e2e-serve', 'selenium-start'], function (done) {
   gulp.watch(['e2e_test/**'], function () {

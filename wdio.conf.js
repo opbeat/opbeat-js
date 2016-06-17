@@ -39,7 +39,10 @@ exports.config = {
     {
       maxInstances: 1,
       browserName: 'chrome',
-      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
+      before: function () {
+        browser.timeoutsAsyncScript(30000)
+      }
     }
     // {
     //   maxInstances: 1,
@@ -154,8 +157,8 @@ exports.config = {
   // Gets executed before test execution begins. At this point you will have access to all global
   // variables like `browser`. It is the perfect place to define custom commands.
   before: function () {
-    browser.timeoutsAsyncScript(15000)
-  // do something
+    // do something
+    browser.timeoutsAsyncScript(30000)
   },
   //
   // Gets executed after all tests are done. You still have access to all global variables from
