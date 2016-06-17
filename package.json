@@ -11,7 +11,7 @@
   "main": "src/opbeat.js",
   "scripts": {
     "build": "gulp build:release",
-    "test": "node node_modules/standard/bin/cmd.js src/**/* && gulp test && gulp e2e-travis",
+    "test": "node node_modules/standard/bin/cmd.js src/**/* && gulp test && gulp test:e2e:start",
     "prepublish": "npm run build"
   },
   "files": [
@@ -26,6 +26,7 @@
     "es6-promise": "^3.0.2",
     "event-stream": "^3.3.1",
     "loglevel": "^1.4.0",
+    "sauce-connect-launcher": "^0.14.0",
     "simple-lru-cache": "0.0.2",
     "stack-generator": "^1.0.7",
     "zone.js": "^0.5.15"
