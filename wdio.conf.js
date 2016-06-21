@@ -159,6 +159,26 @@ exports.config = {
   before: function () {
     // do something
     browser.timeoutsAsyncScript(30000)
+
+    // check if the environment contains a specific angular version
+    // that we will be testing for
+    console.log('Environment ANGULAR_VERSION: ' + process.env.ANGULAR_VERSION)
+    if (process.env.ANGULAR_VERSION) {
+      var versionString = process.env.ANGULAR_VERSION.replace('~', '')
+      var versionArray = versionString.split('.')
+      var version = {
+        major: parseInt(versionArray[0], 10),
+        minor: parseInt(versionArray[1], 10),
+        patch: parseInt(versionArray[2], 10),
+        full: versionString
+      }
+
+      browser.expectedAngularVersion = version
+    }
+    else {
+      // otherwise we manually set the version to the latest major/minor combination
+      browser.expectedAngularVersion = { major: 1, minor: 5, patch: 0, full: '1.5.0' }
+    }
   },
   //
   // Gets executed after all tests are done. You still have access to all global variables from
