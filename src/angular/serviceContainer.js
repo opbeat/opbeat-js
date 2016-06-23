@@ -8,6 +8,8 @@ var transport = require('../lib/transport')
 
 var utils = require('../lib/utils')
 
+var PatchingService = require('../patching/patchingService')
+
 function ServiceContainer () {
   this.services = {}
 
@@ -16,6 +18,8 @@ function ServiceContainer () {
   this.services.configService = configService
 
   var logger = this.services.logger = this.createLogger()
+  var patchingService = new PatchingService()
+  patchingService.patchAll()
 
   var zoneService = this.services.zoneService = this.createZoneService()
 

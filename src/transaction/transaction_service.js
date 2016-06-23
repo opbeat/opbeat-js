@@ -22,7 +22,18 @@ function TransactionService (zoneService, logger, config) {
 
   var transactionService = this
 
+  function onBeforeInvokeTask (task) {
+    if (task.source === 'XMLHttpRequest.send') {
+      task.trace.end()
+    }
+  }
+  zoneService.spec.onBeforeInvokeTask = onBeforeInvokeTask
+
   function onScheduleTask (task) {
+    if (task.source === 'XMLHttpRequest.send') {
+      var trace = transactionService.startTrace('Http ' + task['XHR']['method'] + ' ' + task['XHR']['url'], 'ext.HttpRequest')
+      task.trace = trace
+    }
     transactionService.addTask(task.taskId)
   }
   zoneService.spec.onScheduleTask = onScheduleTask
