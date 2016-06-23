@@ -14,7 +14,6 @@ function Trace (transaction, signature, type, options) {
 
   // Start timers
   this._start = window.performance.now()
-  this._startStamp = new Date()
 
   this._isFinish = new Promise(function (resolve, reject) {
     this._markFinishedFunc = resolve
