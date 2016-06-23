@@ -28,7 +28,7 @@ var Transaction = function (name, type, options) {
 
   // A transaction should always have a root trace spanning the entire transaction.
   this._rootTrace = this.startTrace('transaction', 'transaction', {enableStackFrames: false})
-  this._startStamp = this._rootTrace._startStamp
+  this._startStamp = new Date()
   this._start = this._rootTrace._start
 
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
@@ -151,10 +151,7 @@ Transaction.prototype._adjustStartToEarliestTrace = function () {
 
   if (trace) {
     this._rootTrace._start = trace._start
-    this._rootTrace._startStamp = trace._startStamp
     this._rootTrace.calcDiff()
-
-    this._startStamp = this._rootTrace._startStamp
     this._start = this._rootTrace._start
   }
 }

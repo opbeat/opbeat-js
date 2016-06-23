@@ -120,7 +120,7 @@ function groupTraces (traces) {
       transaction: trace.transaction.name,
       signature: trace.signature,
       kind: trace.type,
-      timestamp: trace._startStamp.toISOString(),
+      timestamp: trace.transaction._startStamp.toISOString(),
       parents: trace.ancestors(),
       extra: extra,
       _group: key
@@ -153,7 +153,7 @@ function groupingTs (ts) {
 
 function transactionGroupingKey (trans) {
   return [
-    groupingTs(trans._startStamp).getTime(),
+    groupingTs(trans.transaction._startStamp).getTime(),
     trans.name,
     trans.result,
     trans.type
@@ -166,7 +166,7 @@ function traceGroupingKey (trace) {
   }).join(',')
 
   return [
-    groupingTs(trace._startStamp).getTime(),
+    groupingTs(trace.transaction._startStamp).getTime(),
     trace.transaction.name,
     ancestors,
     trace.signature,
