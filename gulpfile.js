@@ -277,8 +277,14 @@ gulp.task('test:e2e:selenium', function (done) {
   })
 })
 
+gulp.task('test:e2e:start-local', function (done) {
+  runSequence('build', 'build:release', 'test:e2e:serve', 'test:e2e:selenium', function () {
+    console.log('All tasks completed.')
+  });
+})
+
 // Run all required tasks to perform remote end-to-end testing
-gulp.task('test:e2e:start', function (done) {
+gulp.task('test:e2e:start-sauce', function (done) {
   runSequence('build', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function () {
     console.log('All tasks completed.')
     done()
