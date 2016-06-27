@@ -74,7 +74,7 @@ ServiceContainer.prototype.createZoneService = function () {
   }
 
   var ZoneService = require('../transaction/zone_service')
-  return new ZoneService(window.Zone.current, logger)
+  return new ZoneService(window.Zone.current, logger, this.services.configService)
 }
 
 ServiceContainer.prototype.createOpbeatBackend = function () {

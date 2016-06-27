@@ -8,7 +8,7 @@ var methodSymbol = patchUtils.opbeatSymbol('method')
 var XMLHttpRequest_send = 'XMLHttpRequest.send'
 var XHR = window.XMLHttpRequest
 
-function ZoneService (zone, logger) {
+function ZoneService (zone, logger, config) {
   this.events = new Subscription()
 
   var nextId = 0
@@ -24,12 +24,13 @@ function ZoneService (zone, logger) {
     onHandleError: noop
   }
 
-  this.zone = zone.fork({
+  var zoneConfig = {
+    name: 'opbeatRootZone',
     onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
       var taskId = nextId++
       if (task.type === 'macroTask') {
         var opbeatTask = {
-          taskId: taskId,
+          taskId: task.source + taskId,
           source: task.source,
           type: task.type,
           data: {
@@ -72,7 +73,7 @@ function ZoneService (zone, logger) {
     },
     onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
       var result
-      if (task.data.target && XHR === task.data.target.constructor) {
+      if (task.data && task.data.target && XHR === task.data.target.constructor) {
         var opbeatTask = task.data.target[opbeatTaskSymbol]
 
         if (opbeatTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === XHR.DONE) {
@@ -113,7 +114,31 @@ function ZoneService (zone, logger) {
   //   spec.onHandleError(error)
   //   parentZoneDelegate.handleError(targetZone, error)
   // }
-  })
+  }
+
+  // if (config.get('debug') === true) {
+  //   zoneConfig.properties = {opbeatZoneData: {name: 'opbeatRootZone', children: []}}
+  //   zoneConfig.onFork = function (parentZoneDelegate, currentZone, targetZone, zoneSpec) {
+  //     var childZone = parentZoneDelegate.fork(targetZone, zoneSpec)
+  //     console.log('onFork: ', arguments)
+  //     console.log('onFork: ', childZone)
+
+  //     var childZoneData = {name: childZone.name}
+
+  //     if (targetZone._properties['opbeatZoneData']) {
+  //       targetZone._properties['opbeatZoneData'].children.push(childZoneData)
+  //     } else {
+  //       targetZone._properties['opbeatZoneData'] = {
+  //         name: targetZone.name,
+  //         children: [childZoneData]
+  //       }
+  //     }
+  //     console.log('onFork:opbeatZoneData:', targetZone._properties['opbeatZoneData'])
+  //     return childZone
+  //   }
+  // }
+
+  this.zone = zone.fork(zoneConfig)
 }
 
 ZoneService.prototype.set = function (key, value) {
