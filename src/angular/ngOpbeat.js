@@ -12,6 +12,10 @@ function NgOpbeatProvider (logger, configService) {
 
   this.version = '%%VERSION%%'
 
+  this.install = function install () {
+    logger.warn('$opbeatProvider.install is deprecated!')
+  }
+
   var _exceptions = new Exceptions()
 
   this.$get = [
