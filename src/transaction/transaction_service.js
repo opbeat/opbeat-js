@@ -31,7 +31,7 @@ function TransactionService (zoneService, logger, config) {
 
   function onScheduleTask (task) {
     if (task.source === 'XMLHttpRequest.send') {
-      var trace = transactionService.startTrace('Http ' + task['XHR']['method'] + ' ' + task['XHR']['url'], 'ext.HttpRequest')
+      var trace = transactionService.startTrace(task['XHR']['method'] + ' ' + task['XHR']['url'], 'ext.HttpRequest')
       task.trace = trace
     }
     transactionService.addTask(task.taskId)
