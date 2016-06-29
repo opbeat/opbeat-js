@@ -153,7 +153,7 @@ function groupingTs (ts) {
 
 function transactionGroupingKey (trans) {
   return [
-    groupingTs(trans._startStamp).getTime(),
+    groupingTs(trans.transaction._startStamp).getTime(),
     trans.name,
     trans.result,
     trans.type
