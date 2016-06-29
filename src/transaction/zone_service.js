@@ -27,8 +27,9 @@ function ZoneService (zone, logger, config) {
   var zoneConfig = {
     name: 'opbeatRootZone',
     onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
-      var taskId = nextId++
       if (task.type === 'macroTask') {
+        logger.debug('Zone: ', targetZone.name)
+        var taskId = nextId++
         var opbeatTask = {
           taskId: task.source + taskId,
           source: task.source,
@@ -72,6 +73,7 @@ function ZoneService (zone, logger, config) {
       return delegateTask
     },
     onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
+      // logger.debug('Zone: ', targetZone.name)
       var result
       if (task.data && task.data.target && XHR === task.data.target.constructor) {
         var opbeatTask = task.data.target[opbeatTaskSymbol]
@@ -98,6 +100,7 @@ function ZoneService (zone, logger, config) {
       return result
     },
     onCancelTask: function (parentZoneDelegate, currentZone, targetZone, task) {
+      // logger.debug('Zone: ', targetZone.name)
       var opbeatTask
       if (task.type === 'macroTask') {
         if (task.source === XMLHttpRequest_send) {
