@@ -16,6 +16,14 @@ describe('ZoneService', function () {
   })
   zoneService = new ZoneService(window.Zone.current, logger)
 
+  function resetZoneCallbacks (zoneService) {
+    zoneService.spec.onScheduleTask = function (task) {}
+    zoneService.spec.onBeforeInvokeTask = function () {}
+    zoneService.spec.onInvokeTask = function (task) {}
+    zoneService.spec.onCancelTask = function (task) {}
+    zoneService.spec.onHandleError = function (task) {}
+  }
+
   it('should call registered event listeners for XHR', function (done) {
     var response
 
@@ -100,6 +108,14 @@ describe('ZoneService', function () {
       setTimeout(function () {
         callbackFlag = true
       }, 0)
+    })
+  })
+
+  it('should not throw if the setTimeout callbackFn is undefined', function (done) {
+    resetZoneCallbacks(zoneService)
+    zoneService.zone.run(function () {
+      setTimeout(undefined, 0)
+      done()
     })
   })
 
