@@ -98,6 +98,8 @@ module.exports = function (config) {
   var version = require('./package').version
 
   console.log('MODE: ' + process.env.MODE)
+  console.log('Environment ANGULAR_VERSION: ' + process.env.ANGULAR_VERSION)
+
 
   if (isTravis) {
     buildId = 'OpbeatJS@' + version + ' - TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
