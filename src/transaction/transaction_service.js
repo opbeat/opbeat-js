@@ -23,7 +23,7 @@ function TransactionService (zoneService, logger, config) {
   var transactionService = this
 
   function onBeforeInvokeTask (task) {
-    if (task.source === 'XMLHttpRequest.send') {
+    if (task.source === 'XMLHttpRequest.send' && task.trace) {
       task.trace.end()
     }
   }
