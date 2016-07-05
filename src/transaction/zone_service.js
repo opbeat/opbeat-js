@@ -66,7 +66,7 @@ function ZoneService (zone, logger) {
     $setTimeout: function (parentTimeout) {
       return function (timeoutFn, delay) {
         var self = this
-        if (delay === 0) {
+        if (delay === 0 && typeof timeoutFn === 'function') {
           var args = patchUtils.argumentsToArray(arguments)
           var tId
           args[0] = patchUtils.wrapAfter(timeoutFn, function () {
