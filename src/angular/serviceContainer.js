@@ -49,18 +49,7 @@ function ServiceContainer () {
     })
   }
 
-  // binding bootstrap to zone
-
-  // window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
-  var _resumeDeferred = window.angular.resumeDeferredBootstrap
-  window.name = 'NG_DEFER_BOOTSTRAP!' + window.name
-  window.angular.resumeDeferredBootstrap = zoneService.zone.bind(function () {
-    var resumeBootstrap = window.angular.resumeBootstrap
-    if (typeof _resumeDeferred === 'function') {
-      resumeBootstrap = _resumeDeferred
-    }
-    resumeBootstrap()
-  })
+  this.patchAngularBootstrap()
 
   ngOpbeat(transactionService, logger, configService, zoneService)
 }
@@ -112,6 +101,48 @@ ServiceContainer.prototype.createOpbeatBackend = function () {
     opbeatBackend.sendTransactions(transactions)
     serviceContainer.services.transactionService.clearTransactions()
   }, 5000)
+}
+
+ServiceContainer.prototype.patchAngularBootstrap = function () {
+  var zoneService = this.services.zoneService
+
+  var DEFER_LABEL = 'NG_DEFER_BOOTSTRAP!'
+
+  var deferRegex = new RegExp('^' + DEFER_LABEL + '.*')
+  // If the bootstrap is already deferred. (like run by Protractor)
+  // In this case `resumeBootstrap` should be patched
+  if (deferRegex.test(window.name)) {
+    var originalResumeBootstrap
+    Object.defineProperty(window.angular, 'resumeBootstrap', {
+      get: function () {
+        return function (modules) {
+          return zoneService.zone.run(function () {
+            originalResumeBootstrap.call(window.angular, modules)
+          })
+        }
+      },
+      set: function (resumeBootstrap) {
+        originalResumeBootstrap = resumeBootstrap
+      }
+    })
+  } else { // If this is not a test, defer bootstrapping
+    window.name = DEFER_LABEL + window.name
+
+    window.angular.resumeDeferredBootstrap = function () {
+      return zoneService.zone.run(function () {
+        var resumeBootstrap = window.angular.resumeBootstrap
+        return resumeBootstrap.call(window.angular)
+      })
+    }
+
+    /* angular should remove DEFER_LABEL from window.name, but if angular is never loaded, we want
+     to remove it ourselves */
+    window.addEventListener('beforeunload', function () {
+      if (deferRegex.test(window.name)) {
+        window.name = window.name.substring(DEFER_LABEL.length)
+      }
+    })
+  }
 }
 
 module.exports = ServiceContainer
