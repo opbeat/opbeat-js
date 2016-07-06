@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+
+<body>
+
+  <script src="/e2e/browser_utils.js"></script>
+  <script src="/node_modules/systemjs/dist/system.src.js"></script>
+
+  <script src="/node_modules/angular/angular.js"></script>
+
+  <script>
+    window.System.config({
+      paths: {
+        'opbeat-angular':'../src/angular/opbeat-angular.js',
+        'zone.js':'/node_modules/zone.js/dist/zone.js',
+        // 'zone.js':'/angular/zone.js0.6/node_modules/zone.js/dist/zone.js',
+        '*': '/node_modules/*'
+      },
+      meta: {
+        './app.js': {
+          format: 'cjs'
+        },
+        '../dist/dev/opbeat-angular.e2e.js':{
+          format:'cjs'
+        },
+        '../dist/dev/opbeat-angular.js':{
+          format:'cjs'
+        }
+      },
+      packageConfigPaths: ['/node_modules/*/package.json'],
+      'defaultJSExtensions': true
+    })
+    
+    var fixtures = {
+        'ui_router_app':{
+          path:'./ui_router_app/ui_router_app.js',
+          deps:['opbeat-angular', 'angular-ui-router','angular-resource'],
+          options:{
+            appName:'ui_router_app',
+            useNgApp:false,
+            uiRouter:true,
+            opbeatConfig:{
+              debug: true,
+              orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
+              appId: '0a8757798e',
+              performance: {
+                enable: true,
+                enableStackFrames: true
+              }
+            }
+          }
+        },
+        'too_many_traces_app':{
+          path:'./too_many_traces_app/too_many_traces_app.js',
+          deps:['opbeat-angular', 'angular-ui-router'],
+          options:{
+            appName:'too_many_traces_app',
+            useNgApp:false,
+            uiRouter:true,
+            opbeatConfig:{
+              debug: true,
+              orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
+              appId: '0a8757798e',
+              performance: {
+                enable: true,
+                enableStackFrames: true
+              }
+            }
+          }
+        },
+        'minified_module_app':{
+          path:'./minified_module_app/minified_module_app.js',
+          deps:['../dist/dev/opbeat-angular.js', 'angular-ui-router'],
+          options:{
+            appName:'minified_module_app',
+            useNgApp:false,
+            uiRouter:true,
+            beforeInit:function(app,deps){
+              app.init({
+                debug: true,
+                orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
+                appId: '0a8757798e',
+                performance: {
+                  enable: true,
+                  enableStackFrames: true
+                }
+              })
+            },
+            opbeatConfig:{
+              debug: true,
+              orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
+              appId: '0a8757798e',
+              performance: {
+                enable: true,
+                enableStackFrames: true
+              }
+            }
+          }
+        },
+        'simple_app':{
+          path:'./simple_app/simple_app.js',
+          deps:['opbeat-angular', 'angular-route'],
+          options:{
+            appName:'simple_app',
+            useNgApp:false,
+            uiRouter:false
+          }
+        }     
+    }
+    
+    var fx = fixtures['ui_router_app']
+    runFixture(fx.path, fx.deps, fx.options)
+  </script>
+
+</body>
+
+</html>

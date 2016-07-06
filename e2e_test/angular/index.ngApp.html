@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+
+<body>
+
+  <script src="/e2e/browser_utils.js"></script>
+  <script src="/node_modules/systemjs/dist/system.src.js"></script>
+
+  <script src="/node_modules/angular/angular.js"></script>
+  <script src="/node_modules/angular-route/angular-route.js"></script>
+  <script src="/dist/dev/opbeat-angular.js"></script>
+  
+  <script src="/angular/simple_app/simple_app.js"></script>
+  
+
+  <script>
+    window.System.config({
+      paths: {
+        '*': '/node_modules/*'
+      },
+      meta: {
+        './app.js': {
+          format: 'cjs'
+        }
+      },
+      packageConfigPaths: ['/node_modules/*/package.json'],
+      'defaultJSExtensions': true
+    })
+  </script>
+
+  <script>
+    simple_app.init()
+  </script>
+  <div ng-app="simple_app">
+    <ng-view />
+  </div>
+
+</body>
+
+</html>
