@@ -31,13 +31,16 @@ describe('ZoneService', function () {
       expect(response).toBeUndefined()
     }
     zoneService.spec.onBeforeInvokeTask = function (task) {
-      expect(response).toBeUndefined()
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
     }
     zoneService.spec.onInvokeTask = function (task) {
       expect(response).toBeDefined()
       expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
-      done()
+
+      // should call done asynchronously since we're spying in this function in multiple tests
+      setTimeout(function () {
+        done()
+      })
     }
 
     spyOn(zoneService.spec, 'onScheduleTask').and.callThrough()
@@ -60,18 +63,59 @@ describe('ZoneService', function () {
     })
   })
 
+  it('should call registered event listeners for XHR even if load event is not registered', function (done) {
+    var response
+
+    resetZoneCallbacks(zoneService)
+
+    zoneService.spec.onScheduleTask = function (task) {
+      expect(response).toBeUndefined()
+    }
+    zoneService.spec.onBeforeInvokeTask = function (task) {
+      expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
+    }
+    zoneService.spec.onInvokeTask = function (task) {
+      expect(response).toBeDefined()
+      expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
+
+      // should call done asynchronously since we're spying in this function in multiple tests
+      setTimeout(function () {
+        done()
+      })
+    }
+
+    spyOn(zoneService.spec, 'onScheduleTask').and.callThrough()
+    spyOn(zoneService.spec, 'onBeforeInvokeTask').and.callThrough()
+    spyOn(zoneService.spec, 'onInvokeTask').and.callThrough()
+
+    zoneService.zone.run(function () {
+      function reqListener () {
+        if (this.readyState === window.XMLHttpRequest.DONE) {
+          response = this.responseText
+        }
+      }
+
+      var oReq = new window.XMLHttpRequest()
+      oReq.addEventListener('readystatechange', reqListener)
+      oReq.addEventListener('error', function (event) {
+        console.log('failed')
+      })
+
+      oReq.open('GET', '/', true)
+      oReq.send(null)
+    })
+  })
+
   it('should not call registered event listeners for setTimeout if timeout > 0', function (done) {
     var callbackFlag = false
     // zoneService = new ZoneService(window.Zone.current.parent, logger)
-
-    zoneService.spec.onScheduleTask = function (task) {}
-
-    zoneService.spec.onBeforeInvokeTask = function () {}
-
-    zoneService.spec.onInvokeTask = function (task) {}
+    resetZoneCallbacks(zoneService)
 
     spyOn(zoneService.spec, 'onScheduleTask').and.callThrough()
     spyOn(zoneService.spec, 'onInvokeTask').and.callThrough()
+
+    zoneService.spec.onInvokeTask.calls.reset()
+    zoneService.spec.onScheduleTask.calls.reset()
 
     zoneService.zone.run(function () {
       setTimeout(function () {
@@ -90,10 +134,7 @@ describe('ZoneService', function () {
   it('should call registered event listeners for setTimeout if timeout == 0', function (done) {
     var callbackFlag = false
     // zoneService = new ZoneService(window.Zone.current.parent, logger)
-
-    zoneService.spec.onScheduleTask = function (task) {}
-
-    zoneService.spec.onBeforeInvokeTask = function () {}
+    resetZoneCallbacks(zoneService)
 
     zoneService.spec.onInvokeTask = function (task) {
       expect(callbackFlag).toBe(true)
@@ -122,10 +163,7 @@ describe('ZoneService', function () {
   it('should call registered event listeners for requestAnimationFrame', function (done) {
     var callbackFlag = false
     // zoneService = new ZoneService(window.Zone.current.parent, logger)
-
-    zoneService.spec.onScheduleTask = function (task) {}
-
-    zoneService.spec.onBeforeInvokeTask = function () {}
+    resetZoneCallbacks(zoneService)
 
     zoneService.spec.onInvokeTask = function (task) {
       expect(callbackFlag).toBe(true)

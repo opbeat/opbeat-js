@@ -4,6 +4,7 @@ var opbeatTaskSymbol = patchUtils.opbeatSymbol('taskData')
 
 var urlSympbol = patchUtils.opbeatSymbol('url')
 var methodSymbol = patchUtils.opbeatSymbol('method')
+var hasLoadEventSymbol = patchUtils.opbeatSymbol('hasLoadEvent')
 
 var XMLHttpRequest_send = 'XMLHttpRequest.send'
 var XHR = window.XMLHttpRequest
@@ -55,18 +56,22 @@ function ZoneService (zone, logger, config) {
                   "XMLHttpRequest.send"
                   "XMLHttpRequest.addEventListener:readystatechange"
           */
+
           opbeatTask['XHR'] = {
             'load': false,
             'readystatechange': false,
             'send': false,
             url: task.data.target[urlSympbol],
-            method: task.data.target[methodSymbol]
+            method: task.data.target[methodSymbol],
+            hasLoadEvent: task.data.target[hasLoadEventSymbol]
           }
 
           task[opbeatTaskSymbol] = task.data.target[opbeatTaskSymbol] = opbeatTask
 
           spec.onScheduleTask(opbeatTask)
         }
+      } else if (task.type === 'eventTask' && task.source === 'XMLHttpRequest.addEventListener:load') {
+        task.data.target[hasLoadEventSymbol] = true
       }
 
       var delegateTask = parentZoneDelegate.scheduleTask(targetZone, task)
@@ -88,7 +93,7 @@ function ZoneService (zone, logger, config) {
         }
 
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
-        if (opbeatTask && opbeatTask.XHR['load'] && opbeatTask.XHR['readystatechange'] && opbeatTask.XHR['send']) {
+        if (opbeatTask && (opbeatTask.XHR['load'] || !opbeatTask.XHR.hasLoadEvent) && opbeatTask.XHR['readystatechange'] && opbeatTask.XHR['send']) {
           spec.onInvokeTask(opbeatTask)
         }
       } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
