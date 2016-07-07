@@ -4,10 +4,11 @@ var opbeatTaskSymbol = patchUtils.opbeatSymbol('taskData')
 
 var urlSympbol = patchUtils.opbeatSymbol('url')
 var methodSymbol = patchUtils.opbeatSymbol('method')
-var hasLoadEventSymbol = patchUtils.opbeatSymbol('hasLoadEvent')
 
 var XMLHttpRequest_send = 'XMLHttpRequest.send'
 var XHR = window.XMLHttpRequest
+
+var opbeatDataSymbol = patchUtils.opbeatSymbol('opbeatData')
 
 function ZoneService (zone, logger, config) {
   this.events = new Subscription()
@@ -28,16 +29,24 @@ function ZoneService (zone, logger, config) {
   var zoneConfig = {
     name: 'opbeatRootZone',
     onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
+      if (task.type === 'eventTask' && task.data.eventName === 'dummyImmediateEvent') {
+        task.data.handler(task.data)
+        return task
+      }
+
+      var hasTarget = task.data && task.data.target
+      if (hasTarget && typeof task.data.target[opbeatDataSymbol] === 'undefined') {
+        task.data.target[opbeatDataSymbol] = {registeredEventListeners: {}}
+      }
+
+      logger.debug('zoneservice.onScheduleTask', task.source, ' type:', task.type)
       if (task.type === 'macroTask') {
         logger.debug('Zone: ', targetZone.name)
         var taskId = nextId++
         var opbeatTask = {
           taskId: task.source + taskId,
           source: task.source,
-          type: task.type,
-          data: {
-            target: task.data.target
-          }
+          type: task.type
         }
 
         if (task.source === 'setTimeout') {
@@ -58,42 +67,53 @@ function ZoneService (zone, logger, config) {
           */
 
           opbeatTask['XHR'] = {
-            'load': false,
-            'readystatechange': false,
+            resolved: false,
             'send': false,
             url: task.data.target[urlSympbol],
-            method: task.data.target[methodSymbol],
-            hasLoadEvent: task.data.target[hasLoadEventSymbol]
+            method: task.data.target[methodSymbol]
           }
 
-          task[opbeatTaskSymbol] = task.data.target[opbeatTaskSymbol] = opbeatTask
+          // target for event tasks is different instance from the XMLHttpRequest, on mobile browsers
+          // A hack to get the correct target for event tasks
+          task.data.target.addEventListener('dummyImmediateEvent', function (event) {
+            if (typeof event.target[opbeatDataSymbol] !== 'undefined') {
+              task.data.target[opbeatDataSymbol] = event.target[opbeatDataSymbol]
+            }
+          })
+
+          task.data.target[opbeatDataSymbol].task = opbeatTask
+          task.data.target[opbeatDataSymbol].typeName = 'XMLHttpRequest'
 
           spec.onScheduleTask(opbeatTask)
         }
-      } else if (task.type === 'eventTask' && task.source === 'XMLHttpRequest.addEventListener:load') {
-        task.data.target[hasLoadEventSymbol] = true
+      } else if (task.type === 'eventTask' && hasTarget && (task.data.eventName === 'readystatechange' || task.data.eventName === 'load')) {
+        task.data.target[opbeatDataSymbol].registeredEventListeners[task.data.eventName] = {resolved: false}
       }
 
       var delegateTask = parentZoneDelegate.scheduleTask(targetZone, task)
       return delegateTask
     },
     onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
-      // logger.debug('Zone: ', targetZone.name)
+      logger.debug('zoneservice.onInvokeTask', task.source, ' type:', task.type)
+      var hasTarget = task.data && task.data.target
       var result
-      if (task.data && task.data.target && XHR === task.data.target.constructor) {
-        var opbeatTask = task.data.target[opbeatTaskSymbol]
+
+      if (hasTarget && task.data.target[opbeatDataSymbol].typeName === 'XMLHttpRequest') {
+        var opbeatData = task.data.target[opbeatDataSymbol]
+        logger.debug('opbeatData', opbeatData)
+        var opbeatTask = opbeatData.task
 
         if (opbeatTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === XHR.DONE) {
-          opbeatTask.XHR['readystatechange'] = true
+          opbeatData.registeredEventListeners['readystatechange'].resolved = true
           spec.onBeforeInvokeTask(opbeatTask)
-        } else if (opbeatTask && task.data.eventName === 'load') {
-          opbeatTask.XHR['load'] = true
+        } else if (opbeatTask && task.data.eventName === 'load' && 'load' in opbeatData.registeredEventListeners) {
+          opbeatData.registeredEventListeners.load.resolved = true
         } else if (opbeatTask && task.source === XMLHttpRequest_send) {
-          opbeatTask.XHR['send'] = true
+          opbeatTask.XHR.resolved = true
         }
 
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
-        if (opbeatTask && (opbeatTask.XHR['load'] || !opbeatTask.XHR.hasLoadEvent) && opbeatTask.XHR['readystatechange'] && opbeatTask.XHR['send']) {
+        if (opbeatTask && (!opbeatData.registeredEventListeners['load'] || opbeatData.registeredEventListeners['load'].resolved) && opbeatData.registeredEventListeners['readystatechange'].resolved && opbeatTask.XHR.resolved) {
           spec.onInvokeTask(opbeatTask)
         }
       } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
@@ -109,7 +129,7 @@ function ZoneService (zone, logger, config) {
       var opbeatTask
       if (task.type === 'macroTask') {
         if (task.source === XMLHttpRequest_send) {
-          opbeatTask = task.data.target[opbeatTaskSymbol]
+          opbeatTask = task.data.target[opbeatDataSymbol].task
           spec.onCancelTask(opbeatTask)
         } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
           opbeatTask = task[opbeatTaskSymbol]
