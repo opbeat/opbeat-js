@@ -8,6 +8,8 @@ var transport = require('../lib/transport')
 
 var utils = require('../lib/utils')
 
+var PatchingService = require('../patching/patchingService')
+
 function ServiceContainer () {
   this.services = {}
 
@@ -16,6 +18,8 @@ function ServiceContainer () {
   this.services.configService = configService
 
   var logger = this.services.logger = this.createLogger()
+  var patchingService = new PatchingService()
+  patchingService.patchAll()
 
   var zoneService = this.services.zoneService = this.createZoneService()
 
@@ -64,24 +68,13 @@ ServiceContainer.prototype.createLogger = function () {
 
 ServiceContainer.prototype.createZoneService = function () {
   var logger = this.services.logger
-  // todo: remove this when updating to new version of zone.js
-  function noop () { }
-  var _warn = console.warn
-  console.warn = noop
 
-  if (typeof window.zone === 'undefined') {
+  if (typeof window.Zone === 'undefined') {
     require('zone.js')
   }
 
-  var zonePrototype = ('getPrototypeOf' in Object)
-    ? Object.getPrototypeOf(window.zone) : window.zone.__proto__ // eslint-disable-line 
-
-  zonePrototype.enqueueTask = noop
-  zonePrototype.dequeueTask = noop
-  console.warn = _warn
-
   var ZoneService = require('../transaction/zone_service')
-  return new ZoneService(window.zone, logger)
+  return new ZoneService(window.Zone.current, logger, this.services.configService)
 }
 
 ServiceContainer.prototype.createOpbeatBackend = function () {

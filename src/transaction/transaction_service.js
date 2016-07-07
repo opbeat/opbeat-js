@@ -21,17 +21,34 @@ function TransactionService (zoneService, logger, config) {
   this._subscription = new Subscription()
 
   var transactionService = this
-  zoneService.spec.onAddTask = function (taskId) {
-    transactionService.addTask(taskId)
-  }
 
-  zoneService.spec.onRemoveTask = function (taskId) {
-    transactionService.removeTask(taskId)
+  function onBeforeInvokeTask (task) {
+    if (task.source === 'XMLHttpRequest.send' && task.trace && !task.trace.ended) {
+      task.trace.end()
+    }
   }
+  zoneService.spec.onBeforeInvokeTask = onBeforeInvokeTask
 
-  zoneService.spec.onDetectFinish = function () {
+  function onScheduleTask (task) {
+    if (task.source === 'XMLHttpRequest.send') {
+      var trace = transactionService.startTrace(task['XHR']['method'] + ' ' + task['XHR']['url'], 'ext.HttpRequest', {'enableStackFrames': false})
+      task.trace = trace
+    }
+    transactionService.addTask(task.taskId)
+  }
+  zoneService.spec.onScheduleTask = onScheduleTask
+
+  function onInvokeTask (task) {
+    transactionService.removeTask(task.taskId)
     transactionService.detectFinish()
   }
+  zoneService.spec.onInvokeTask = onInvokeTask
+
+  function onCancelTask (task) {
+    transactionService.removeTask(task.taskId)
+    transactionService.detectFinish()
+  }
+  zoneService.spec.onCancelTask = onCancelTask
 }
 
 TransactionService.prototype.getTransaction = function (id) {
