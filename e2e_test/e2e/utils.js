@@ -19,10 +19,12 @@ module.exports = {
         if (logLevels[logEntry.level].value > logLevels.WARNING.value) {
           filteredLog.push(logEntry)
         } else if (logLevels[logEntry.level].value >= logLevels.INFO.value) {
-          console.log('>> ' + logEntry.message)
+          // console.log('>> ' + logEntry.message)
         }
       }
-      console.log(filteredLog)
+      if (filteredLog.length > 0) {
+        console.log('Erros: ', filteredLog)
+      }
       expect(filteredLog.length).toEqual(0, 'Expected no errors in the browserLog but got ' + filteredLog.length + ' error(s)') // .because()
       if (typeof done === 'function') {
         done()

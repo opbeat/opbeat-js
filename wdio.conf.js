@@ -44,24 +44,6 @@ exports.config = {
         browser.timeoutsAsyncScript(30000)
       }
     }
-    // {
-    //   maxInstances: 1,
-    //   browserName: 'internet explorer'
-    // },
-    // {
-    //   browserName: 'internet explorer',
-    //   maxInstances: 1,
-    //   'platform': 'Windows 7',
-    //   'version': '9.0',
-    //   specs: [
-    //     '/e2e_test/**/*.ie9.spec.js'
-    //   ],
-    //   baseUrl: 'http://localhost:8000',
-    //   initialBrowserUrl: 'about:blank',
-    //   before: function () {
-    //     browser.timeoutsAsyncScript(15000)
-    //   }
-    // }
   ],
   //
   // ===================
@@ -83,7 +65,7 @@ exports.config = {
   baseUrl: 'http://localhost:8000',
   //
   // Default timeout for all waitForXXX commands.
-  waitforTimeout: 10000,
+  waitforTimeout: 30000,
   //
   // Initialize the browser instance with a WebdriverIO plugin. The object should have the
   // plugin name as key and the desired plugin options as property. Make sure you have
@@ -174,8 +156,7 @@ exports.config = {
       }
 
       browser.expectedAngularVersion = version
-    }
-    else {
+    } else {
       // otherwise we manually set the version to the latest major/minor combination
       browser.expectedAngularVersion = { major: 1, minor: 5, patch: 0, full: '1.5.0' }
     }

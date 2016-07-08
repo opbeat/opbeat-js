@@ -33,7 +33,7 @@ gulp.task('server', function () {
   })
 })
 
-function createBuildStream(mainFilePath) {
+function createBuildStream (mainFilePath) {
   return browserify({
     entries: [mainFilePath],
     standalone: '',
@@ -49,15 +49,14 @@ function createBuildStream(mainFilePath) {
     .pipe(derequire())
 }
 
-function writeToDestinations(stream, dests) {
+function writeToDestinations (stream, dests) {
   var tasks = dests.map(function (destPath) {
     return stream.pipe(gulp.dest(versionPath))
   })
   return es.merge.apply(null, tasks)
 }
 
-
-function getMajorVersion() {
+function getMajorVersion () {
   var version = require('./package').version
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
   return majorVersion
@@ -99,7 +98,6 @@ gulp.task('build:release', function () {
         'description': integration.description
       }))
       .pipe(gulp.dest(prodPath + integration.name))
-
 
     return es.merge.apply(null, [mainStream, packagejson, gulp.src(['./README.md', 'LICENSE']).pipe(gulp.dest(prodPath + integration.name))])
   })
@@ -159,7 +157,6 @@ gulp.task('deploy', ['build:release'], function () {
     'Cache-Control': 'max-age=1800, public'
   }
 
-
   var version = require('./package').version
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
@@ -176,7 +173,7 @@ gulp.task('deploy', ['build:release'], function () {
     .pipe(awspublish.reporter())
 })
 
-function runKarma(configFile, done) {
+function runKarma (configFile, done) {
   var exec = require('child_process').exec
 
   var cmd = process.platform === 'win32' ? 'node_modules\\.bin\\karma run ' :
@@ -202,7 +199,6 @@ gulp.task('test', function (done) {
   }, done).start()
 })
 
-
 // Run end-to-end tests on the local machine using webdriver configuration
 gulp.task('test:e2e', function (done) {
   gulp.src('wdio.conf.js')
@@ -215,16 +211,17 @@ gulp.task('test:e2e', function (done) {
     })
 })
 
-// Run end-to-end tests remotely in saucelabs using webdriver configuration
-gulp.task('test:e2e:sauceconnect', function () {
-  return gulp.src('wdio.conf.js')
-    .pipe(webdriver({
-      user: 'opbeat',
-      key: 'de42e589-1450-41a2-8a44-90aa00c15168',
-      host: 'ondemand.saucelabs.com',
-      port: 80,
-      baseUrl: 'http://localhost:8000'
-    }))
+gulp.task('test:e2e:sauceconnect:failsafe', function () {
+  failSafeConfig = {
+    user: 'opbeat',
+    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
+    host: 'ondemand.saucelabs.com',
+    port: 80,
+    baseUrl: 'http://localhost:8000',
+  }
+
+  var failSafeStream = gulp.src('wdio.failsafe.conf.js')
+    .pipe(webdriver(failSafeConfig))
     .on('error', function () {
       console.log('Exiting process with status 1')
       process.exit(1)
@@ -232,6 +229,29 @@ gulp.task('test:e2e:sauceconnect', function () {
     .on('end', function () {
       console.log('Tests complete')
     })
+  return failSafeStream
+})
+
+// Run end-to-end tests remotely in saucelabs using webdriver configuration
+gulp.task('test:e2e:sauceconnect', ['test:e2e:sauceconnect:failsafe'], function () {
+  var e2eConfig = {
+    user: 'opbeat',
+    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
+    host: 'ondemand.saucelabs.com',
+    port: 80,
+    baseUrl: 'http://localhost:8000'
+  }
+
+  var e2eStream = gulp.src('wdio.sauce.conf.js')
+    .pipe(webdriver(e2eConfig))
+    .on('error', function () {
+      console.log('Exiting process with status 1')
+      process.exit(1)
+    })
+    .on('end', function () {
+      console.log('Tests complete')
+    })
+  return e2eStream
 })
 
 // Launch sauce connect and connect
@@ -280,14 +300,14 @@ gulp.task('test:e2e:selenium', function (done) {
 gulp.task('test:e2e:start-local', function (done) {
   runSequence('build', 'build:release', 'test:e2e:serve', 'test:e2e:selenium', function () {
     console.log('All tasks completed.')
-  });
+  })
 })
 
 // Run all required tasks to perform remote end-to-end testing
 gulp.task('test:e2e:start-sauce', function (done) {
   runSequence('build', 'test:e2e:launchsauceconnect', function () {
     console.log('All tasks completed.')
-  });
+  })
 })
 
 gulp.task('test:e2e:start-travis', function (done) {
@@ -295,7 +315,7 @@ gulp.task('test:e2e:start-travis', function (done) {
     console.log('All tasks completed.')
     done()
     process.exit(0)
-  });
+  })
 })
 
 gulp.task('watch:e2e', ['e2e-serve', 'selenium-start'], function (done) {

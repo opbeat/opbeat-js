@@ -1,4 +1,11 @@
 function setup () {
+  if (!window.console) {
+    window.console = {}
+  }
+  if (!console.log) {
+    console.log = function () {}
+  }
+
   function logError (e) {
     console.log(e)
   }
@@ -81,15 +88,15 @@ function setup () {
   //   //   return originalSend.apply(xhr, arguments)
   //   // }
 
-  //   xhr.addEventListener('load', function () {
-  //     window.__httpInterceptor.requests.push({
-  //       requestedMethod: lastMethod.toUpperCase(),
-  //       requestedURL: lastURL,
-  //       xhr: this
-  //     })
-  //   })
-  //   return xhr
-  // }
+//   xhr.addEventListener('load', function () {
+//     window.__httpInterceptor.requests.push({
+//       requestedMethod: lastMethod.toUpperCase(),
+//       requestedURL: lastURL,
+//       xhr: this
+//     })
+//   })
+//   return xhr
+// }
 }
 
 setup()
