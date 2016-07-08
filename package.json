@@ -47,6 +47,7 @@
     "gulp-jasmine-phantom": "^2.1.2",
     "gulp-json-editor": "^2.2.1",
     "gulp-livereload": "^3.8.1",
+    "gulp-protractor": "^2.4.0",
     "gulp-release-tasks": "0.0.3",
     "gulp-rename": "^1.2.2",
     "gulp-task-listing": "^1.0.1",

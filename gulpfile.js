@@ -199,8 +199,18 @@ gulp.task('test', function (done) {
   }, done).start()
 })
 
+gulp.task('test:e2e:protractor', function () {
+  var protractor = require('gulp-protractor').protractor
+
+  return gulp.src(['e2e_test/**/*.pspec.js'])
+    .pipe(protractor({
+      configFile: 'protractor.conf.js',
+    }))
+    .on('error', function (e) { throw e })
+})
+
 // Run end-to-end tests on the local machine using webdriver configuration
-gulp.task('test:e2e', function (done) {
+gulp.task('test:e2e', ['test:e2e:protractor'], function (done) {
   gulp.src('wdio.conf.js')
     .pipe(webdriver())
     .on('error', function () {
