@@ -23,6 +23,14 @@ require('gulp-release-tasks')(gulp)
 
 var jeditor = require('gulp-json-editor')
 
+var webdriverConfig = {
+    user: process.env.WD_USER || 'opbeat',
+    key: process.env.WD_KEY || 'de42e589-1450-41a2-8a44-90aa00c15168',
+    host: process.env.WD_HOST ||'ondemand.saucelabs.com',
+    port: process.env.WD_PORT || 80,
+    baseUrl: process.env.WD_BASEURL || 'http://localhost:8000'
+}
+
 // Static file server
 gulp.task('server', function () {
   connect.server({
@@ -222,16 +230,8 @@ gulp.task('test:e2e', ['test:e2e:protractor'], function (done) {
 })
 
 gulp.task('test:e2e:sauceconnect:failsafe', function () {
-  failSafeConfig = {
-    user: 'opbeat',
-    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
-    host: 'ondemand.saucelabs.com',
-    port: 80,
-    baseUrl: 'http://localhost:8000',
-  }
-
   var failSafeStream = gulp.src('wdio.failsafe.conf.js')
-    .pipe(webdriver(failSafeConfig))
+    .pipe(webdriver(webdriverConfig))
     .on('error', function () {
       console.log('Exiting process with status 1')
       process.exit(1)
@@ -244,16 +244,8 @@ gulp.task('test:e2e:sauceconnect:failsafe', function () {
 
 // Run end-to-end tests remotely in saucelabs using webdriver configuration
 gulp.task('test:e2e:sauceconnect', ['test:e2e:sauceconnect:failsafe'], function () {
-  var e2eConfig = {
-    user: 'opbeat',
-    key: 'de42e589-1450-41a2-8a44-90aa00c15168',
-    host: 'ondemand.saucelabs.com',
-    port: 80,
-    baseUrl: 'http://localhost:8000'
-  }
-
   var e2eStream = gulp.src('wdio.sauce.conf.js')
-    .pipe(webdriver(e2eConfig))
+    .pipe(webdriver(webdriverConfig))
     .on('error', function () {
       console.log('Exiting process with status 1')
       process.exit(1)
@@ -268,11 +260,13 @@ gulp.task('test:e2e:sauceconnect', ['test:e2e:sauceconnect:failsafe'], function 
 gulp.task('test:e2e:launchsauceconnect', function (done) {
   var sauceConnectLauncher = require('sauce-connect-launcher')
 
-  sauceConnectLauncher({
-    username: 'opbeat',
-    accessKey: 'de42e589-1450-41a2-8a44-90aa00c15168',
+  var config = {
+    username: webdriverConfig.user,
+    accessKey: webdriverConfig.key,
     logger: console.log
-  }, function (err, sauceConnectProcess) {
+  }
+
+  sauceConnectLauncher(config, function (err, sauceConnectProcess) {
     if (err) {
       console.error(err.message)
       return process.exit(1)
