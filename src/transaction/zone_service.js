@@ -117,6 +117,7 @@ function ZoneService (zone, logger, config) {
           spec.onInvokeTask(opbeatTask)
         }
       } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
+        spec.onBeforeInvokeTask(task[opbeatTaskSymbol])
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
         spec.onInvokeTask(task[opbeatTaskSymbol])
       } else {
