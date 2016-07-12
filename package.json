@@ -32,7 +32,7 @@
     "sauce-connect-launcher": "^0.14.0",
     "simple-lru-cache": "0.0.2",
     "stack-generator": "^1.0.7",
-    "zone.js": "^0.6.12"
+    "zone.js": "git://github.com/jahtalab/zone.js.git#dev"
   },
   "devDependencies": {
     "angular": "^1.5.0",
