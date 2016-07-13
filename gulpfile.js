@@ -266,15 +266,24 @@ gulp.task('test:e2e:launchsauceconnect', function (done) {
     logger: console.log
   }
 
-  sauceConnectLauncher(config, function (err, sauceConnectProcess) {
-    if (err) {
-      console.error(err.message)
-      return process.exit(1)
-    }
+  var tryConnect = function(maxAttempts, currAttempts, done) {
+    sauceConnectLauncher(config, function (err, sauceConnectProcess) {
+      if (err) {
+        console.error(err.message)
+        if (currAttempts <= maxAttempts) {
+          console.log("Retrying... (attempt " + currAttempts + " of " + maxAttempts + ")")
+          tryConnect(maxAttempts, ++currAttempts, done)
+        }else{
+          return process.exit(1)
+        }
+      }else{
+        console.log('Sauce Connect ready')
+        done()
+      }
+    })
+  }
 
-    console.log('Sauce Connect ready')
-    done()
-  })
+  tryConnect(3, 1, done)
 })
 
 // Serve test application
