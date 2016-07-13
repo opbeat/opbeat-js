@@ -20,19 +20,29 @@ describe('angular.simple app', function () {
       })
       .then(function (response) {
         var transactions = response.value
-        // console.log('transactions', transactions)
-        expect(transactions.length).toBe(1)
 
-        var first = transactions[0]
-        expect(first.traces.groups.length).toBe(8)
-        expect(first.traces.raw[0].length).toBe(13)
-        expect(first.transactions.length).toBe(1)
-        expect(first.transactions[0].transaction).toBe('/')
+        browser.execute(function () {
+          return window.angular.version
+        }).then(function(response) {
+          var version = response.value
+          var minor = version.minor
+          // console.log('transactions', transactions)
+          expect(transactions.length).toBe(1)
 
-        done()
+          var first = transactions[0]
+          expect(first.traces.groups.length).toBe(8)
+          
+          // Angular 1.3 does only 12 traces here
+          var expectedTraces = minor == 3 ? 12 : 13
+          expect(first.traces.raw[0].length).toBe(expectedTraces)
+          expect(first.transactions.length).toBe(1)
+          expect(first.transactions[0].transaction).toBe('/')
+
+          done()
       }, function (error) {
         console.log(error)
       })
+   })
   })
 
   it('should be running the correct major/minor version of angular', function (done) {
