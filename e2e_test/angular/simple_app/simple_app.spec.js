@@ -24,8 +24,8 @@ describe('angular.simple app', function () {
         expect(transactions.length).toBe(1)
 
         var first = transactions[0]
-        expect(first.traces.groups.length).toBe(8)
-        expect(first.traces.raw[0].length).toBe(13)
+        expect(first.traces.groups.length).toBeGreaterThan(7)
+        expect(first.traces.raw[0].length).toBeGreaterThan(11)
         expect(first.transactions.length).toBe(1)
         expect(first.transactions[0].transaction).toBe('/')
 
@@ -39,9 +39,9 @@ describe('angular.simple app', function () {
     browser.url('/angular/index.e2e.html').then(function () {
       browser.execute(function () {
         return window.angular.version
-      }).then(function(response) {
+      }).then(function (response) {
         var version = response.value
-        console.log('Browser angular version: ' + version.full);
+        console.log('Browser angular version: ' + version.full)
         console.log('Expected angular version: ' + browser.expectedAngularVersion.full)
 
         expect(version.major).toEqual(browser.expectedAngularVersion.major)
