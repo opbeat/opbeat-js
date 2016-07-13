@@ -266,15 +266,24 @@ gulp.task('test:e2e:launchsauceconnect', function (done) {
     logger: console.log
   }
 
-  sauceConnectLauncher(config, function (err, sauceConnectProcess) {
-    if (err) {
-      console.error(err.message)
-      return process.exit(1)
-    }
+  var tryConnect = function(maxAttempts, currAttempts, done) {
+    sauceConnectLauncher(config, function (err, sauceConnectProcess) {
+      if (err) {
+        console.error(err.message)
+        if (currAttempts <= maxAttempts) {
+          console.log("Retrying... (attempt " + currAttempts + " of " + maxAttempts + ")")
+          tryConnect(maxAttempts, ++currAttempts, done)
+        }else{
+          return process.exit(1)
+        }
+      }else{
+        console.log('Sauce Connect ready')
+        done()
+      }
+    })
+  }
 
-    console.log('Sauce Connect ready')
-    done()
-  })
+  tryConnect(3, 1, done)
 })
 
 // Serve test application
@@ -314,8 +323,8 @@ gulp.task('test:e2e:start-sauce', function (done) {
   })
 })
 
-gulp.task('test:e2e:start-travis', function (done) {
-  runSequence('build', 'test:e2e:serve', 'test:e2e:sauceconnect', function () {
+gulp.task('test:e2e', function (done) {
+  runSequence('build', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function () {
     console.log('All tasks completed.')
     done()
     process.exit(0)
