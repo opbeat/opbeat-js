@@ -331,6 +331,14 @@ gulp.task('test:e2e', function (done) {
   })
 })
 
+gulp.task('test:unit:sauce', function (done) {
+  runSequence('build', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test', function () {
+    console.log('All tasks completed.')
+    done()
+    process.exit(0)
+  })
+})
+
 gulp.task('watch:e2e', ['e2e-serve', 'selenium-start'], function (done) {
   gulp.watch(['e2e_test/**'], function () {
     runSequence('test:e2e')
