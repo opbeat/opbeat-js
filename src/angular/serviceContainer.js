@@ -1,23 +1,18 @@
-var Logger = require('loglevel')
 var ngOpbeat = require('./ngOpbeat')
 var TransactionService = require('../transaction/transaction_service')
-var Config = require('../lib/config')
-
-var OpbeatBackend = require('../backend/opbeat_backend')
-var transport = require('../lib/transport')
 
 var utils = require('../lib/utils')
 
 var PatchingService = require('../patching/patchingService')
+var ServiceFactory = require('../common/serviceFactory')
 
 function ServiceContainer () {
+  this.serviceFactory = new ServiceFactory()
   this.services = {}
 
-  Config.init()
-  var configService = Config
-  this.services.configService = configService
+  var configService = this.services.configService = this.serviceFactory.getConfigService()
 
-  var logger = this.services.logger = this.createLogger()
+  var logger = this.services.logger = this.serviceFactory.getLogger()
   var patchingService = new PatchingService()
   patchingService.patchAll()
 
@@ -31,7 +26,7 @@ function ServiceContainer () {
     return
   }
 
-  this.createOpbeatBackend()
+  this.scheduleTransactionSend()
 
   if (typeof window.angular === 'undefined') {
     throw new Error('AngularJS is not available. Please make sure you load opbeat-angular after AngularJS.')
@@ -58,14 +53,6 @@ function ServiceContainer () {
   ngOpbeat(transactionService, logger, configService, zoneService)
 }
 
-ServiceContainer.prototype.createLogger = function () {
-  if (this.services.configService.get('debug') === true) {
-    this.services.configService.config.logLevel = 'debug'
-  }
-  Logger.setLevel(this.services.configService.get('logLevel'), false)
-  return Logger
-}
-
 ServiceContainer.prototype.createZoneService = function () {
   var logger = this.services.logger
 
@@ -77,10 +64,10 @@ ServiceContainer.prototype.createZoneService = function () {
   return new ZoneService(window.Zone.current, logger, this.services.configService)
 }
 
-ServiceContainer.prototype.createOpbeatBackend = function () {
+ServiceContainer.prototype.scheduleTransactionSend = function () {
   var logger = this.services.logger
 
-  var opbeatBackend = new OpbeatBackend(transport, this.services.logger, this.services.configService)
+  var opbeatBackend = this.serviceFactory.getOpbeatBackend()
   var serviceContainer = this
 
   setInterval(function () {
