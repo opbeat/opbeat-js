@@ -26,7 +26,7 @@ function NgOpbeatProvider (logger, configService) {
         },
         captureException: function captureException (exception, options) {
           if (!(exception instanceof Error)) {
-            logger.error("Can't capture exception. Passed exception needs to be an instanceof Error")
+            logger.warn("Can't capture exception. Passed exception needs to be an instanceof Error")
             return
           }
 
