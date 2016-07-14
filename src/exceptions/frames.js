@@ -2,8 +2,6 @@ var Promise = require('es6-promise').Promise
 
 var logger = require('../lib/logger')
 var config = require('../lib/config')
-var transport = require('../lib/transport')
-var backendUtils = require('../backend/backend_utils')
 var utils = require('../lib/utils')
 var context = require('./context')
 var stackTrace = require('./stacktrace')
@@ -168,9 +166,8 @@ module.exports = {
       data.extra = utils.mergeObject(data.extra, config.get('context.extra'))
     }
 
-    data.stacktrace.frames = backendUtils.createValidFrames(data.stacktrace.frames)
     logger.log('opbeat.exceptions.processOpbeatException', data)
-    transport.sendError(data)
+    return data
   },
 
   cleanFilePath: function (filePath) {

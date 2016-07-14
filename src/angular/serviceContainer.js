@@ -50,7 +50,8 @@ function ServiceContainer () {
 
   this.patchAngularBootstrap()
 
-  ngOpbeat(transactionService, logger, configService, zoneService)
+  this.services.exceptionHandler = this.serviceFactory.getExceptionHandler()
+  ngOpbeat(transactionService, logger, configService, zoneService, this.services.exceptionHandler)
 }
 
 ServiceContainer.prototype.createZoneService = function () {

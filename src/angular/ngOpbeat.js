@@ -1,6 +1,4 @@
-var Exceptions = require('../exceptions/exceptions')
-
-function NgOpbeatProvider (logger, configService) {
+function NgOpbeatProvider (logger, configService, exceptionHandler) {
   this.config = function config (properties) {
     if (properties) {
       configService.setConfig(properties)
@@ -15,8 +13,6 @@ function NgOpbeatProvider (logger, configService) {
   this.install = function install () {
     logger.warn('$opbeatProvider.install is deprecated!')
   }
-
-  var _exceptions = new Exceptions()
 
   this.$get = [
     function () {
@@ -36,7 +32,7 @@ function NgOpbeatProvider (logger, configService) {
           // raises an exception different from the one we asked to
           // report on.
 
-          _exceptions.processError(exception, options)
+          exceptionHandler.processError(exception, options)
         },
 
         setUserContext: function setUser (user) {
@@ -74,7 +70,7 @@ function patchAll ($provide, transactionService) {
   patchDirectives($provide, transactionService)
 }
 
-function initialize (transactionService, logger, configService, zoneService) {
+function initialize (transactionService, logger, configService, zoneService, exceptionHandler) {
   function moduleRun ($rootScope) {
     if (!configService.isPlatformSupport()) {
       return
@@ -116,7 +112,7 @@ function initialize (transactionService, logger, configService, zoneService) {
   }
 
   window.angular.module('ngOpbeat', [])
-    .provider('$opbeat', new NgOpbeatProvider(logger, configService))
+    .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
     .config(['$provide', moduleConfig])
     .run(['$rootScope', moduleRun])
   window.angular.module('opbeat-angular', ['ngOpbeat'])

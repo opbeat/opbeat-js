@@ -6,8 +6,12 @@ function OpbeatBackend (transport, logger, config) {
   this._config = config
 }
 OpbeatBackend.prototype.sendError = function (errorData) {
-  errorData.stacktrace.frames = backendUtils.createValidFrames(errorData.stacktrace.frames)
-  this._transport.sendError(errorData)
+  if (this._config.isValid()) {
+    errorData.stacktrace.frames = backendUtils.createValidFrames(errorData.stacktrace.frames)
+    this._transport.sendError(errorData)
+  } else {
+    this._logger.debug('Config is not valid')
+  }
 }
 
 OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transaction) {

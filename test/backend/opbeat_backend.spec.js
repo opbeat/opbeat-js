@@ -3,12 +3,14 @@ var OpbeatBackend = require('../../src/backend/opbeat_backend')
 var logger = require('loglevel')
 
 var Transaction = require('../../src/transaction/transaction')
+var ExceptionHandler = require('../../src/exceptions/exceptionHandler')
 
 function TransportMock () {
   this.transportData = []
   this.sendTransaction = function (data) {
     this.transportData.push(data)
   }
+  this.sendError = function () {}
 }
 
 describe('backend.OpbeatBackend', function () {
@@ -20,6 +22,7 @@ describe('backend.OpbeatBackend', function () {
     config.init()
     transportMock = new TransportMock()
     spyOn(transportMock, 'sendTransaction').and.callThrough()
+    spyOn(transportMock, 'sendError')
     spyOn(logger, 'warn')
     spyOn(logger, 'debug')
     opbeatBackend = new OpbeatBackend(transportMock, logger, config)
@@ -86,5 +89,14 @@ describe('backend.OpbeatBackend', function () {
     tr.end()
     opbeatBackend.sendTransactions([tr])
     expect(opbeatBackend.groupSmallContinuouslySimilarTraces).not.toHaveBeenCalled()
+  })
+
+  it('should not send errors if the config is not valid', function () {
+    expect(config.isValid()).toBe(false)
+    var exc = new ExceptionHandler(opbeatBackend)
+    exc.processError(new Error()).then(function () {
+      expect(logger.debug).toHaveBeenCalledWith('Config is not valid')
+      expect(transportMock.sendError).not.toHaveBeenCalled()
+    })
   })
 })

@@ -1,11 +1,12 @@
 var logger = require('./lib/logger')
-var config = require('./lib/config')
-var Exceptions = require('./exceptions/exceptions')
 var API = require('./lib/api')
 
+var ServiceFactory = require('./common/serviceFactory')
+
 function Opbeat () {
-  this._config = config
-  this._config.init()
+  this._serviceFactory = new ServiceFactory()
+
+  this._config = this._serviceFactory.getConfigService()
 
   var queuedCommands = []
   if (window._opbeat) {
@@ -31,7 +32,7 @@ Opbeat.prototype.isPlatformSupport = function () {
  */
 Opbeat.prototype.config = function (properties) {
   if (properties) {
-    config.setConfig(properties)
+    this._config.setConfig(properties)
   }
 
   this.install()
@@ -49,7 +50,7 @@ Opbeat.prototype.config = function (properties) {
  */
 
 Opbeat.prototype.install = function () {
-  if (!config.isValid()) {
+  if (!this._config.isValid()) {
     logger.warning('opbeat.install.config.invalid')
     return this
   }
@@ -64,7 +65,7 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  this._exceptions = new Exceptions()
+  this._exceptions = this._exceptionHandler = this._serviceFactory.getExceptionHandler()
 
   this._exceptions.install()
   this._config.set('isInstalled', true)
@@ -120,7 +121,7 @@ Opbeat.prototype.captureException = function (ex, options) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setUserContext = function (user) {
-  config.set('context.user', user)
+  this._config.set('context.user', user)
 
   return this
 }
@@ -132,7 +133,7 @@ Opbeat.prototype.setUserContext = function (user) {
  * @return {Opbeat}
  */
 Opbeat.prototype.setExtraContext = function (extra) {
-  config.set('context.extra', extra)
+  this._config.set('context.extra', extra)
 
   return this
 }

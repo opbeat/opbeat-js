@@ -2,25 +2,25 @@ var Promise = require('es6-promise').Promise
 var stackTrace = require('./stacktrace')
 var frames = require('./frames')
 
-var Exceptions = function () {
-
+var ExceptionHandler = function (opbeatBackend) {
+  this._opbeatBackend = opbeatBackend
 }
 
-Exceptions.prototype.install = function () {
+ExceptionHandler.prototype.install = function () {
   window.onerror = function (msg, file, line, col, error) {
-    processError.call(this, error, msg, file, line, col)
+    this._processError(error, msg, file, line, col)
   }.bind(this)
 }
 
-Exceptions.prototype.uninstall = function () {
+ExceptionHandler.prototype.uninstall = function () {
   window.onerror = null
 }
 
-Exceptions.prototype.processError = function (err) {
-  processError(err)
+ExceptionHandler.prototype.processError = function (err) {
+  return this._processError(err)
 }
 
-function processError (error, msg, file, line, col) {
+ExceptionHandler.prototype._processError = function processError (error, msg, file, line, col) {
   if (msg === 'Script error.' && !file) {
     // ignoring script errors: See https://github.com/getsentry/raven-js/issues/41
     return
@@ -55,12 +55,14 @@ function processError (error, msg, file, line, col) {
     })
   }
 
-  resolveStackFrames.then(function (stackFrames) {
+  var exceptionHandler = this
+  return resolveStackFrames.then(function (stackFrames) {
     exception.stack = stackFrames || []
     return frames.stackInfoToOpbeatException(exception).then(function (exception) {
-      frames.processOpbeatException(exception)
+      var data = frames.processOpbeatException(exception)
+      exceptionHandler._opbeatBackend.sendError(data)
     })
   })['catch'](function () {})
 }
 
-module.exports = Exceptions
+module.exports = ExceptionHandler

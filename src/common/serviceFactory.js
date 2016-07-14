@@ -4,6 +4,7 @@ var Config = require('../lib/config')
 
 var utils = require('../lib/utils')
 var transport = require('../lib/transport')
+var ExceptionHandler = require('../exceptions/exceptionHandler')
 
 function ServiceFactory () {
   this.services = {}
@@ -36,6 +37,14 @@ ServiceFactory.prototype.getConfigService = function () {
     this.services['ConfigService'] = Config
   }
   return this.services['ConfigService']
+}
+
+ServiceFactory.prototype.getExceptionHandler = function () {
+  if (utils.isUndefined(this.services['ExceptionHandler'])) {
+    var exceptionHandler = new ExceptionHandler(this.getOpbeatBackend())
+    this.services['ExceptionHandler'] = exceptionHandler
+  }
+  return this.services['ExceptionHandler']
 }
 
 module.exports = ServiceFactory
