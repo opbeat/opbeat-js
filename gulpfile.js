@@ -218,7 +218,7 @@ gulp.task('test:e2e:protractor', function () {
 })
 
 // Run end-to-end tests on the local machine using webdriver configuration
-gulp.task('test:e2e', ['test:e2e:protractor'], function (done) {
+gulp.task('test:e2e:run', ['test:e2e:protractor'], function (done) {
   gulp.src('wdio.conf.js')
     .pipe(webdriver())
     .on('error', function () {
