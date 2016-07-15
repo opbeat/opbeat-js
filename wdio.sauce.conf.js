@@ -4,6 +4,7 @@ config.capabilities = [
     maxInstances: 1,
     browserName: 'chrome',
     'version': '45',
+    name: 'e2e',
     before: function () {
       browser.timeoutsAsyncScript(30000)
     }

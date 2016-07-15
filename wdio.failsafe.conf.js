@@ -3,6 +3,7 @@ config.capabilities = [
   {
     browserName: 'internet explorer',
     maxInstances: 1,
+    name: 'e2e:failsafe',
     'platform': 'Windows 7',
     'version': '9.0'
   }
