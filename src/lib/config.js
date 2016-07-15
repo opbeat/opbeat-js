@@ -13,7 +13,8 @@ function Config () {
     performance: {
       enable: true,
       enableStackFrames: false,
-      groupSimilarTraces: false
+      groupSimilarTraces: false,
+      similarTraceThershold: 0.05
     },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {

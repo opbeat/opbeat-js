@@ -14,14 +14,11 @@ OpbeatBackend.prototype.sendError = function (errorData) {
   }
 }
 
-OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transaction) {
+OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transaction, threshold) {
   var transDuration = transaction.duration()
   var traces = []
   var lastCount = 1
-  var threshold = 0.05
-  transaction.traces.sort(function (traceA, traceB) {
-    return traceA._start - traceB._start
-  })
+  transaction.traces
     .forEach(function (trace, index) {
       if (traces.length === 0) {
         traces.push(trace)
@@ -51,22 +48,32 @@ OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transact
         }
       }
     })
-  transaction.traces = traces
   return traces
 }
 
 OpbeatBackend.prototype.sendTransactions = function (transactionList) {
+  var opbeatBackend = this
   if (this._config.isValid()) {
-    if (this._config.get('performance.groupSimilarTraces')) {
-      transactionList.forEach(this.groupSmallContinuouslySimilarTraces)
-    }
+    transactionList.forEach(function (transaction) {
+      transaction.traces.sort(function (traceA, traceB) {
+        return traceA._start - traceB._start
+      })
 
-    var formatedTransactions = this._formatTransactions(transactionList)
+      if (opbeatBackend._config.get('performance.groupSimilarTraces')) {
+        var similarTraceThershold = opbeatBackend._config.get('performance.similarTraceThershold')
+        transaction.traces = opbeatBackend.groupSmallContinuouslySimilarTraces(transaction, similarTraceThershold)
+      }
+    })
+    var filterTransactions = transactionList.filter(function (tr) {
+      return !tr.isUseless
+    })
+    var formatedTransactions = this._formatTransactions(filterTransactions)
     return this._transport.sendTransaction(formatedTransactions)
   } else {
     this._logger.debug('Config is not valid')
   }
 }
+
 OpbeatBackend.prototype._formatTransactions = function (transactionList) {
   var transactions = this.groupTransactions(transactionList)
 
