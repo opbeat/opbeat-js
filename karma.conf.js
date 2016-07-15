@@ -104,7 +104,6 @@ module.exports = function (config) {
 
   if (isTravis) {
     buildId = 'OpbeatJS@' + version + ' - TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
-    cfg.sauceLabs.tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
     // 'karma-chrome-launcher',
     cfg.plugins.push('karma-firefox-launcher')
     cfg.browsers.push('Firefox')
