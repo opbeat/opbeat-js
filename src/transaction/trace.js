@@ -54,9 +54,10 @@ Trace.prototype.end = function () {
 }
 
 Trace.prototype.duration = function () {
-  if (!this.ended) {
+  if (!this.ended || !this._start) {
     return null
   }
+  this._diff = this._end - this._start
 
   return parseFloat(this._diff)
 }
