@@ -24,11 +24,11 @@ require('gulp-release-tasks')(gulp)
 var jeditor = require('gulp-json-editor')
 
 var webdriverConfig = {
-    user: process.env.SAUCE_USERNAME || 'opbeat',
-    key: process.env.SAUCE_ACCESS_KEY || 'de42e589-1450-41a2-8a44-90aa00c15168',
-    host: process.env.SAUCE_HOST ||'ondemand.saucelabs.com',
-    port: process.env.SAUCE_PORT || 80,
-    baseUrl: process.env.SAUCE_BASEURL || 'http://localhost:8000'
+  user: process.env.SAUCE_USERNAME || 'opbeat',
+  key: process.env.SAUCE_ACCESS_KEY || 'de42e589-1450-41a2-8a44-90aa00c15168',
+  host: process.env.SAUCE_HOST || 'ondemand.saucelabs.com',
+  port: process.env.SAUCE_PORT || 80,
+  baseUrl: process.env.SAUCE_BASEURL || 'http://localhost:8000'
 }
 
 // Static file server
@@ -266,17 +266,17 @@ gulp.task('test:e2e:launchsauceconnect', function (done) {
     logger: console.log
   }
 
-  var tryConnect = function(maxAttempts, currAttempts, done) {
+  var tryConnect = function (maxAttempts, currAttempts, done) {
     sauceConnectLauncher(config, function (err, sauceConnectProcess) {
       if (err) {
         console.error(err.message)
         if (currAttempts <= maxAttempts) {
-          console.log("Retrying... (attempt " + currAttempts + " of " + maxAttempts + ")")
+          console.log('Retrying... (attempt ' + currAttempts + ' of ' + maxAttempts + ')')
           tryConnect(maxAttempts, ++currAttempts, done)
-        }else{
+        } else {
           return process.exit(1)
         }
-      }else{
+      } else {
         console.log('Sauce Connect ready')
         done()
       }
@@ -332,7 +332,7 @@ gulp.task('test:e2e', function (done) {
 })
 
 gulp.task('test:unit:sauce', function (done) {
-  runSequence('build', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test', function () {
+  runSequence('build', 'test:e2e:launchsauceconnect', 'test', function () {
     console.log('All tasks completed.')
     done()
     process.exit(0)
