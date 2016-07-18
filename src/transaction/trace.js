@@ -1,6 +1,6 @@
 var Promise = require('es6-promise').Promise
 var frames = require('../exceptions/frames')
-var traceCache = require('../instrumentation/traceCache')
+var traceCache = require('./traceCache')
 var utils = require('../lib/utils')
 
 function Trace (transaction, signature, type, options) {
