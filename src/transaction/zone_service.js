@@ -166,7 +166,7 @@ function ZoneService (zone, logger, config) {
   //     return childZone
   //   }
   // }
-
+  this.outer = zone
   this.zone = zone.fork(zoneConfig)
 }
 
@@ -179,6 +179,10 @@ ZoneService.prototype.get = function (key) {
 
 ZoneService.prototype.getCurrentZone = function () {
   return window.zone
+}
+
+ZoneService.prototype.runOuter = function (fn) {
+  return this.outer.run(fn)
 }
 
 module.exports = ZoneService

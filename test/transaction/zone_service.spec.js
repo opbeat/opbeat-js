@@ -181,6 +181,16 @@ describe('ZoneService', function () {
     })
   })
 
+  it('should run in the outer zone', function () {
+    resetZoneCallbacks(zoneService)
+    zoneService.zone.run(function () {
+      expect(window.Zone.current.name).toBe('opbeatRootZone')
+      zoneService.runOuter(function () {
+        expect(window.Zone.current.name).toBe('<root>')
+      })
+    })
+  })
+
   afterEach(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
