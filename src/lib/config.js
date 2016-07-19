@@ -1,4 +1,5 @@
 var utils = require('./utils')
+var Subscription = require('../common/subscription')
 
 function Config () {
   this.config = {}
@@ -6,6 +7,7 @@ function Config () {
     VERSION: '%%VERSION%%',
     apiHost: 'intake.opbeat.com',
     isInstalled: false,
+    debug: false,
     logLevel: 'warn',
     orgId: null,
     appId: null,
@@ -28,6 +30,8 @@ function Config () {
   if (shouldGenerateStackFrames) {
     this.defaults.performance.enableStackFrames = shouldGenerateStackFrames
   }
+
+  this._changeSubscription = new Subscription()
 }
 
 Config.prototype.init = function () {
@@ -64,6 +68,11 @@ Config.prototype.setConfig = function (properties) {
   properties = properties || {}
   var prevCfg = utils.mergeObject(this.defaults, this.config)
   this.config = utils.mergeObject(prevCfg, properties)
+  this._changeSubscription.applyAll(this, [this.config])
+}
+
+Config.prototype.subscribeToChange = function (fn) {
+  return this._changeSubscription.subscribe(fn)
 }
 
 Config.prototype.isValid = function () {

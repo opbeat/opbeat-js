@@ -1,6 +1,6 @@
 var Config = require('../../src/lib/config')
 var OpbeatBackend = require('../../src/backend/opbeat_backend')
-var logger = require('loglevel')
+var logger = Object.create(require('loglevel'))
 
 var Transaction = require('../../src/transaction/transaction')
 var ExceptionHandler = require('../../src/exceptions/exceptionHandler')

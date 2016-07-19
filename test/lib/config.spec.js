@@ -4,14 +4,14 @@ var config = Config
 config.init()
 describe('config', function () {
   it('should merge configs with already set configs', function () {
-    expect(config.get('debug')).toBe(undefined)
+    expect(config.get('debug')).toBe(false)
     expect(config.get('appId')).toBe(null)
 
     config.setConfig({
       appId: 'appId'
     })
 
-    expect(config.get('debug')).toBe(undefined)
+    expect(config.get('debug')).toBe(false)
     expect(config.get('appId')).toBe('appId')
 
     config.setConfig({

@@ -2,7 +2,7 @@ var TransactionService = require('../../src/transaction/transaction_service')
 var Transaction = require('../../src/transaction/transaction')
 
 var ZoneServiceMock = require('./zone_service_mock.js')
-var logger = require('loglevel')
+var logger = Object.create(require('loglevel'))
 
 var Config = require('../../src/lib/config')
 

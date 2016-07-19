@@ -19,13 +19,21 @@ ServiceFactory.prototype.getOpbeatBackend = function () {
   return this.services['OpbeatBackend']
 }
 
+ServiceFactory.prototype.setLogLevel = function (logger, configService) {
+  if (configService.get('debug') === true && configService.config.logLevel !== 'trace') {
+    logger.setLevel('debug', false)
+  } else {
+    logger.setLevel(configService.get('logLevel'), false)
+  }
+}
 ServiceFactory.prototype.getLogger = function () {
   if (utils.isUndefined(this.services['Logger'])) {
     var configService = this.getConfigService()
-    if (configService.get('debug') === true) {
-      configService.config.logLevel = 'debug'
-    }
-    Logger.setLevel(configService.get('logLevel'), false)
+    var serviceFactory = this
+    serviceFactory.setLogLevel(Logger, configService)
+    configService.subscribeToChange(function (newConfig) {
+      serviceFactory.setLogLevel(Logger, configService)
+    })
     this.services['Logger'] = Logger
   }
   return this.services['Logger']

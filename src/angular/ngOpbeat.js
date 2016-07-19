@@ -3,9 +3,6 @@ function NgOpbeatProvider (logger, configService, exceptionHandler) {
     if (properties) {
       configService.setConfig(properties)
     }
-    if (properties.debug === true) {
-      logger.setLevel('debug', false)
-    }
   }
 
   this.version = '%%VERSION%%'
