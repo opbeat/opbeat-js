@@ -60,8 +60,8 @@ OpbeatBackend.prototype.sendTransactions = function (transactionList) {
       })
 
       if (opbeatBackend._config.get('performance.groupSimilarTraces')) {
-        var similarTraceThershold = opbeatBackend._config.get('performance.similarTraceThershold')
-        transaction.traces = opbeatBackend.groupSmallContinuouslySimilarTraces(transaction, similarTraceThershold)
+        var similarTraceThreshold = opbeatBackend._config.get('performance.similarTraceThreshold')
+        transaction.traces = opbeatBackend.groupSmallContinuouslySimilarTraces(transaction, similarTraceThreshold)
       }
     })
     var filterTransactions = transactionList.filter(function (tr) {
