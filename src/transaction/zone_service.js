@@ -39,9 +39,9 @@ function ZoneService (zone, logger, config) {
         task.data.target[opbeatDataSymbol] = {registeredEventListeners: {}}
       }
 
-      logger.debug('zoneservice.onScheduleTask', task.source, ' type:', task.type)
+      logger.trace('zoneservice.onScheduleTask', task.source, ' type:', task.type)
       if (task.type === 'macroTask') {
-        logger.debug('Zone: ', targetZone.name)
+        logger.trace('Zone: ', targetZone.name)
         var taskId = nextId++
         var opbeatTask = {
           taskId: task.source + taskId,
@@ -94,13 +94,13 @@ function ZoneService (zone, logger, config) {
       return delegateTask
     },
     onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
-      logger.debug('zoneservice.onInvokeTask', task.source, ' type:', task.type)
+      logger.trace('zoneservice.onInvokeTask', task.source, ' type:', task.type)
       var hasTarget = task.data && task.data.target
       var result
 
       if (hasTarget && task.data.target[opbeatDataSymbol].typeName === 'XMLHttpRequest') {
         var opbeatData = task.data.target[opbeatDataSymbol]
-        logger.debug('opbeatData', opbeatData)
+        logger.trace('opbeatData', opbeatData)
         var opbeatTask = opbeatData.task
 
         if (opbeatTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === XHR.DONE) {
@@ -126,7 +126,7 @@ function ZoneService (zone, logger, config) {
       return result
     },
     onCancelTask: function (parentZoneDelegate, currentZone, targetZone, task) {
-      // logger.debug('Zone: ', targetZone.name)
+      // logger.trace('Zone: ', targetZone.name)
       var opbeatTask
       if (task.type === 'macroTask') {
         if (task.source === XMLHttpRequest_send) {
