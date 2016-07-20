@@ -55,7 +55,32 @@ TransactionService.prototype.getTransaction = function (id) {
   return this.transactions[id]
 }
 
-TransactionService.prototype.createTransaction = function (name, type) {}
+TransactionService.prototype.createTransaction = function (name, type, options) {
+  var tr = new Transaction(name, type, options)
+  this._zoneService.set('transaction', tr)
+  if (this._config.get('performance.checkBrowserResponsiveness')) {
+    this.startCounter(tr)
+  }
+  return tr
+}
+
+TransactionService.prototype.startCounter = function (transaction) {
+  transaction.browserResponsivenessCounter = 0
+  var interval = this._config.get('performance.browserResponsivenessInterval')
+  if (typeof interval === 'undefined') {
+    this._logger.debug('browserResponsivenessInterval is undefined!')
+    return
+  }
+  this._zoneService.runOuter(function () {
+    var id = setInterval(function () {
+      if (transaction.ended) {
+        window.clearInterval(id)
+      } else {
+        transaction.browserResponsivenessCounter++
+      }
+    }, interval)
+  })
+}
 
 TransactionService.prototype.startTransaction = function (name, type) {
   var self = this
@@ -67,8 +92,7 @@ TransactionService.prototype.startTransaction = function (name, type) {
 
   var tr = this._zoneService.get('transaction')
   if (typeof tr === 'undefined' || tr.ended) {
-    tr = new Transaction(name, type, perfOptions)
-    this._zoneService.set('transaction', tr)
+    tr = this.createTransaction(name, type, perfOptions)
   } else {
     tr.name = name
     tr.type = type
@@ -103,8 +127,7 @@ TransactionService.prototype.startTrace = function (signature, type, options) {
   if (!utils.isUndefined(tr) && !tr.ended) {
     this._logger.debug('TransactionService.startTrace', signature, type)
   } else {
-    tr = new Transaction('ZoneTransaction', 'transaction', perfOptions)
-    this._zoneService.set('transaction', tr)
+    tr = this.createTransaction('ZoneTransaction', 'transaction', perfOptions)
     this._logger.debug('TransactionService.startTrace - ZoneTransaction', signature, type)
   }
   var trace = tr.startTrace(signature, type, options)

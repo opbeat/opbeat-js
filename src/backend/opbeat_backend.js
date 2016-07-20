@@ -51,6 +51,19 @@ OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transact
   return traces
 }
 
+OpbeatBackend.prototype.checkBrowserResponsiveness = function (transaction, interval, buffer) {
+  var counter = transaction.browserResponsivenessCounter
+  if (typeof interval === 'undefined' || typeof counter === 'undefined') {
+    return true
+  }
+
+  var duration = transaction._rootTrace.duration()
+  var expectedCount = Math.floor(duration / interval)
+  var wasBrowserResponsive = counter + buffer >= expectedCount
+
+  return wasBrowserResponsive
+}
+
 OpbeatBackend.prototype.sendTransactions = function (transactionList) {
   var opbeatBackend = this
   if (this._config.isValid()) {
@@ -65,10 +78,26 @@ OpbeatBackend.prototype.sendTransactions = function (transactionList) {
       }
     })
     var filterTransactions = transactionList.filter(function (tr) {
-      return !tr.isUseless
+      var checkBrowserResponsiveness = opbeatBackend._config.get('performance.checkBrowserResponsiveness')
+
+      if (checkBrowserResponsiveness) {
+        var interval = opbeatBackend._config.get('performance.browserResponsivenessInterval')
+        var buffer = opbeatBackend._config.get('performance.browserResponsivenessBuffer')
+
+        var duration = tr._rootTrace.duration()
+        var wasBrowserResponsive = opbeatBackend.checkBrowserResponsiveness(tr, interval, buffer)
+        if (!wasBrowserResponsive) {
+          opbeatBackend._logger.debug('Transaction was discarded! browser was not responsive enough during the transaction.', ' duration:', duration, ' browserResponsivenessCounter:', tr.browserResponsivenessCounter, 'interval:', interval)
+          return false
+        }
+      }
+      return true
     })
-    var formatedTransactions = this._formatTransactions(filterTransactions)
-    return this._transport.sendTransaction(formatedTransactions)
+
+    if (filterTransactions.length > 0) {
+      var formatedTransactions = this._formatTransactions(filterTransactions)
+      return this._transport.sendTransaction(formatedTransactions)
+    }
   } else {
     this._logger.debug('Config is not valid')
   }

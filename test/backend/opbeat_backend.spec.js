@@ -13,7 +13,7 @@ function TransportMock () {
   this.sendError = function () {}
 }
 
-describe('backend.OpbeatBackend', function () {
+describe('OpbeatBackend', function () {
   var config
   var transportMock
   var opbeatBackend
@@ -28,11 +28,11 @@ describe('backend.OpbeatBackend', function () {
     opbeatBackend = new OpbeatBackend(transportMock, logger, config)
   })
 
-  it('should call sendTransctions', function () {
+  it('should not send transctions when the list is empty', function () {
     config.setConfig({ appId: 'test', orgId: 'test', isInstalled: true })
     expect(config.isValid()).toBe(true)
     opbeatBackend.sendTransactions([])
-    expect(transportMock.sendTransaction).toHaveBeenCalledWith(Object({ transactions: [], traces: Object({ groups: [], raw: [] }) }))
+    expect(transportMock.sendTransaction).not.toHaveBeenCalled()
     expect(logger.warn).not.toHaveBeenCalled()
   })
 
@@ -44,7 +44,13 @@ describe('backend.OpbeatBackend', function () {
   })
 
   it('should not send frames with length === 0', function (done) {
-    config.setConfig({ appId: 'test', orgId: 'test', isInstalled: true })
+    config.setConfig({
+      appId: 'test', orgId: 'test', isInstalled: true,
+      performance: {
+        checkBrowserResponsiveness: false,
+        groupSimilarTraces: false
+      }
+    })
     expect(config.isValid()).toBe(true)
 
     var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
@@ -119,5 +125,77 @@ describe('backend.OpbeatBackend', function () {
       expect(logger.debug).toHaveBeenCalledWith('Config is not valid')
       expect(transportMock.sendError).not.toHaveBeenCalled()
     })
+  })
+
+  it('should calculate browser responsiveness', function () {
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    tr.end()
+
+    tr._rootTrace._start = 1
+
+    tr._rootTrace._end = 400
+    tr.browserResponsivenessCounter = 0
+    var resp = opbeatBackend.checkBrowserResponsiveness(tr, 500, 2)
+    expect(resp).toBe(true)
+
+    tr._rootTrace._end = 1001
+    tr.browserResponsivenessCounter = 2
+    resp = opbeatBackend.checkBrowserResponsiveness(tr, 500, 2)
+    expect(resp).toBe(true)
+
+    tr._rootTrace._end = 1601
+    tr.browserResponsivenessCounter = 2
+    resp = opbeatBackend.checkBrowserResponsiveness(tr, 500, 2)
+    expect(resp).toBe(true)
+
+    tr._rootTrace._end = 3001
+    tr.browserResponsivenessCounter = 3
+    resp = opbeatBackend.checkBrowserResponsiveness(tr, 500, 2)
+    expect(resp).toBe(false)
+  })
+
+  it('should check browser responsiveness based on config', function () {
+    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    expect(config.isValid()).toBe(true)
+
+    config.setConfig({
+      performance: {
+        checkBrowserResponsiveness: false
+      }
+    })
+
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    tr.end()
+
+    tr._rootTrace._start = 1
+    tr._rootTrace._end = 1001
+    tr.browserResponsivenessCounter = 0
+
+    spyOn(opbeatBackend, 'checkBrowserResponsiveness').and.callThrough()
+
+    opbeatBackend.sendTransactions([tr])
+
+    expect(opbeatBackend.checkBrowserResponsiveness).not.toHaveBeenCalled()
+    expect(transportMock.sendTransaction).toHaveBeenCalled()
+
+    config.setConfig({
+      performance: {
+        checkBrowserResponsiveness: true
+      }
+    })
+
+    transportMock.sendTransaction.calls.reset()
+    opbeatBackend.sendTransactions([tr])
+    expect(opbeatBackend.checkBrowserResponsiveness).toHaveBeenCalled()
+    expect(transportMock.sendTransaction).toHaveBeenCalled()
+
+    tr._rootTrace._start = 1
+    tr._rootTrace._end = 3001
+    tr.browserResponsivenessCounter = 1
+
+    transportMock.sendTransaction.calls.reset()
+    opbeatBackend.sendTransactions([tr])
+    expect(opbeatBackend.checkBrowserResponsiveness).toHaveBeenCalled()
+    expect(transportMock.sendTransaction).not.toHaveBeenCalled()
   })
 })

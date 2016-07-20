@@ -33,6 +33,8 @@ var Transaction = function (name, type, options) {
 
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
   this.nextId = 0
+
+  this.loadCounter = 0
 }
 
 Transaction.prototype.startTrace = function (signature, type, options) {
