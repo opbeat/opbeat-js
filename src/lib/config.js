@@ -25,12 +25,6 @@ function Config () {
     }
   }
 
-  // Only generate stack frames 10% of the time
-  var shouldGenerateStackFrames = utils.getRandomInt(0, 10) === 1
-  if (shouldGenerateStackFrames) {
-    this.defaults.performance.enableStackFrames = shouldGenerateStackFrames
-  }
-
   this._changeSubscription = new Subscription()
 }
 
