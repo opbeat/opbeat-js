@@ -60,8 +60,8 @@ Config.prototype.set = function (key, value) {
 
 Config.prototype.setConfig = function (properties) {
   properties = properties || {}
-  var prevCfg = utils.mergeObject(this.defaults, this.config)
-  this.config = utils.mergeObject(prevCfg, properties)
+  this.config = utils.merge({}, this.defaults, this.config, properties)
+
   this._changeSubscription.applyAll(this, [this.config])
 }
 
