@@ -1,3 +1,5 @@
+var slice = [].slice
+
 module.exports = {
   getViewPortInfo: function getViewPort () {
     var e = document.documentElement
@@ -25,6 +27,39 @@ module.exports = {
 
     return o3
   },
+
+  extend: function extend (dst) {
+    return this.baseExtend(dst, slice.call(arguments, 1), false)
+  },
+
+  merge: function merge (dst) {
+    return this.baseExtend(dst, slice.call(arguments, 1), true)
+  },
+
+  baseExtend: function baseExtend (dst, objs, deep) {
+    for (var i = 0, ii = objs.length; i < ii; ++i) {
+      var obj = objs[i]
+      if (!isObject(obj) && !isFunction(obj)) continue
+      var keys = Object.keys(obj)
+      for (var j = 0, jj = keys.length; j < jj; j++) {
+        var key = keys[j]
+        var src = obj[key]
+
+        if (deep && isObject(src)) {
+          if (!isObject(dst[key])) dst[key] = Array.isArray(src) ? [] : {}
+          baseExtend(dst[key], [src], false) // only one level of deep merge
+        } else {
+          dst[key] = src
+        }
+      }
+    }
+
+    return dst
+  },
+
+  isObject: isObject,
+
+  isFunction: isFunction,
 
   arrayReduce: function (arrayValue, callback, value) {
     // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
@@ -188,4 +223,13 @@ module.exports = {
     return _p8() + _p8(true) + _p8(true) + _p8()
   }
 
+}
+
+function isObject (value) {
+  // http://jsperf.com/isobject4
+  return value !== null && typeof value === 'object'
+}
+
+function isFunction (value) {
+  return typeof value === 'function'
 }
