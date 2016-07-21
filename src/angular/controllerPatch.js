@@ -7,11 +7,6 @@ function getControllerInfoFromArgs (args) {
     name = args[0]
   } else if (typeof args[0] === 'function') {
     name = args[0].name
-
-    // Function has been wrapped by us, use original function name
-    if (name === 'opbeatFunctionWrapper' && args[0].original) {
-      name = args[0].original.name
-    }
   }
 
   if (typeof args[1] === 'object') {
