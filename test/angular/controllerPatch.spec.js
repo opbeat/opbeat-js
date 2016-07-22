@@ -43,16 +43,20 @@ describe('controllerPatch', function () {
     expect(trService.startTrace).toHaveBeenCalledWith('$controller.testController', 'app.$controller', { 'enableStackFrames': false })
   })
 
-  it('should include the function name for inline controllers', function () {
+  it('should include the function name for inline controllers if function.name is supported', function () {
+    function test () {}
     app.directive('testDirective', function () {
       return {
-        controller: function test () {},
+        controller: test,
         template: '<div></div>'
       }
     })
-
     angular.bootstrap('<div test-directive=""></div>', ['patchModule'])
 
-    expect(trService.startTrace).toHaveBeenCalledWith('$controller.test', 'app.$controller', { 'enableStackFrames': false })
+    if (test.name) {
+      expect(trService.startTrace).toHaveBeenCalledWith('$controller.test', 'app.$controller', { 'enableStackFrames': false })
+    } else {
+      expect(trService.startTrace).not.toHaveBeenCalled()
+    }
   })
 })
