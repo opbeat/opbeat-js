@@ -1,18 +1,27 @@
-var OpbeatBackend = require('../../src/backend/opbeat_backend')
 var ServiceContainer = require('../../src/angular/serviceContainer')
+var ServiceFactory = require('../../src/common/serviceFactory')
 
 var Subscription = require('../../src/common/subscription')
 
-var opbeat = require('../../src/opbeat')
-
-function TransportMock () {
+function TransportMock (transport) {
+  this._transport = transport
   this.transactions = []
   this.subscription = new Subscription()
 }
 
 TransportMock.prototype.sendTransaction = function (transactions) {
   this.transactions = this.transactions.concat(transactions)
-  this.subscription.applyAll(this, [transactions])
+  var trMock = this
+  if (this._transport) {
+    this._transport.sendTransaction(transactions).then(function () {
+      trMock.subscription.applyAll(this, [transactions])
+    }, function (reason) {
+      console.log('Failed to send to opbeat: ', reason)
+      trMock.subscription.applyAll(this, [transactions])
+    })
+  } else {
+    this.subscription.applyAll(this, [transactions])
+  }
 }
 
 TransportMock.prototype.subscribe = function (fn) {
@@ -24,14 +33,25 @@ function init () {
   if (initialized) {
     return
   }
-  var config = opbeat.config()
-  config.logLevel = 'debug'
-  var services = new ServiceContainer(config).services
+  var serviceFactory = new ServiceFactory()
+  var transport = serviceFactory.getTransport()
+  var transportMock = new TransportMock(transport)
+  serviceFactory.services['Transport'] = transportMock
+
+  var services = new ServiceContainer(serviceFactory).services
+  // var config = serviceFactory.getConfigService()
+
+  // opbeat.com/jahtalab/opbeat-e2e
+  // config.setConfig({
+  //   orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
+  //   appId: '6664ca4dfc'
+  // })
+
   var logger = services.logger
   var transactionService = services.transactionService
 
-  var transportMock = new TransportMock()
-  var opbeatBackend = new OpbeatBackend(transportMock, logger, config)
+  var opbeatBackend = serviceFactory.getOpbeatBackend()
+
   transactionService.subscribe(function (tr) {
     opbeatBackend.sendTransactions([tr])
   })

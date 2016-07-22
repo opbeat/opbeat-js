@@ -12,7 +12,7 @@ function init (opbeatConfig) {
     $urlRouterProvider.otherwise('/')
 
     $stateProvider
-      .state('exponentialstate', routeConfig)
+      .state('minified_module_app_exponentialstate', routeConfig)
   })
 
   app.config(function ($opbeatProvider) {

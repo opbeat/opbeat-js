@@ -14,9 +14,17 @@ ServiceFactory.prototype.getOpbeatBackend = function () {
   if (utils.isUndefined(this.services['OpbeatBackend'])) {
     var logger = this.getLogger()
     var configService = this.getConfigService()
-    this.services['OpbeatBackend'] = new OpbeatBackend(transport, logger, configService)
+    var _transport = this.getTransport()
+    this.services['OpbeatBackend'] = new OpbeatBackend(_transport, logger, configService)
   }
   return this.services['OpbeatBackend']
+}
+
+ServiceFactory.prototype.getTransport = function () {
+  if (utils.isUndefined(this.services['Transport'])) {
+    this.services['Transport'] = transport
+  }
+  return this.services['Transport']
 }
 
 ServiceFactory.prototype.setLogLevel = function (logger, configService) {
@@ -26,6 +34,7 @@ ServiceFactory.prototype.setLogLevel = function (logger, configService) {
     logger.setLevel(configService.get('logLevel'), false)
   }
 }
+
 ServiceFactory.prototype.getLogger = function () {
   if (utils.isUndefined(this.services['Logger'])) {
     var configService = this.getConfigService()

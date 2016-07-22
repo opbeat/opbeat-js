@@ -13,7 +13,7 @@ describe('minified_module_app', function () {
             app.init({
               debug: true,
               orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
-              appId: '0a8757798e',
+              appId: '6664ca4dfc',
               performance: {
                 enable: true,
                 enableStackFrames: true
@@ -40,7 +40,7 @@ describe('minified_module_app', function () {
         expect(first.traces.groups.length).toBeGreaterThan(11)
         expect(first.traces.raw[0].length).toBeGreaterThan(15)
         expect(first.transactions.length).toBe(1)
-        expect(first.transactions[0].transaction).toBe('exponentialstate')
+        expect(first.transactions[0].transaction).toBe('minified_module_app_exponentialstate')
 
         done()
       }, function (error) {

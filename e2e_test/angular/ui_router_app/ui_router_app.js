@@ -8,14 +8,14 @@ function init (opbeatConfig) {
       url: '/',
       controller: 'expCtrl',
       templateUrl: 'common/exponential_ctrl.html',
-      deepStateRedirect: { default: 'exponentialstate.substate' }
+      deepStateRedirect: { default: 'ui_router_app_exponentialstate.substate' }
     }
 
     $urlRouterProvider.otherwise('/')
 
     $stateProvider
-      .state('exponentialstate', routeConfig)
-      .state('exponentialstate.substate', {
+      .state('ui_router_app_exponentialstate', routeConfig)
+      .state('ui_router_app_exponentialstate.substate', {
         url: '',
         controller: function ($scope) {
           $scope.test = 'passed'

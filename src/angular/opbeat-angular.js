@@ -1,7 +1,8 @@
-
 var ServiceContainer = require('./serviceContainer')
+var ServiceFactory = require('../common/serviceFactory')
 function init () {
-  var services = new ServiceContainer().services
+  var serviceFactory = new ServiceFactory()
+  var services = new ServiceContainer(serviceFactory).services
   return services
 }
 

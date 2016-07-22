@@ -14,7 +14,7 @@ describe('angular.ui router app', function () {
             app.init({
               debug: true,
               orgId: '7f9fa667d0a349dd8377bc740bcfc33e',
-              appId: '0a8757798e',
+              appId: '6664ca4dfc',
               performance: {
                 enable: true,
                 enableStackFrames: true
@@ -34,7 +34,7 @@ describe('angular.ui router app', function () {
         expect(first.traces.groups.length).toBeGreaterThan(11)
         expect(first.traces.raw[0].length).toBeGreaterThan(16)
         expect(first.transactions.length).toBe(1)
-        expect(first.transactions[0].transaction).toBe('exponentialstate.substate')
+        expect(first.transactions[0].transaction).toBe('ui_router_app_exponentialstate.substate')
 
         done()
       }, function (error) {

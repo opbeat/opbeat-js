@@ -4,10 +4,9 @@ var TransactionService = require('../transaction/transaction_service')
 var utils = require('../lib/utils')
 
 var PatchingService = require('../patching/patchingService')
-var ServiceFactory = require('../common/serviceFactory')
 
-function ServiceContainer () {
-  this.serviceFactory = new ServiceFactory()
+function ServiceContainer (serviceFactory) {
+  this.serviceFactory = serviceFactory
   this.services = {}
 
   var configService = this.services.configService = this.serviceFactory.getConfigService()
