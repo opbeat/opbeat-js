@@ -324,18 +324,35 @@ gulp.task('test:e2e:start-sauce', function (done) {
 })
 
 gulp.task('test:e2e', function (done) {
-  runSequence('build', 'build:release', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function () {
-    console.log('All tasks completed.')
-    done()
-    process.exit(0)
+  runSequence('build', 'build:release', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function (err) {
+    if (err) {
+      return taskFailed(err)
+    } else {
+      return sequenceSucceeded(done)
+    }
   })
 })
 
+function taskFailed (err) {
+  var exitCode = 2
+  console.log('[ERROR] gulp build task failed', err)
+  console.log('[FAIL] gulp build task failed - exiting with code ' + exitCode)
+  return process.exit(exitCode)
+}
+
+function sequenceSucceeded (done) {
+  console.log('All tasks completed.')
+  done()
+  return process.exit(0)
+}
+
 gulp.task('test:unit:sauce', function (done) {
-  runSequence('build', 'test:e2e:launchsauceconnect', 'test', function () {
-    console.log('All tasks completed.')
-    done()
-    process.exit(0)
+  runSequence('build', 'test:e2e:launchsauceconnect', 'test', function (err) {
+    if (err) {
+      return taskFailed(err)
+    } else {
+      return sequenceSucceeded(done)
+    }
   })
 })
 
