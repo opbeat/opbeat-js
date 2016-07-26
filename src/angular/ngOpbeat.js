@@ -5,7 +5,7 @@ function NgOpbeatProvider (logger, configService, exceptionHandler) {
     }
   }
 
-  this.version = '%%VERSION%%'
+  this.version = configService.get('VERSION')
 
   this.install = function install () {
     logger.warn('$opbeatProvider.install is deprecated!')
@@ -73,6 +73,9 @@ function initialize (transactionService, logger, configService, zoneService, exc
       return
     }
     configService.set('isInstalled', true)
+    configService.set('opbeatAgentName', 'opbeat-angular')
+
+    logger.debug('Agent:', configService.getAgentName())
 
     // onRouteChangeStart
     function onRouteChangeStart (event, current) {

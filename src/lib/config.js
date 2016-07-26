@@ -4,6 +4,7 @@ var Subscription = require('../common/subscription')
 function Config () {
   this.config = {}
   this.defaults = {
+    opbeatAgentName: 'opbeat-js',
     VERSION: '%%VERSION%%',
     apiHost: 'intake.opbeat.com',
     isInstalled: false,
@@ -56,6 +57,14 @@ Config.prototype.set = function (key, value) {
       target = obj
     }
   })
+}
+
+Config.prototype.getAgentName = function () {
+  var version = this.config['VERSION']
+  if (!version || version.indexOf('%%VERSION') >= 0) {
+    version = 'dev'
+  }
+  return this.get('opbeatAgentName') + '/' + version
 }
 
 Config.prototype.setConfig = function (properties) {
