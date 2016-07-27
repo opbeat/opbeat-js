@@ -16,7 +16,8 @@ describe('minified_module_app', function () {
               appId: '6664ca4dfc',
               performance: {
                 enable: true,
-                enableStackFrames: true
+                enableStackFrames: true,
+                groupSimilarTraces: true
               }
             })
           },
@@ -38,6 +39,7 @@ describe('minified_module_app', function () {
         var first = transactions[0]
 
         expect(first.traces.groups.length).toBeGreaterThan(11)
+        utils.expectTraceInGroups('transaction', 1, first.traces.groups)
         expect(first.traces.raw[0].length).toBeGreaterThan(15)
         expect(first.transactions.length).toBe(1)
         expect(first.transactions[0].transaction).toBe('minified_module_app_exponentialstate')

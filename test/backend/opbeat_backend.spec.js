@@ -70,16 +70,18 @@ describe('OpbeatBackend', function () {
     })
   })
 
-  it('should group small continuously similar traces', function () {
+  it('should group small continuously similar traces up until the last one', function () {
     var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
     var trace1 = tr.startTrace('signature', 'type')
     trace1.end()
     var trace2 = tr.startTrace('signature', 'type')
     trace2.end()
-    var trace3 = tr.startTrace('signature', 'type')
+    var trace3 = tr.startTrace('another-signature', 'type')
     trace3.end()
     var trace4 = tr.startTrace('signature', 'type')
     trace4.end()
+    var trace5 = tr.startTrace('signature', 'type')
+    trace5.end()
 
     tr.end()
 
@@ -98,24 +100,78 @@ describe('OpbeatBackend', function () {
     trace4._start = 50
     trace4._end = 60
 
+    trace5._start = 61
+    trace5._end = 70
+
     tr.traces.sort(function (traceA, traceB) {
       return traceA._start - traceB._start
     })
     var grouped = opbeatBackend.groupSmallContinuouslySimilarTraces(tr, 0.05)
-    expect(grouped.length).toBe(2)
-    expect(grouped[1].signature).toBe('4x signature')
+
+    expect(grouped.length).toBe(4)
+    expect(grouped[0].signature).toBe('transaction')
+    expect(grouped[1].signature).toBe('2x signature')
+    expect(grouped[2].signature).toBe('another-signature')
+    expect(grouped[3].signature).toBe('2x signature')
   })
 
-  it('should not group small similar traces by default', function () {
+  it('should group small continuously similar traces', function () {
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    var trace1 = tr.startTrace('signature', 'type')
+    trace1.end()
+    var trace2 = tr.startTrace('signature', 'type')
+    trace2.end()
+    var trace3 = tr.startTrace('signature', 'type')
+    trace3.end()
+    var trace4 = tr.startTrace('signature', 'type')
+    trace4.end()
+    var trace5 = tr.startTrace('another-signature', 'type')
+    trace5.end()
+
+    tr.end()
+
+    tr._rootTrace._start = 10
+    tr._rootTrace._end = 1000
+
+    trace1._start = 20
+    trace1._end = 30
+
+    trace2._start = 31
+    trace2._end = 35
+
+    trace3._start = 35
+    trace3._end = 45
+
+    trace4._start = 50
+    trace4._end = 60
+
+    trace5._start = 60
+    trace5._end = 70
+
+    tr.traces.sort(function (traceA, traceB) {
+      return traceA._start - traceB._start
+    })
+
+    var grouped = opbeatBackend.groupSmallContinuouslySimilarTraces(tr, 0.05)
+
+    expect(grouped.length).toBe(3)
+    expect(grouped[0].signature).toBe('transaction')
+    expect(grouped[1].signature).toBe('4x signature')
+    expect(grouped[2].signature).toBe('another-signature')
+  })
+
+  it('should group small similar traces by default', function () {
     config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
     expect(config.isValid()).toBe(true)
-    expect(config.get('performance.groupSimilarTraces')).toBe(false)
+    expect(config.get('performance.groupSimilarTraces')).toBe(true)
+
     var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
     tr.startTrace('signature', 'type').end()
-    spyOn(opbeatBackend, 'groupSmallContinuouslySimilarTraces')
     tr.end()
+
+    spyOn(opbeatBackend, 'groupSmallContinuouslySimilarTraces').and.callThrough()
     opbeatBackend.sendTransactions([tr])
-    expect(opbeatBackend.groupSmallContinuouslySimilarTraces).not.toHaveBeenCalled()
+    expect(opbeatBackend.groupSmallContinuouslySimilarTraces).toHaveBeenCalled()
   })
 
   it('should not send errors if the config is not valid', function () {

@@ -43,7 +43,7 @@ OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transact
           lastCount = 1
         }
 
-        if (!isContinuouslySimilar && !isLastTrace) {
+        if (!isContinuouslySimilar) {
           traces.push(trace)
         }
       }

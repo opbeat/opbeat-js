@@ -19,7 +19,7 @@ function Config () {
       checkBrowserResponsiveness: true,
       enable: true,
       enableStackFrames: false,
-      groupSimilarTraces: false,
+      groupSimilarTraces: true,
       similarTraceThreshold: 0.05
     },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
