@@ -58,7 +58,9 @@ ServiceFactory.prototype.getConfigService = function () {
 
 ServiceFactory.prototype.getExceptionHandler = function () {
   if (utils.isUndefined(this.services['ExceptionHandler'])) {
-    var exceptionHandler = new ExceptionHandler(this.getOpbeatBackend())
+    var logger = this.getLogger()
+    var configService = this.getConfigService()
+    var exceptionHandler = new ExceptionHandler(this.getOpbeatBackend(), configService, logger)
     this.services['ExceptionHandler'] = exceptionHandler
   }
   return this.services['ExceptionHandler']

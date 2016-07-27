@@ -1,19 +1,29 @@
-var ExceptionHandler = require('../../src/exceptions/exceptionHandler')
+var ServiceFactory = require('../../src/common/serviceFactory')
+var Config = require('../../src/lib/config')
 
 function OpbeatBackendMock () {
   this.sendError = function () {}
 }
 describe('ExceptionHandler', function () {
-  var opbeatBackend
   var exceptionHandler
+  var config
+  var opbeatBackend
   beforeEach(function () {
+    var serviceFactory = new ServiceFactory()
+    config = Object.create(Config)
+    config.init()
+    serviceFactory.services['ConfigService'] = config
     opbeatBackend = new OpbeatBackendMock()
-    exceptionHandler = new ExceptionHandler(opbeatBackend)
+    serviceFactory.services['OpbeatBackend'] = opbeatBackend
+
+    exceptionHandler = serviceFactory.getExceptionHandler()
   })
   it('should process errors', function (done) {
     exceptionHandler.processError(new Error())
       .then(function () {
         done()
+      }, function (reason) {
+        fail(reason)
       })
   })
 })

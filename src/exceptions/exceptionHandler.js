@@ -2,8 +2,10 @@ var Promise = require('es6-promise').Promise
 var stackTrace = require('./stacktrace')
 var frames = require('./frames')
 
-var ExceptionHandler = function (opbeatBackend) {
+var ExceptionHandler = function (opbeatBackend, config, logger) {
   this._opbeatBackend = opbeatBackend
+  this._config = config
+  this._logger = logger
 }
 
 ExceptionHandler.prototype.install = function () {
@@ -59,10 +61,12 @@ ExceptionHandler.prototype._processError = function processError (error, msg, fi
   return resolveStackFrames.then(function (stackFrames) {
     exception.stack = stackFrames || []
     return frames.stackInfoToOpbeatException(exception).then(function (exception) {
-      var data = frames.processOpbeatException(exception)
+      var data = frames.processOpbeatException(exception, exceptionHandler._config.get('context.user'), exceptionHandler._config.get('context.extra'))
       exceptionHandler._opbeatBackend.sendError(data)
     })
-  })['catch'](function () {})
+  })['catch'](function (error) {
+    exceptionHandler._logger.debug(error)
+  })
 }
 
 module.exports = ExceptionHandler

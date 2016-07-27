@@ -104,7 +104,7 @@ module.exports = {
     }.bind(this))
   },
 
-  processOpbeatException: function (exception) {
+  processOpbeatException: function (exception, userContext, extraContext) {
     var type = exception.type
     var message = String(exception.message) || 'Script error'
     var filePath = this.cleanFilePath(exception.fileurl)
@@ -154,7 +154,7 @@ module.exports = {
         url: window.location.href
       },
       stacktrace: stacktrace,
-      user: config.get('context.user'),
+      user: userContext,
       level: null,
       logger: null,
       machine: null
@@ -162,8 +162,8 @@ module.exports = {
 
     data.extra = this.getBrowserSpecificMetadata()
 
-    if (config.get('context.extra')) {
-      data.extra = utils.mergeObject(data.extra, config.get('context.extra'))
+    if (extraContext) {
+      data.extra = utils.mergeObject(data.extra, extraContext)
     }
 
     logger.log('opbeat.exceptions.processOpbeatException', data)
