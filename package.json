@@ -66,6 +66,7 @@
     "karma-jasmine": "~0.3.6",
     "karma-sauce-launcher": "^0.3.1",
     "karma-spec-reporter": "0.0.23",
+    "phantomjs2": "^2.2.0",
     "proxyquireify": "^3.0.1",
     "run-sequence": "^1.1.5",
     "selenium-standalone": "^4.8.0",

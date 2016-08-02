@@ -32,10 +32,6 @@ exports.config = {
   // https://docs.saucelabs.com/reference/platforms-configurator
   //
   capabilities: [
-    // {
-    //   browserName: 'phantomjs',
-    //   'phantomjs.binary.path': require('phantomjs').path
-    // },
     {
       maxInstances: 1,
       browserName: 'chrome',

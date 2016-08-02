@@ -37,7 +37,7 @@ gulp.task('server', function () {
     root: ['examples', 'dist'],
     port: 7000,
     livereload: false,
-    open: false,
+    open: false
   })
 })
 
@@ -212,7 +212,7 @@ gulp.task('test:e2e:protractor', function () {
 
   return gulp.src(['e2e_test/**/*.pspec.js'])
     .pipe(protractor({
-      configFile: 'protractor.conf.js',
+      configFile: 'protractor.conf.js'
     }))
     .on('error', function (e) { throw e })
 })
@@ -227,6 +227,19 @@ gulp.task('test:e2e:run', ['test:e2e:protractor'], function (done) {
     .on('end', function () {
       return process.exit(0)
     })
+})
+
+gulp.task('test:e2e:phantomjs', function () {
+  var failSafeStream = gulp.src('wdio.phantomjs.conf.js')
+    .pipe(webdriver())
+    .on('error', function () {
+      console.log('Exiting process with status 1')
+      process.exit(1)
+    })
+    .on('end', function () {
+      console.log('Tests complete')
+    })
+  return failSafeStream
 })
 
 gulp.task('test:e2e:sauceconnect:failsafe', function () {
@@ -312,6 +325,7 @@ gulp.task('test:e2e:selenium', function (done) {
 
 gulp.task('test:e2e:start-local', function (done) {
   runSequence('build', 'build:release', 'test:e2e:serve', 'test:e2e:selenium', function () {
+    done()
     console.log('All tasks completed.')
   })
 })
@@ -324,7 +338,7 @@ gulp.task('test:e2e:start-sauce', function (done) {
 })
 
 gulp.task('test:e2e', function (done) {
-  runSequence('build', 'build:release', 'test:e2e:serve', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function (err) {
+  runSequence('build', 'build:release', 'test:e2e:start-local', 'test:e2e:phantomjs', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function (err) {
     if (err) {
       return taskFailed(err)
     } else {
