@@ -29,7 +29,7 @@ function ZoneService (zone, logger, config) {
   var zoneConfig = {
     name: 'opbeatRootZone',
     onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
-      if (task.type === 'eventTask' && task.data.eventName === 'dummyImmediateEvent') {
+      if (task.type === 'eventTask' && task.data.eventName === 'opbeatImmediatelyFiringEvent') {
         task.data.handler(task.data)
         return task
       }
@@ -75,9 +75,11 @@ function ZoneService (zone, logger, config) {
 
           // target for event tasks is different instance from the XMLHttpRequest, on mobile browsers
           // A hack to get the correct target for event tasks
-          task.data.target.addEventListener('dummyImmediateEvent', function (event) {
+          task.data.target.addEventListener('opbeatImmediatelyFiringEvent', function (event) {
             if (typeof event.target[opbeatDataSymbol] !== 'undefined') {
               task.data.target[opbeatDataSymbol] = event.target[opbeatDataSymbol]
+            } else {
+              task.data.target[opbeatDataSymbol] = event.target[opbeatDataSymbol] = {registeredEventListeners: {}}
             }
           })
 
@@ -113,7 +115,7 @@ function ZoneService (zone, logger, config) {
         }
 
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
-        if (opbeatTask && (!opbeatData.registeredEventListeners['load'] || opbeatData.registeredEventListeners['load'].resolved) && opbeatData.registeredEventListeners['readystatechange'].resolved && opbeatTask.XHR.resolved) {
+        if (opbeatTask && (!opbeatData.registeredEventListeners['load'] || opbeatData.registeredEventListeners['load'].resolved) && (!opbeatData.registeredEventListeners['readystatechange'] || opbeatData.registeredEventListeners['readystatechange'].resolved) && opbeatTask.XHR.resolved) {
           spec.onInvokeTask(opbeatTask)
         }
       } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {

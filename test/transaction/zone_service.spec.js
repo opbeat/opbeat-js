@@ -29,6 +29,8 @@ describe('ZoneService', function () {
 
     zoneService.spec.onScheduleTask = function (task) {
       expect(response).toBeUndefined()
+      expect(task.XHR.url).toBe('/')
+      expect(task.XHR.method).toBe('GET')
     }
     zoneService.spec.onBeforeInvokeTask = function (task) {
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
@@ -57,6 +59,72 @@ describe('ZoneService', function () {
       oReq.addEventListener('error', function (event) {
         console.log('failed')
       })
+
+      oReq.open('GET', '/', true)
+      oReq.send(null)
+    })
+  })
+
+  it('should keep track of task for XHR if the event listeners are registered after send', function (done) {
+    var response
+
+    zoneService.spec.onScheduleTask = function (task) {
+      expect(response).toBeUndefined()
+    }
+    zoneService.spec.onBeforeInvokeTask = function (task) {
+      expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
+    }
+    zoneService.spec.onInvokeTask = function (task) {
+      expect(response).toBeDefined()
+      expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
+
+      // should call done asynchronously since we're spying in this function in multiple tests
+      setTimeout(function () {
+        done()
+      })
+    }
+
+    spyOn(zoneService.spec, 'onScheduleTask').and.callThrough()
+    spyOn(zoneService.spec, 'onBeforeInvokeTask').and.callThrough()
+    spyOn(zoneService.spec, 'onInvokeTask').and.callThrough()
+
+    zoneService.zone.run(function () {
+      function reqListener () {
+        response = this.responseText
+      }
+
+      var oReq = new window.XMLHttpRequest()
+
+      oReq.open('GET', '/', true)
+      oReq.send(null)
+      oReq.addEventListener('load', reqListener)
+      oReq.addEventListener('error', function (event) {
+        console.log('failed')
+      })
+    })
+  })
+
+  it('should keep track of tasks even if no event listeners are registered', function (done) {
+    resetZoneCallbacks(zoneService)
+
+    zoneService.spec.onBeforeInvokeTask = function (task) {
+      expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
+    }
+    zoneService.spec.onInvokeTask = function (task) {
+      expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
+
+      // should call done asynchronously since we're spying in this function in multiple tests
+      setTimeout(function () {
+        done()
+      })
+    }
+
+    spyOn(zoneService.spec, 'onScheduleTask').and.callThrough()
+    spyOn(zoneService.spec, 'onBeforeInvokeTask').and.callThrough()
+    spyOn(zoneService.spec, 'onInvokeTask').and.callThrough()
+
+    zoneService.zone.run(function () {
+      var oReq = new window.XMLHttpRequest()
 
       oReq.open('GET', '/', true)
       oReq.send(null)
