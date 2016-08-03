@@ -316,9 +316,18 @@ gulp.task('test:e2e:serve', function () {
 
 // Install and start selenium
 gulp.task('test:e2e:selenium', function (done) {
-  selenium.install({ logger: console.log }, function () {
-    selenium.start(function () {
-      done()
+  selenium.install({ logger: console.log }, function (installError) {
+    if (installError) {
+      console.log('Error while installing selenium:', installError)
+    }
+    selenium.start(function (startError) {
+      if (startError) {
+        console.log('Error while starting selenium:', startError)
+        return process.exit(1)
+      } else {
+        console.log('Done')
+        done()
+      }
     })
   })
 })
@@ -338,7 +347,7 @@ gulp.task('test:e2e:start-sauce', function (done) {
 })
 
 gulp.task('test:e2e', function (done) {
-  runSequence('build', 'build:release', 'test:e2e:start-local', 'test:e2e:phantomjs', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function (err) {
+  runSequence('build', 'build:release', 'test:e2e:start-local', 'test:e2e:protractor', 'test:e2e:phantomjs', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function (err) {
     if (err) {
       return taskFailed(err)
     } else {
