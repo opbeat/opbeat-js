@@ -314,30 +314,57 @@ gulp.task('test:e2e:serve', function () {
   })
 })
 
-// Install and start selenium
-gulp.task('test:e2e:selenium', function (done) {
+function onExit (callback) {
+  function exitHandler (err) {
+    try {
+      callback(err)
+    }
+    finally {
+      if (err) console.log(err.stack)
+    }
+  }
+
+  process.on('exit', exitHandler)
+
+  process.on('SIGINT', exitHandler)
+
+  process.on('uncaughtException', exitHandler)
+}
+
+function startSelenium (callback, manualStop) {
   selenium.install({ logger: console.log }, function (installError) {
     if (installError) {
       console.log('Error while installing selenium:', installError)
     }
-    selenium.start(function (startError) {
+    selenium.start(function (startError, child) {
       if (startError) {
         console.log('Error while starting selenium:', startError)
         return process.exit(1)
       } else {
-        console.log('Done')
-        done()
+        console.log('Selenium started!')
+        function killSelenium () {
+          child.kill()
+          console.log('Just killed selenium!')
+        }
+        if (manualStop) {
+          callback(killSelenium)
+        }else {
+          onExit(killSelenium)
+          callback()
+        }
       }
     })
   })
-})
+}
 
-gulp.task('test:e2e:start-local', function (done) {
-  runSequence('build', 'build:release', 'test:e2e:serve', 'test:e2e:selenium', function () {
+// Install and start selenium
+gulp.task('test:e2e:selenium', function (done) {
+  startSelenium(function () {
     done()
-    console.log('All tasks completed.')
   })
 })
+
+gulp.task('test:e2e:start-local', ['test:e2e:serve', 'test:e2e:selenium'])
 
 // Run all required tasks to perform remote end-to-end testing
 gulp.task('test:e2e:start-sauce', function (done) {
@@ -347,7 +374,7 @@ gulp.task('test:e2e:start-sauce', function (done) {
 })
 
 gulp.task('test:e2e', function (done) {
-  runSequence('build', 'build:release', 'test:e2e:start-local', 'test:e2e:protractor', 'test:e2e:phantomjs', 'test:e2e:launchsauceconnect', 'test:e2e:sauceconnect', function (err) {
+  runSequence(['build', 'build:release', 'test:e2e:start-local'], ['test:e2e:protractor', 'test:e2e:phantomjs', 'test:e2e:launchsauceconnect'], 'test:e2e:sauceconnect', function (err) {
     if (err) {
       return taskFailed(err)
     } else {
@@ -370,7 +397,7 @@ function sequenceSucceeded (done) {
 }
 
 gulp.task('test:unit:sauce', function (done) {
-  runSequence('build', 'test:e2e:launchsauceconnect', 'test', function (err) {
+  runSequence(['build', 'test:e2e:launchsauceconnect'], 'test', function (err) {
     if (err) {
       return taskFailed(err)
     } else {
