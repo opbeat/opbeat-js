@@ -38,7 +38,9 @@ function init () {
   var transportMock = new TransportMock(transport)
   serviceFactory.services['Transport'] = transportMock
 
-  var services = new ServiceContainer(serviceFactory).services
+  var serviceContainer = new ServiceContainer(serviceFactory)
+  serviceContainer.init()
+  var services = serviceContainer.services
   // var config = serviceFactory.getConfigService()
 
   // opbeat.com/jahtalab/opbeat-e2e

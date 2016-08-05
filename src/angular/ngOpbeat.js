@@ -66,12 +66,13 @@ function patchAll ($provide, transactionService) {
   var patchDirectives = require('./directivesPatch')
   patchDirectives($provide, transactionService)
 }
-
-function initialize (transactionService, logger, configService, zoneService, exceptionHandler) {
+function noop () {}
+function initialize (serviceContainer) {
+  // var transactionService, logger, configService, zoneService, exceptionHandler
+  var configService = serviceContainer.services.configService
+  var logger = serviceContainer.services.logger
+  var exceptionHandler = serviceContainer.services.exceptionHandler
   function moduleRun ($rootScope) {
-    if (!configService.isPlatformSupport()) {
-      return
-    }
     configService.set('isInstalled', true)
     configService.set('opbeatAgentName', 'opbeat-angular')
 
@@ -94,7 +95,7 @@ function initialize (transactionService, logger, configService, zoneService, exc
         transactionName = '/'
       }
 
-      transactionService.startTransaction(transactionName, 'transaction')
+      serviceContainer.services.transactionService.startTransaction(transactionName, 'transaction')
     }
 
     // ng-router
@@ -105,16 +106,20 @@ function initialize (transactionService, logger, configService, zoneService, exc
   }
 
   function moduleConfig ($provide) {
-    if (!configService.isPlatformSupport()) {
-      return
-    }
-    patchAll($provide, transactionService)
+    patchAll($provide, serviceContainer.services.transactionService)
   }
 
-  window.angular.module('ngOpbeat', [])
-    .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
-    .config(['$provide', moduleConfig])
-    .run(['$rootScope', moduleRun])
+  if (!configService.isPlatformSupport() || !serviceContainer.isAngularSupported()) {
+    window.angular.module('ngOpbeat', [])
+      .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
+      .config(['$provide', noop])
+      .run(['$rootScope', noop])
+  } else {
+    window.angular.module('ngOpbeat', [])
+      .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
+      .config(['$provide', moduleConfig])
+      .run(['$rootScope', moduleRun])
+  }
   window.angular.module('opbeat-angular', ['ngOpbeat'])
 }
 

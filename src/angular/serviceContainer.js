@@ -9,9 +9,37 @@ function ServiceContainer (serviceFactory) {
   this.serviceFactory = serviceFactory
   this.services = {}
 
-  var configService = this.services.configService = this.serviceFactory.getConfigService()
+  this.services.configService = this.serviceFactory.getConfigService()
 
-  var logger = this.services.logger = this.serviceFactory.getLogger()
+  this.services.logger = this.serviceFactory.getLogger()
+}
+
+ServiceContainer.prototype.init = function () {
+  var configService = this.services.configService
+  var logger = this.services.logger
+  var angular = window.angular
+  if (typeof angular === 'undefined') {
+    logger.warn('AngularJS is not available. Please make sure you load opbeat-angular after AngularJS.')
+  } else if (!configService.isPlatformSupport()) {
+    ngOpbeat(this)
+    this.services.logger.warn('Platform is not supported.')
+  } else if (!this.isAngularSupported()) {
+    ngOpbeat(this)
+    logger.warn('AngularJS version is not supported.')
+  } else {
+    this.initSupportedPlatform()
+  }
+}
+
+ServiceContainer.prototype.isAngularSupported = function () {
+  var angular = window.angular
+  return (angular.version && angular.version.major >= 1 && (angular.version.minor > 3 || angular.version.minor === 3 && angular.version.dot >= 12))
+}
+
+ServiceContainer.prototype.initSupportedPlatform = function () {
+  var configService = this.services.configService
+  var logger = this.services.logger
+
   var patchingService = new PatchingService()
   patchingService.patchAll()
 
@@ -19,17 +47,7 @@ function ServiceContainer (serviceFactory) {
 
   var transactionService = this.services.transactionService = new TransactionService(zoneService, this.services.logger, configService)
 
-  if (!configService.isPlatformSupport()) {
-    ngOpbeat(transactionService, this.services.logger, configService, zoneService)
-    this.services.logger.debug('Platform is not supported.')
-    return
-  }
-
   this.scheduleTransactionSend()
-
-  if (typeof window.angular === 'undefined') {
-    throw new Error('AngularJS is not available. Please make sure you load opbeat-angular after AngularJS.')
-  }
 
   if (utils.isUndefined(window.opbeatApi)) {
     window.opbeatApi = {}
@@ -50,7 +68,7 @@ function ServiceContainer (serviceFactory) {
   this.patchAngularBootstrap()
 
   this.services.exceptionHandler = this.serviceFactory.getExceptionHandler()
-  ngOpbeat(transactionService, logger, configService, zoneService, this.services.exceptionHandler)
+  ngOpbeat(this)
 }
 
 ServiceContainer.prototype.createZoneService = function () {
