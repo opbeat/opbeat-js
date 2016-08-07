@@ -20,8 +20,8 @@ function Opbeat () {
 
 Opbeat.prototype.VERSION = '%%VERSION%%'
 
-Opbeat.prototype.isPlatformSupport = function () {
-  return this._config.isPlatformSupport()
+Opbeat.prototype.isPlatformSupported = function () {
+  return this._config.isPlatformSupported()
 }
 
 /*
@@ -55,7 +55,7 @@ Opbeat.prototype.install = function () {
     return this
   }
 
-  if (!this.isPlatformSupport()) {
+  if (!this.isPlatformSupported()) {
     logger.warning('opbeat.install.platform.unsupported')
     return this
   }

@@ -5,7 +5,6 @@ var ZoneServiceMock = require('../transaction/zone_service_mock')
 
 var Config = require('../../src/lib/config')
 
-
 describe('angular.rootScopePatch', function () {
   it('should call startTrace for $scope.$digest', function () {
     var angular = window.angular

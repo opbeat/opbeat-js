@@ -2,13 +2,14 @@ var Transaction = require('./transaction')
 var utils = require('../lib/utils')
 var Subscription = require('../common/subscription')
 
-function TransactionService (zoneService, logger, config) {
+function TransactionService (zoneService, logger, config, opbeatBackend) {
   this._config = config
   if (typeof config === 'undefined') {
     logger.debug('TransactionService: config is not provided')
   }
   this._queue = []
   this._logger = logger
+  this._opbeatBackend = opbeatBackend
   this._zoneService = zoneService
 
   this.transactions = []
@@ -49,6 +50,8 @@ function TransactionService (zoneService, logger, config) {
     transactionService.detectFinish()
   }
   zoneService.spec.onCancelTask = onCancelTask
+
+  this.scheduleTransactionSend()
 }
 
 TransactionService.prototype.getTransaction = function (id) {
@@ -82,6 +85,13 @@ TransactionService.prototype.startCounter = function (transaction) {
   })
 }
 
+TransactionService.prototype.getCurrentTransaction = function () {
+  var tr = this._zoneService.get('transaction')
+  if (!utils.isUndefined(tr) && !tr.ended) {
+    return tr
+  }
+}
+
 TransactionService.prototype.startTransaction = function (name, type) {
   var self = this
 
@@ -91,7 +101,7 @@ TransactionService.prototype.startTransaction = function (name, type) {
   }
 
   var tr = this._zoneService.get('transaction')
-  if (typeof tr === 'undefined' || tr.ended) {
+  if (!this.getCurrentTransaction()) {
     tr = this.createTransaction(name, type, perfOptions)
   } else {
     tr.name = name
@@ -123,14 +133,17 @@ TransactionService.prototype.startTrace = function (signature, type, options) {
   if (!perfOptions.enable) {
     return
   }
-  var tr = this._zoneService.get('transaction')
-  if (!utils.isUndefined(tr) && !tr.ended) {
+
+  var trans = this.getCurrentTransaction()
+
+  if (trans) {
     this._logger.debug('TransactionService.startTrace', signature, type)
   } else {
-    tr = this.createTransaction('ZoneTransaction', 'transaction', perfOptions)
+    trans = this.createTransaction('ZoneTransaction', 'transaction', perfOptions)
     this._logger.debug('TransactionService.startTrace - ZoneTransaction', signature, type)
   }
-  var trace = tr.startTrace(signature, type, options)
+
+  var trace = trans.startTrace(signature, type, options)
   // var zone = this._zoneService.getCurrentZone()
   // trace._zone = 'Zone(' + zone.$id + ') ' // parent(' + zone.parent.$id + ') '
   return trace
@@ -184,6 +197,23 @@ TransactionService.prototype.detectFinish = function () {
     tr.detectFinish()
     this._logger.debug('TransactionService.detectFinish')
   }
+}
+
+TransactionService.prototype.scheduleTransactionSend = function () {
+  var logger = this._logger
+  var opbeatBackend = this._opbeatBackend
+  var self = this
+
+  setInterval(function () {
+    var transactions = self.getTransactions()
+    if (transactions.length === 0) {
+      return
+    }
+    logger.debug('Sending Transactions to opbeat.', transactions.length)
+    // todo: if transactions are already being sent, should check
+    opbeatBackend.sendTransactions(transactions)
+    self.clearTransactions()
+  }, 5000)
 }
 
 module.exports = TransactionService
