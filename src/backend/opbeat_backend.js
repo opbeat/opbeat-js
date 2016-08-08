@@ -113,6 +113,13 @@ OpbeatBackend.prototype._formatTransactions = function (transactionList) {
   var groupedTraces = groupTraces(traces)
   var groupedTracesTimings = this.getRawGroupedTracesTimings(traces, groupedTraces)
 
+  groupedTraces.forEach(function (g) {
+    delete g._group
+    if (typeof g.signature === 'string') {
+      g.signature = g.signature.substring(0, 511)
+    }
+  })
+
   return {
     transactions: transactions,
     traces: {

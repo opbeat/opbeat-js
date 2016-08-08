@@ -67,6 +67,8 @@ describe('OpbeatBackend', function () {
         }
       })
       done()
+    }).catch(function (reason) {
+      fail(reason)
     })
   })
 
@@ -253,5 +255,22 @@ describe('OpbeatBackend', function () {
     opbeatBackend.sendTransactions([tr])
     expect(opbeatBackend.checkBrowserResponsiveness).toHaveBeenCalled()
     expect(transportMock.sendTransaction).not.toHaveBeenCalled()
+  })
+
+  it('should truncate the trace signature at 512', function () {
+    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    expect(config.isValid()).toBe(true)
+    var longSignature = 'GET http://test.com?data=hiyjietyudpmenkjnnlrvjgzqpzaaijgujvedixcgybhrqnbwbqrycsxyckmcjyqkiuwnppyfqgirckivfcledrzrxoowqjqfjptoywtfuuwpvovhrbytrqciymufopnyawkbiaddpnvaxbxvnyfjmumjrvtwitwiuicpyebzqzqtqxtggtkkjpndpwthssufrftwxdohmyegdutqajlgrqzsemfoyuhvngnhkcbexccebbazlpyjmwdyhfdfuxbmbpycuuwbtnngsjlijsfpemotctdiumwopdmtsxzaohvttrooabidjmqdxxjuwmhkvmzsxxnchpnnewzvvlifeprdpwnsvojhptizdndjfrnlfxyganzgstgpsqhbyrrkftnkmvkrpnaickpxasxwahgdknywbixyvzapppmsmmjupwfllsmndmnhqzuknswdgitdanvxvjgjspszmkavqsedujaxuvopyfubyjsldjqsxzhtaodcigzbqxfodwukpboehcgnokznywzgx'
+    expect(longSignature.length).toBeGreaterThan(512)
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    tr.startTrace(longSignature, 'type').end()
+    tr.end()
+    opbeatBackend.sendTransactions([tr])
+    expect(transportMock.sendTransaction).toHaveBeenCalled()
+    expect(transportMock.transportData.length).toBe(1)
+    var groups = transportMock.transportData[0].traces.groups
+    groups.forEach(function (g) {
+      expect(g.signature.length).toBeLessThan(512)
+    })
   })
 })
