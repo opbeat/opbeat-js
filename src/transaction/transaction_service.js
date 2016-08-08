@@ -50,8 +50,6 @@ function TransactionService (zoneService, logger, config, opbeatBackend) {
     transactionService.detectFinish()
   }
   zoneService.spec.onCancelTask = onCancelTask
-
-  this.scheduleTransactionSend()
 }
 
 TransactionService.prototype.getTransaction = function (id) {
