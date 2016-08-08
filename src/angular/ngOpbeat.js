@@ -123,23 +123,4 @@ function registerOpbeatModule(transactionService, logger, configService, isAngul
   window.angular.module('opbeat-angular', ['ngOpbeat'])
 }
 
-function initialize (serviceContainer, isAngularSupported) {
-  services = serviceContainer.services
-  if (typeof window.angular === 'undefined') {
-    throw new Error('AngularJS is not available. Please make sure you load opbeat-angular after AngularJS.')
-  } else if (!services.configService.isPlatformSupported()) {
-    registerOpbeatModule(services.transactionService, services.logger, services.configService, isAngularSupported)
-    services.logger.warn('Platform is not supported.')
-  } else if (!isAngularSupported()) {
-    registerOpbeatModule(services.transactionService, services.logger, services.configService, isAngularSupported)
-    services.logger.warn('AngularJS version is not supported.')
-  } else {
-    services.patchingService.patchAll()
-    patchAngularBootstrap(services.zoneService)
-
-    registerOpbeatModule(services.transactionService, services.logger, services.configService, isAngularSupported, services.exceptionHandler)
-  }
-
-}
-
-module.exports = initialize
+module.exports = registerOpbeatModule
