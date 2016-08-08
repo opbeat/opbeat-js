@@ -11,7 +11,7 @@ function patchAngularBootstrap (zoneService) {
       get: function () {
         return function (modules) {
           return zoneService.zone.run(function () {
-            originalResumeBootstrap.call(window.angular, modules)
+            return originalResumeBootstrap.call(window.angular, modules)
           })
         }
       },

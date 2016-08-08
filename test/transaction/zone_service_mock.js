@@ -7,7 +7,6 @@ function ZoneServiceMock () {
     onCancelTask: noop
   }
 
-  this.zone = {}
   this.get = function (key) {
     return this.zone[key]
   }
@@ -17,5 +16,6 @@ function ZoneServiceMock () {
   this.runOuter = function (fn) {
     return fn()
   }
+  this.zone = {run: function(fn) { return fn()}}
 }
 module.exports = ZoneServiceMock

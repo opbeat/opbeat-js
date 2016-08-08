@@ -1,3 +1,5 @@
+var patchAngularBootstrap = require('./bootstrapPatch')
+
 function NgOpbeatProvider (logger, configService, exceptionHandler) {
   this.config = function config (properties) {
     if (properties) {
@@ -66,8 +68,10 @@ function patchAll ($provide, transactionService) {
   var patchDirectives = require('./directivesPatch')
   patchDirectives($provide, transactionService)
 }
+
 function noop () {}
-function initialize (transactionService, logger, configService, isAngularSupported, exceptionHandler) {
+
+function registerOpbeatModule(transactionService, logger, configService, isAngularSupported, exceptionHandler) {
   function moduleRun ($rootScope) {
     configService.set('isInstalled', true)
     configService.set('opbeatAgentName', 'opbeat-angular')
@@ -117,6 +121,25 @@ function initialize (transactionService, logger, configService, isAngularSupport
       .run(['$rootScope', moduleRun])
   }
   window.angular.module('opbeat-angular', ['ngOpbeat'])
+}
+
+function initialize (serviceContainer, isAngularSupported) {
+  services = serviceContainer.services
+  if (typeof window.angular === 'undefined') {
+    throw new Error('AngularJS is not available. Please make sure you load opbeat-angular after AngularJS.')
+  } else if (!services.configService.isPlatformSupported()) {
+    registerOpbeatModule(services.transactionService, services.logger, services.configService, isAngularSupported)
+    services.logger.warn('Platform is not supported.')
+  } else if (!isAngularSupported()) {
+    registerOpbeatModule(services.transactionService, services.logger, services.configService, isAngularSupported)
+    services.logger.warn('AngularJS version is not supported.')
+  } else {
+    services.patchingService.patchAll()
+    patchAngularBootstrap(services.zoneService)
+
+    registerOpbeatModule(services.transactionService, services.logger, services.configService, isAngularSupported, services.exceptionHandler)
+  }
+
 }
 
 module.exports = initialize
