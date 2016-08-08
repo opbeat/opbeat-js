@@ -1,4 +1,4 @@
-var patchRootScope = require('../../src/angular/rootScopePatch')
+var patchRootScope = require('../../src/angular/patches/rootScopePatch')
 var TransactionService = require('../../src/transaction/transaction_service')
 var logger = require('loglevel')
 var ZoneServiceMock = require('../transaction/zone_service_mock')

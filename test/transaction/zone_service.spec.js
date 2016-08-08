@@ -1,14 +1,15 @@
 var ZoneService = require('../../src/transaction/zone_service')
-var PatchingService = require('../../src/patching/patchingService')
+var ServiceContainer = require('../../src/common/serviceContainer')
+var ServiceFactory = require('../../src/common/serviceFactory')
+var patchCommon = require('../../src/common/patchCommon')
 
 var logger = require('loglevel')
-// require('zone.js')
 
 describe('ZoneService', function () {
   var zoneService
   var originalTimeout
-  var patchingService = new PatchingService()
-  patchingService.patchAll()
+  var serviceContainer = new ServiceContainer(new ServiceFactory())
+  patchCommon(serviceContainer)
 
   beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL

@@ -1,13 +1,12 @@
-var patchUtils = require('./patchUtils')
+var patchUtils = require('../patchUtils')
 
 var urlSympbol = patchUtils.opbeatSymbol('url')
 var methodSymbol = patchUtils.opbeatSymbol('method')
 var isAsyncSymbol = patchUtils.opbeatSymbol('isAsync')
 
-function patchingService () {
-}
+var patchUtils = require('../patchUtils')
 
-patchingService.prototype.patchXMLHttpRequest = function () {
+module.exports = function patchXMLHttpRequest () {
   patchUtils.patchMethod(window.XMLHttpRequest.prototype, 'open', function (delegate) {
     return function (self, args) {
       self[methodSymbol] = args[0]
@@ -17,9 +16,3 @@ patchingService.prototype.patchXMLHttpRequest = function () {
     }
   })
 }
-
-patchingService.prototype.patchAll = function () {
-  this.patchXMLHttpRequest()
-}
-
-module.exports = patchingService

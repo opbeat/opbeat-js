@@ -1,4 +1,4 @@
-var utils = require('../lib/utils')
+var utils = require('../../lib/utils')
 module.exports = function ($provide, transactionService) {
   'use strict'
   $provide.decorator('ngRepeatDirective', ['$delegate', '$injector', function ($delegate, $injector) {

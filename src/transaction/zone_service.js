@@ -1,5 +1,5 @@
 var Subscription = require('../common/subscription')
-var patchUtils = require('../patching/patchUtils')
+var patchUtils = require('../common/patchUtils')
 var opbeatTaskSymbol = patchUtils.opbeatSymbol('taskData')
 
 var urlSympbol = patchUtils.opbeatSymbol('url')

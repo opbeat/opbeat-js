@@ -1,3 +1,9 @@
+var patchController = require('./patches/controllerPatch')
+var patchCompile = require('./patches/compilePatch')
+var patchRootScope = require('./patches/rootScopePatch')
+var patchDirectives = require('./patches/directivesPatch')
+var patchExceptionHandler = require('./patches/exceptionHandlerPatch') 
+
 function NgOpbeatProvider (logger, configService, exceptionHandler) {
   this.config = function config (properties) {
     if (properties) {
@@ -44,26 +50,11 @@ function NgOpbeatProvider (logger, configService, exceptionHandler) {
   ]
 }
 
-function patchExceptionHandler ($provide) {
-  $provide.decorator('$exceptionHandler', ['$delegate', '$opbeat', function $ExceptionHandlerDecorator ($delegate, $opbeat) {
-    return function $ExceptionHandler (exception, cause) {
-      $opbeat.captureException(exception)
-      return $delegate(exception, cause)
-    }
-  }])
-}
-
-var patchController = require('./controllerPatch')
-var patchCompile = require('./compilePatch')
-var patchRootScope = require('./rootScopePatch')
-
 function patchAll ($provide, transactionService) {
   patchExceptionHandler($provide)
   patchController($provide, transactionService)
   patchCompile($provide, transactionService)
   patchRootScope($provide, transactionService)
-
-  var patchDirectives = require('./directivesPatch')
   patchDirectives($provide, transactionService)
 }
 
