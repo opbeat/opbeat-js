@@ -4,8 +4,6 @@ var urlSympbol = patchUtils.opbeatSymbol('url')
 var methodSymbol = patchUtils.opbeatSymbol('method')
 var isAsyncSymbol = patchUtils.opbeatSymbol('isAsync')
 
-var patchUtils = require('../patchUtils')
-
 module.exports = function patchXMLHttpRequest () {
   patchUtils.patchMethod(window.XMLHttpRequest.prototype, 'open', function (delegate) {
     return function (self, args) {

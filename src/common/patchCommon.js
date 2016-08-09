@@ -1,6 +1,6 @@
 var patchXMLHttpRequest = require('./patches/xhrPatch')
 
-function patchCommon(serviceContainer) {
+function patchCommon (serviceContainer) {
   patchXMLHttpRequest(serviceContainer)
 }
 

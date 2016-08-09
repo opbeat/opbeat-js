@@ -2,7 +2,7 @@ var patchController = require('./patches/controllerPatch')
 var patchCompile = require('./patches/compilePatch')
 var patchRootScope = require('./patches/rootScopePatch')
 var patchDirectives = require('./patches/directivesPatch')
-var patchExceptionHandler = require('./patches/exceptionHandlerPatch') 
+var patchExceptionHandler = require('./patches/exceptionHandlerPatch')
 
 function NgOpbeatProvider (logger, configService, exceptionHandler) {
   this.config = function config (properties) {
