@@ -2,6 +2,13 @@
 var context = require('../../src/exceptions/context')
 
 describe('exceptions.context', function () {
+  var originalTimeout
+
+  beforeEach(function () {
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
+  })
+
   describe('.isSourceMinified', function () {
     it('Empty source returns false', function () {
       expect(context.isSourceMinified('')).toBe(false)
@@ -58,5 +65,9 @@ describe('exceptions.context', function () {
         done()
       })
     })
+  })
+
+  afterEach(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 })
