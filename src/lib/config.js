@@ -122,7 +122,7 @@ function _getDataAttributesFromNode (node) {
 
 Config.prototype.VERSION = '%%VERSION%%'
 
-Config.prototype.isPlatformSupport = function () {
+Config.prototype.isPlatformSupported = function () {
   return typeof Array.prototype.forEach === 'function' &&
   typeof JSON.stringify === 'function' &&
   typeof Function.bind === 'function' &&

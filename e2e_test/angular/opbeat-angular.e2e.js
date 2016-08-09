@@ -1,5 +1,8 @@
-var ServiceContainer = require('../../src/angular/serviceContainer')
+var ServiceContainer = require('../../src/common/serviceContainer')
 var ServiceFactory = require('../../src/common/serviceFactory')
+var patchAngularBootstrap = require('../../src/angular/bootstrapPatch')
+var ngOpbeat = require('../../src/angular/ngOpbeat')
+var isAngularSupported = require('../../src/angular/isAngularSupported')
 
 var Subscription = require('../../src/common/subscription')
 
@@ -39,7 +42,6 @@ function init () {
   serviceFactory.services['Transport'] = transportMock
 
   var serviceContainer = new ServiceContainer(serviceFactory)
-  serviceContainer.init()
   var services = serviceContainer.services
   // var config = serviceFactory.getConfigService()
 
@@ -53,6 +55,9 @@ function init () {
   var transactionService = services.transactionService
 
   var opbeatBackend = serviceFactory.getOpbeatBackend()
+
+  services.patchingService.patchAll()
+  patchAngularBootstrap(services.zoneService)
 
   transactionService.subscribe(function (tr) {
     opbeatBackend.sendTransactions([tr])
@@ -74,6 +79,8 @@ function init () {
       }
     })
   }
+
+  ngOpbeat(services.transactionService, services.logger, services.configService, isAngularSupported, services.exceptionHandler)
 
   window.e2e = {
     transactionService: transactionService,

@@ -66,12 +66,10 @@ function patchAll ($provide, transactionService) {
   var patchDirectives = require('./directivesPatch')
   patchDirectives($provide, transactionService)
 }
+
 function noop () {}
-function initialize (serviceContainer) {
-  // var transactionService, logger, configService, zoneService, exceptionHandler
-  var configService = serviceContainer.services.configService
-  var logger = serviceContainer.services.logger
-  var exceptionHandler = serviceContainer.services.exceptionHandler
+
+function registerOpbeatModule (transactionService, logger, configService, isAngularSupported, exceptionHandler) {
   function moduleRun ($rootScope) {
     configService.set('isInstalled', true)
     configService.set('opbeatAgentName', 'opbeat-angular')
@@ -95,7 +93,7 @@ function initialize (serviceContainer) {
         transactionName = '/'
       }
 
-      serviceContainer.services.transactionService.startTransaction(transactionName, 'transaction')
+      transactionService.startTransaction(transactionName, 'transaction')
     }
 
     // ng-router
@@ -106,10 +104,10 @@ function initialize (serviceContainer) {
   }
 
   function moduleConfig ($provide) {
-    patchAll($provide, serviceContainer.services.transactionService)
+    patchAll($provide, transactionService)
   }
 
-  if (!configService.isPlatformSupport() || !serviceContainer.isAngularSupported()) {
+  if (!configService.isPlatformSupported() || !isAngularSupported()) {
     window.angular.module('ngOpbeat', [])
       .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
       .config(['$provide', noop])
@@ -123,4 +121,4 @@ function initialize (serviceContainer) {
   window.angular.module('opbeat-angular', ['ngOpbeat'])
 }
 
-module.exports = initialize
+module.exports = registerOpbeatModule

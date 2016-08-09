@@ -1,8 +1,9 @@
 describe('ngOpbeat', function () {
   var Config = require('../../src/lib/config')
   var TransactionService = require('../../src/transaction/transaction_service')
+  var isAngularSupported = require('../../src/angular/isAngularSupported')
   var ngOpbeat = require('../../src/angular/ngOpbeat')
-  var ServiceContainer = require('../../src/angular/serviceContainer')
+  var ServiceContainer = require('../../src/common/serviceContainer')
   var ZoneServiceMock = require('../transaction/zone_service_mock.js')
   var ServiceFactory = require('../../src/common/serviceFactory')
 
@@ -11,6 +12,8 @@ describe('ngOpbeat', function () {
   var zoneServiceMock
   var logger
   var serviceContainer
+  var transactionService
+  var exceptionHandler
   beforeEach(function () {
     var serviceFactory = new ServiceFactory()
     config = Object.create(Config)
@@ -23,12 +26,13 @@ describe('ngOpbeat', function () {
     zoneServiceMock = new ZoneServiceMock()
     serviceContainer.services.zoneService = zoneServiceMock
 
-    var trService = new TransactionService(zoneServiceMock, logger, {})
-    serviceContainer.services.transactionService = trService
-
-    serviceContainer.services.exceptionHandler = serviceFactory.getExceptionHandler()
-
-    spyOn(trService, 'startTrace')
+    transactionService = new TransactionService(zoneServiceMock, logger, {})
+    serviceContainer.services.transactionService = transactionService
+    
+    exceptionHandler = serviceFactory.getExceptionHandler()
+    serviceContainer.services.exceptionHandler = exceptionHandler
+    
+    spyOn(transactionService, 'startTrace')
 
     window.angular.module('patchModule', ['ngOpbeat'])
       .config(function ($provide) {
@@ -42,7 +46,7 @@ describe('ngOpbeat', function () {
   })
 
   it('should not start transactions if performance is disable', function () {
-    ngOpbeat(serviceContainer)
+    ngOpbeat(transactionService, logger, config, isAngularSupported, exceptionHandler)
     config.setConfig({appId: 'test', orgId: 'test', isInstalled: true, performance: {enable: false}})
     expect(config.isValid()).toBe(true)
     expect(config.get('performance.enable')).toBe(false)
@@ -57,7 +61,7 @@ describe('ngOpbeat', function () {
   })
 
   it('should set correct log level', function () {
-    ngOpbeat(serviceContainer)
+    ngOpbeat(transactionService, logger, config, isAngularSupported, exceptionHandler)
     expect(config.get('debug')).toBe(false)
     expect(config.get('logLevel')).toBe('warn')
     expect(logger.getLevel()).toBe(logger.levels.WARN)
@@ -80,10 +84,10 @@ describe('ngOpbeat', function () {
 
   it('should consider isPlatformSupported', function () {
     serviceContainer.services.transactionservice = undefined
-    config.isPlatformSupport = function () {
+    serviceContainer.services.configService.isPlatformSupported = function () {
       return false
     }
-    ngOpbeat(serviceContainer)
+    ngOpbeat(transactionService, logger, config, isAngularSupported, exceptionHandler)
 
     var angular = window.angular
     angular.module('patchModule')
@@ -100,11 +104,10 @@ describe('ngOpbeat', function () {
 
   it('should consider if AngularJS is supported', function () {
     serviceContainer.services.transactionservice = undefined
-    serviceContainer.isAngularSupported = function () {
+    var isAngularSupported = function () {
       return false
     }
-    ngOpbeat(serviceContainer)
-
+    ngOpbeat(transactionService, logger, config, isAngularSupported, exceptionHandler)
     var angular = window.angular
     angular.module('patchModule')
       .config(function ($opbeatProvider) {
