@@ -13,3 +13,5 @@ npm-debug.log
 errorShots
 
 e2e_test/libs
+
+coverage
