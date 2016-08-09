@@ -1,9 +1,9 @@
 var ServiceContainer = require('../../src/common/serviceContainer')
 var ServiceFactory = require('../../src/common/serviceFactory')
-var patchAngularBootstrap = require('../../src/angular/bootstrapPatch')
+var patchAngularBootstrap = require('../../src/angular/patches/bootstrapPatch')
 var ngOpbeat = require('../../src/angular/ngOpbeat')
 var isAngularSupported = require('../../src/angular/isAngularSupported')
-
+var patchCommon = require('../../src/common/patchCommon')
 var Subscription = require('../../src/common/subscription')
 
 function TransportMock (transport) {
@@ -56,7 +56,7 @@ function init () {
 
   var opbeatBackend = serviceFactory.getOpbeatBackend()
 
-  services.patchingService.patchAll()
+  patchCommon(serviceContainer)
   patchAngularBootstrap(services.zoneService)
 
   transactionService.subscribe(function (tr) {

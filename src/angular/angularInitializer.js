@@ -1,5 +1,6 @@
 var ngOpbeat = require('./ngOpbeat')
-var patchAngularBootstrap = require('./bootstrapPatch')
+var patchAngularBootstrap = require('./patches/bootstrapPatch')
+var patchCommon = require('../common/patchCommon')
 
 function initialize (serviceContainer, isAngularSupported) {
   var services = serviceContainer.services
@@ -12,7 +13,7 @@ function initialize (serviceContainer, isAngularSupported) {
     registerOpbeatModule(services, isAngularSupported)
     services.logger.warn('AngularJS version is not supported.')
   } else {
-    services.patchingService.patchAll()
+    patchCommon(serviceContainer)
     patchAngularBootstrap(services.zoneService)
     registerOpbeatModule(services, isAngularSupported)
   }

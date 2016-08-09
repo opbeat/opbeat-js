@@ -1,4 +1,4 @@
-var patchController = require('../../src/angular/controllerPatch')
+var patchController = require('../../src/angular/patches/controllerPatch')
 
 describe('controllerPatch', function () {
   var Config = require('../../src/lib/config')

@@ -1,4 +1,4 @@
-var utils = require('../lib/utils')
+var utils = require('../../lib/utils')
 
 function getControllerInfoFromArgs (args) {
   var scope, name

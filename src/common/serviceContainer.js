@@ -2,8 +2,6 @@ var TransactionService = require('../transaction/transaction_service')
 
 var utils = require('../lib/utils')
 
-var PatchingService = require('../patching/patchingService')
-
 function ServiceContainer (serviceFactory) {
   this.serviceFactory = serviceFactory
   this.services = {}
@@ -16,7 +14,6 @@ function ServiceContainer (serviceFactory) {
   var opbeatBackend = this.services.opbeatBackend = this.serviceFactory.getOpbeatBackend()
   var transactionService = this.services.transactionService = new TransactionService(zoneService, this.services.logger, configService, opbeatBackend)
   transactionService.scheduleTransactionSend()
-  this.services.patchingService = new PatchingService(transactionService)
 
   if (utils.isUndefined(window.opbeatApi)) {
     window.opbeatApi = {}
