@@ -1,7 +1,7 @@
 var ngOpbeat = require('./ngOpbeat')
 var patchAngularBootstrap = require('./bootstrapPatch')
 
-function initialize(serviceContainer, isAngularSupported) {
+function initialize (serviceContainer, isAngularSupported) {
   var services = serviceContainer.services
   if (typeof window.angular === 'undefined') {
     throw new Error('AngularJS is not available. Please make sure you load opbeat-angular after AngularJS.')
@@ -18,8 +18,8 @@ function initialize(serviceContainer, isAngularSupported) {
   }
 }
 
-function registerOpbeatModule(services, isAngularSupported) {
-    ngOpbeat(services.transactionService, services.logger, services.configService, isAngularSupported, services.exceptionHandler)
+function registerOpbeatModule (services, isAngularSupported) {
+  ngOpbeat(services.transactionService, services.logger, services.configService, isAngularSupported, services.exceptionHandler)
 }
 
 module.exports = initialize

@@ -1,5 +1,3 @@
-var patchAngularBootstrap = require('./bootstrapPatch')
-
 function NgOpbeatProvider (logger, configService, exceptionHandler) {
   this.config = function config (properties) {
     if (properties) {
@@ -71,7 +69,7 @@ function patchAll ($provide, transactionService) {
 
 function noop () {}
 
-function registerOpbeatModule(transactionService, logger, configService, isAngularSupported, exceptionHandler) {
+function registerOpbeatModule (transactionService, logger, configService, isAngularSupported, exceptionHandler) {
   function moduleRun ($rootScope) {
     configService.set('isInstalled', true)
     configService.set('opbeatAgentName', 'opbeat-angular')
