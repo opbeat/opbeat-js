@@ -1,10 +1,10 @@
-var ServiceContainer = require('../../src/common/serviceContainer')
-var ServiceFactory = require('../../src/common/serviceFactory')
-var patchAngularBootstrap = require('../../src/angular/patches/bootstrapPatch')
-var ngOpbeat = require('../../src/angular/ngOpbeat')
-var isAngularSupported = require('../../src/angular/isAngularSupported')
-var patchCommon = require('../../src/common/patchCommon')
-var Subscription = require('../../src/common/subscription')
+var ServiceContainer = require('../../../src/common/serviceContainer')
+var ServiceFactory = require('../../../src/common/serviceFactory')
+var patchAngularBootstrap = require('../../../src/angular/patches/bootstrapPatch')
+var ngOpbeat = require('../../../src/angular/ngOpbeat')
+var isAngularSupported = require('../../../src/angular/isAngularSupported')
+var patchCommon = require('../../../src/common/patchCommon')
+var Subscription = require('../../../src/common/subscription')
 
 function TransportMock (transport) {
   this._transport = transport

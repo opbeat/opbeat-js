@@ -32,7 +32,7 @@ var webdriverConfig = {
 }
 
 // Static file server
-gulp.task('server', function () {
+gulp.task('examples:serve', function () {
   connect.server({
     root: ['examples', 'dist'],
     port: 7000,
@@ -117,7 +117,7 @@ gulp.task('build', function () {
   var sourceTargets = [
     './src/opbeat.js',
     './src/angular/opbeat-angular.js',
-    './e2e_test/angular/opbeat-angular.e2e.js'
+    './test/e2e/angular/opbeat-angular.e2e.js'
   ]
 
   var tasks = sourceTargets.map(function (entry) {
@@ -210,7 +210,7 @@ gulp.task('test', function (done) {
 gulp.task('test:e2e:protractor', function () {
   var protractor = require('gulp-protractor').protractor
 
-  return gulp.src(['e2e_test/**/*.pspec.js'])
+  return gulp.src(['test/e2e/**/*.pspec.js'])
     .pipe(protractor({
       configFile: 'protractor.conf.js'
     }))
@@ -302,7 +302,7 @@ gulp.task('test:e2e:launchsauceconnect', function (done) {
 // Serve test application
 gulp.task('test:e2e:serve', function () {
   return connect.server({
-    root: ['e2e_test', 'src', './'],
+    root: ['test/e2e', 'src', './'],
     port: 8000,
     livereload: false,
     open: false,
@@ -407,7 +407,7 @@ gulp.task('test:unit:sauce', function (done) {
 })
 
 gulp.task('watch:e2e', ['e2e-serve', 'selenium-start'], function (done) {
-  gulp.watch(['e2e_test/**'], function () {
+  gulp.watch(['test/e2e/**'], function () {
     runSequence('test:e2e')
   })
 })

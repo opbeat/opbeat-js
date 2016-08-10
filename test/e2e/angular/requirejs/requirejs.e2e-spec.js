@@ -1,9 +1,9 @@
-var utils = require('../e2e/utils')
+var utils = require('../../e2e/utils')
 xdescribe('simple app - requirejs', function () {
   beforeEach(utils.verifyNoBrowserErrors)
 
   it('Inspect requests', function (done) {
-    browser.url('/simple_app/requirejs_index.html')
+    browser.url('/angular/requirejs/requirejs_index.html')
       // .setupInterceptor()
       .then(function () {
         setTimeout(function () {

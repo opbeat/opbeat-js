@@ -1,4 +1,5 @@
 module.exports = function (config) {
+  var specPattern = 'test/!(e2e)/*.spec.js'
   var customLaunchers = {
     'SL_CHROME': {
       base: 'SauceLabs',
@@ -48,19 +49,19 @@ module.exports = function (config) {
     }
   }
   var cfg = {
+    exclude: [
+      'e2e/**/*.*'
+    ],
     files: [
       'test/utils/polyfill.js',
       'node_modules/angular/angular.js',
       'node_modules/angular-resource/angular-resource.js',
       'node_modules/zone.js/dist/zone.js',
-      'test/**/*.spec.js',
+      specPattern,
       { pattern: 'test/exceptions/data/*.js', included: false, watched: false },
       { pattern: 'src/**/*.js', included: false, watched: true }
     ],
     frameworks: ['browserify', 'jasmine'],
-    preprocessors: {
-      'test/**/*.spec.js': ['browserify']
-    },
     plugins: [
       'karma-sauce-launcher',
       'karma-failed-reporter',
@@ -94,6 +95,10 @@ module.exports = function (config) {
       }
     }
   }
+
+  cfg.preprocessors = {}
+  cfg.preprocessors[specPattern] = ['browserify']
+
   var isTravis = process.env.TRAVIS
   var isSauce = process.env.MODE && process.env.MODE.startsWith('saucelabs')
   var buildId

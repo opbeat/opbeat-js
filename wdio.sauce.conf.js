@@ -12,7 +12,7 @@ config.capabilities = [
 ]
 
 config.specs = [
-  './e2e_test/**/*.spec.js'
+  './test/e2e/**/*.e2e-spec.js'
 ]
 
 exports.config = config

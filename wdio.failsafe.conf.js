@@ -10,7 +10,7 @@ config.capabilities = [
 ]
 
 config.specs = [
-  './e2e_test/**/*.failsafe.js'
+  './test/e2e/**/*.failsafe.js'
 ]
 
 exports.config = config
