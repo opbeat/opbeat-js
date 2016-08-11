@@ -16,6 +16,7 @@ var karma = require('karma')
 var runSequence = require('run-sequence')
 var webdriver = require('gulp-webdriver')
 var selenium = require('selenium-standalone')
+var replace = require('gulp-replace')
 
 var connect = require('gulp-connect')
 
@@ -41,7 +42,11 @@ gulp.task('examples:serve', function () {
   })
 })
 
-function createBuildStream (mainFilePath) {
+function createBuildStream (mainFilePath, version) {
+  if (typeof version !== 'string') {
+    throw new Error(mainFilePath + ' Expected version as string but got:' + version)
+  }
+
   return browserify({
     entries: [mainFilePath],
     standalone: '',
@@ -51,9 +56,10 @@ function createBuildStream (mainFilePath) {
     .pipe(source(mainFilePath))
     .pipe(rename({ dirname: '' }))
     .pipe(buffer())
-    .pipe(injectVersion({
-      replace: new RegExp(RegExp.escape('%%VERSION%%'), 'g')
-    }))
+    .pipe(replace(
+      new RegExp(RegExp.escape('%%VERSION%%'), 'g'),
+      'v' + version
+    ))
     .pipe(derequire())
 }
 
@@ -77,51 +83,53 @@ gulp.task('build:release', function () {
   var versionPath = './dist/cdn/' + majorVersion
   var prodPath = './dist/'
 
-  var integrations = [
-    { name: 'opbeat-angular', entry: './src/angular/opbeat-angular.js', description: 'Official AngularJS client for logging exceptions, stacktraces and performance data to Opbeat' },
-    { name: 'opbeat-js', entry: './src/opbeat.js', description: 'This is the official frontend JavaScript module for Opbeat' }
-  ]
+  var integrations = require('./release/integrations')
 
-  var tasks = integrations.map(function (integration) {
-    var mainStream = createBuildStream(integration.entry)
+  var tasks = Object.keys(integrations).map(function (key) {
+    var integration = integrations[key]
+    var integrationName = key
+    var mainStream = createBuildStream(integration.entry, integration.version)
       .pipe(gulp.dest(versionPath))
       .pipe(gulp.dest(prodPath))
-      .pipe(gulp.dest(prodPath + integration.name))
+      .pipe(gulp.dest(prodPath + integrationName))
       .pipe(rename({
         extname: '.min.js'
       }))
       .pipe(uglify())
       .pipe(gulp.dest(versionPath))
       .pipe(gulp.dest(prodPath))
-      .pipe(gulp.dest(prodPath + integration.name))
+      .pipe(gulp.dest(prodPath + integrationName))
 
     var filename = integration.entry.split('/')
     filename = filename[filename.length - 1]
 
-    var packagejson = gulp.src(['./release/*.json'])
+    var packagejson = gulp.src(['./release/templates/*.json'])
       .pipe(jeditor({
-        'name': integration.name,
-        'version': version,
+        'name': integrationName,
+        'version': integration.version,
         'main': filename,
         'description': integration.description
       }))
-      .pipe(gulp.dest(prodPath + integration.name))
+      .pipe(gulp.dest(prodPath + integrationName))
 
-    return es.merge.apply(null, [mainStream, packagejson, gulp.src(['./README.md', 'LICENSE']).pipe(gulp.dest(prodPath + integration.name))])
+    return es.merge.apply(null, [mainStream, packagejson, gulp.src(['LICENSE']).pipe(gulp.dest(prodPath + integrationName))])
   })
 
   return es.merge.apply(null, tasks)
 })
 
 gulp.task('build', function () {
-  var sourceTargets = [
-    './src/opbeat.js',
-    './src/angular/opbeat-angular.js',
-    './test/e2e/angular/opbeat-angular.e2e.js'
-  ]
+  var integrations = require('./release/integrations')
 
-  var tasks = sourceTargets.map(function (entry) {
-    return createBuildStream(entry)
+  integrations['opbeat-angular.e2e'] = {
+    version: integrations['opbeat-angular'].version,
+    entry: './test/e2e/angular/opbeat-angular.e2e.js'
+  }
+
+  var tasks = Object.keys(integrations).map(function (key) {
+    var entry = integrations[key].entry
+    var version = integrations[key].version
+    return createBuildStream(entry, version)
       .pipe(gulp.dest('./dist/dev/'))
       .pipe(rename({
         extname: '.min.js'
@@ -169,6 +177,8 @@ gulp.task('deploy', ['build:release'], function () {
   var majorVersion = version.match(/^(\d).(\d).(\d)/)[1]
 
   var versionPath = './dist/cdn/**'
+
+  console.warn('Uploading All files in:', versionPath)
 
   return gulp.src([versionPath])
     // Gzip

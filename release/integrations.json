@@ -1,0 +1,12 @@
+{
+  "opbeat-angular": {
+    "entry": "./src/angular/opbeat-angular.js",
+    "description": "Official AngularJS client for logging exceptions, stacktraces and performance data to Opbeat",
+    "version": "3.1.4"
+  },
+  "opbeat-js": {
+    "entry": "./src/opbeat.js",
+    "description": "This is the official frontend JavaScript module for Opbeat",
+    "version": "3.1.4"
+  }
+}
