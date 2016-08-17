@@ -6,7 +6,6 @@ var urlSympbol = patchUtils.opbeatSymbol('url')
 var methodSymbol = patchUtils.opbeatSymbol('method')
 
 var XMLHttpRequest_send = 'XMLHttpRequest.send'
-var XHR = window.XMLHttpRequest
 
 var opbeatDataSymbol = patchUtils.opbeatSymbol('opbeatData')
 
@@ -105,7 +104,7 @@ function ZoneService (zone, logger, config) {
         logger.trace('opbeatData', opbeatData)
         var opbeatTask = opbeatData.task
 
-        if (opbeatTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === XHR.DONE) {
+        if (opbeatTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === task.data.target.DONE) {
           opbeatData.registeredEventListeners['readystatechange'].resolved = true
           spec.onBeforeInvokeTask(opbeatTask)
         } else if (opbeatTask && task.data.eventName === 'load' && 'load' in opbeatData.registeredEventListeners) {
