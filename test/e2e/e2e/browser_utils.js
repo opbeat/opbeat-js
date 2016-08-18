@@ -10,15 +10,46 @@ function setup () {
     console.log(e)
   }
 
+  function importDependencies (dependencies) {
+    var promises = dependencies.map(function (d) {
+      return System.import(d)
+    })
+
+    return Promise.all(promises)
+      .then(function (resolvedDependencies) {
+        return resolvedDependencies
+      }, logError)
+  }
+
+  function sequentialImport (dependencies) {
+    var results = []
+    return dependencies
+      .reduce(function (p, dep) {
+        return p.then(function () {
+          if (typeof dep === 'string') {
+            return System.import(dep).then(function (r) {
+              results.push(r)
+              return results
+            })
+          } else {
+            return importDependencies()
+              .then(function (rs) {
+                results = results.concat(rs)
+                return results
+              })
+          }
+        })
+      }, Promise.resolve())
+  }
+
   var utils = {
     loadDependencies: function loadDependencies (dependencies, callback) {
-      var promises = dependencies.map(function (d) {
-        return System.import(d)
-      })
-
-      return Promise.all(promises).then(function (modules) {
+      var promise = sequentialImport(dependencies)
+      return promise.then(function (modules) {
         console.log('Dependencies resolved.')
-        callback(modules)
+        if (typeof callback === 'function') {
+          callback(modules)
+        }
         return modules
       }, logError)
     },
