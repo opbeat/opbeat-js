@@ -17,5 +17,8 @@ function ZoneServiceMock () {
   this.runOuter = function (fn) {
     return fn()
   }
+  this.zone.run = function (callback, applyThis, applyArgs, source) {
+    callback.apply(applyThis, applyArgs)
+  }
 }
 module.exports = ZoneServiceMock

@@ -60,7 +60,7 @@ function patchAll ($provide, transactionService) {
 
 function noop () {}
 
-function registerOpbeatModule (transactionService, logger, configService, isAngularSupported, exceptionHandler) {
+function registerOpbeatModule (transactionService, logger, configService, exceptionHandler) {
   function moduleRun ($rootScope) {
     configService.set('isInstalled', true)
     configService.set('opbeatAgentName', 'opbeat-angular')
@@ -98,18 +98,20 @@ function registerOpbeatModule (transactionService, logger, configService, isAngu
     patchAll($provide, transactionService)
   }
 
-  if (!configService.isPlatformSupported() || !isAngularSupported()) {
-    window.angular.module('ngOpbeat', [])
-      .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
-      .config(['$provide', noop])
-      .run(['$rootScope', noop])
-  } else {
-    window.angular.module('ngOpbeat', [])
-      .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
-      .config(['$provide', moduleConfig])
-      .run(['$rootScope', moduleRun])
+  if (window.angular) {
+    if (!configService.isPlatformSupported()) {
+      window.angular.module('ngOpbeat', [])
+        .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
+        .config(['$provide', noop])
+        .run(['$rootScope', noop])
+    } else {
+      window.angular.module('ngOpbeat', [])
+        .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
+        .config(['$provide', moduleConfig])
+        .run(['$rootScope', moduleRun])
+    }
+    window.angular.module('opbeat-angular', ['ngOpbeat'])
   }
-  window.angular.module('opbeat-angular', ['ngOpbeat'])
 }
 
 module.exports = registerOpbeatModule
