@@ -3,7 +3,7 @@ describe('minified_module_app.failsafe', function () {
     browser
       .url('/angular/index.e2e.html')
       .executeAsync(function (cb) {
-        window.runFixture('./minified_module_app/minified_module_app.js', ['../dist/dev/opbeat-angular.min.js', 'angular-ui-router'], {
+        window.runFixture('./minified_module_app/minified_module_app.js', ['../dist/dev/opbeat-angular.min.js', 'angular', 'angular-ui-router'], {
           beforeInit: function (app, deps) {
             var errors = []
             window.onerror = function (error, url, line) {

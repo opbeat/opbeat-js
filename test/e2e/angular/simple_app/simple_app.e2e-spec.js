@@ -1,14 +1,13 @@
 var utils = require('../../e2e/utils')
 
-describe('angular.simple app', function () {
+describe('angular.simple_app', function () {
   beforeEach(utils.verifyNoBrowserErrors)
 
   it('should have correct number of transactions and traces', function (done) {
     browser.url('/angular/index.e2e.html')
       .executeAsync(function (cb) {
-        window.runFixture('./simple_app/simple_app.js', ['./opbeat-angular.e2e.js', 'angular-route'], {
+        window.runFixture('./simple_app/simple_app.js', ['angular', './opbeat-angular.e2e.js', 'angular-route'], {
           beforeInit: function (app, deps) {
-            deps[0]()
             window.e2e.getTransactions(function (trs) {
               cb(trs)
             }, 0, 1)
@@ -37,8 +36,10 @@ describe('angular.simple app', function () {
 
   it('should be running the correct major/minor version of angular', function (done) {
     browser.url('/angular/index.e2e.html').then(function () {
-      browser.execute(function () {
-        return window.angular.version
+      browser.executeAsync(function (cb) {
+        window.loadDependencies(['angular'], function () {
+          cb(window.angular.version)
+        })
       }).then(function (response) {
         var version = response.value
         console.log('Browser angular version: ' + version.full)

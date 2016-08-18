@@ -1,13 +1,12 @@
 var utils = require('../../e2e/utils')
-describe('angular.ui router app', function () {
+describe('angular.ui_router_app', function () {
   beforeEach(utils.verifyNoBrowserErrors)
 
   it('should have correct number of transactions and traces', function (done) {
     browser.url('/angular/index.e2e.html')
       .executeAsync(function (cb) {
-        window.runFixture('./ui_router_app/ui_router_app.js', ['./opbeat-angular.e2e.js', 'angular-ui-router'], {
+        window.runFixture('./ui_router_app/ui_router_app.js', ['./opbeat-angular.e2e.js', 'angular', 'angular-ui-router'], {
           beforeInit: function (app, deps) {
-            deps[0]()
             window.e2e.getTransactions(function (trs) {
               cb(trs)
             }, 0, 1)
@@ -45,9 +44,8 @@ describe('angular.ui router app', function () {
   it('should not send any transaction if config is not valid', function (done) {
     browser.url('/angular/index.e2e.html')
       .executeAsync(function (cb) {
-        window.runFixture('./ui_router_app/ui_router_app.js', ['./opbeat-angular.e2e.js', 'angular-ui-router'], {
+        window.runFixture('./ui_router_app/ui_router_app.js', ['angular', './opbeat-angular.e2e.js', 'angular-ui-router'], {
           beforeInit: function (app, deps) {
-            deps[0]()
             setTimeout(function () {
               cb([])
             }, 1000)
