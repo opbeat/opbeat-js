@@ -30,13 +30,13 @@ function setup () {
             return System.import(dep).then(function (r) {
               results.push(r)
               return results
-            })
+            }, logError)
           } else {
             return importDependencies()
               .then(function (rs) {
                 results = results.concat(rs)
                 return results
-              })
+              }, logError)
           }
         })
       }, Promise.resolve())
@@ -73,18 +73,24 @@ function setup () {
       document.body.appendChild(div)
       System.import(path).then(function (module) {
         utils.loadDependencies(deps, function (modules) {
+          var useNgApp = options.useNgApp
+          // if (typeof useNgApp === 'undefined') {
+          //   useNgApp = (window.angular.version.major >= 1 && window.angular.version.minor >= 3)
+          // }
           if (options.beforeInit) {
             options.beforeInit(module, modules)
           } else {
             module.init(options.opbeatConfig)
           }
-          if (options.useNgApp) {
+
+          if (useNgApp) {
+            console.log('using ngapp')
             window.angular.resumeBootstrap()
           } else {
             module.bootstrap(document)
           }
         })
-      })
+      }, logError)
     },
     getNextTransaction: function getNextTransaction (cb) {
       var cancelFn = window.e2e.transactionService.subscribe(function (tr) {

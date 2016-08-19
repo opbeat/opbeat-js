@@ -2,14 +2,22 @@ var TransactionService = require('../transaction/transaction_service')
 
 var utils = require('../lib/utils')
 
+if (typeof window.Zone === 'undefined') {
+  require('zone.js')
+}
+
 function ServiceContainer (serviceFactory) {
   this.serviceFactory = serviceFactory
   this.services = {}
+  this.services.configService = this.serviceFactory.getConfigService()
+  this.services.logger = this.serviceFactory.getLogger()
+  this.services.zoneService = this.createZoneService()
+}
 
-  var configService = this.services.configService = this.serviceFactory.getConfigService()
-
-  var logger = this.services.logger = this.serviceFactory.getLogger()
-  var zoneService = this.services.zoneService = this.createZoneService()
+ServiceContainer.prototype.initialize = function () {
+  var configService = this.services.configService
+  var logger = this.services.logger
+  var zoneService = this.services.zoneService
 
   var opbeatBackend = this.services.opbeatBackend = this.serviceFactory.getOpbeatBackend()
   var transactionService = this.services.transactionService = new TransactionService(zoneService, this.services.logger, configService, opbeatBackend)
@@ -35,10 +43,6 @@ function ServiceContainer (serviceFactory) {
 
 ServiceContainer.prototype.createZoneService = function () {
   var logger = this.services.logger
-
-  if (typeof window.Zone === 'undefined') {
-    require('zone.js')
-  }
 
   var ZoneService = require('../transaction/zone_service')
   return new ZoneService(window.Zone.current, logger, this.services.configService)

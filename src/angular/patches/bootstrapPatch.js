@@ -6,7 +6,10 @@ function runInOpbeatZone (zoneService, fn, applyThis, applyArgs) {
   }
 }
 
-function patchMainBootstrap (zoneService, beforeBootstrap) {
+var DEFER_LABEL = 'NG_DEFER_BOOTSTRAP!'
+var deferRegex = new RegExp('^' + DEFER_LABEL + '.*')
+
+function patchMainBootstrap (zoneService, beforeBootstrap, weDeferred) {
   if (typeof window.angular === 'undefined') {
     return
   }
@@ -14,6 +17,9 @@ function patchMainBootstrap (zoneService, beforeBootstrap) {
 
   function bootstrap (element, modules) {
     beforeBootstrap(modules)
+    if (weDeferred && deferRegex.test(window.name)) {
+      window.name = window.name.substring(DEFER_LABEL.length)
+    }
     return runInOpbeatZone(zoneService, originalBootstrapFn, window.angular, arguments)
   }
 
@@ -35,12 +41,10 @@ function patchDeferredBootstrap (zoneService, beforeBootstrap) {
   if (typeof window.angular === 'undefined') {
     return
   }
-  var DEFER_LABEL = 'NG_DEFER_BOOTSTRAP!'
-  var deferRegex = new RegExp('^' + DEFER_LABEL + '.*')
   // If the bootstrap is already deferred. (like run by Protractor)
   // In this case `resumeBootstrap` should be patched
   if (deferRegex.test(window.name)) {
-    var originalResumeBootstrap
+    var originalResumeBootstrap = window.angular.resumeBootstrap
     Object.defineProperty(window.angular, 'resumeBootstrap', {
       get: function () {
         return function (modules) {
@@ -52,6 +56,8 @@ function patchDeferredBootstrap (zoneService, beforeBootstrap) {
         originalResumeBootstrap = resumeBootstrap
       }
     })
+    // we have not deferred the bootstrap
+    return false
   } else { // If this is not a test, defer bootstrapping
     window.name = DEFER_LABEL + window.name
 
@@ -67,6 +73,8 @@ function patchDeferredBootstrap (zoneService, beforeBootstrap) {
         window.name = window.name.substring(DEFER_LABEL.length)
       }
     })
+    // we have deferred the bootstrap
+    return true
   }
 }
 
@@ -84,8 +92,7 @@ function createAngular (zoneService, beforeBootstrap) {
       originalAngular = value
       if (!alreadyPatched && typeof originalAngular === 'object') {
         alreadyPatched = true
-        patchMainBootstrap(zoneService, beforeBootstrap)
-        patchDeferredBootstrap(zoneService, beforeBootstrap)
+        patchAll(zoneService, beforeBootstrap)
       }
     },
     enumerable: true,
@@ -94,14 +101,19 @@ function createAngular (zoneService, beforeBootstrap) {
 }
 
 function noop () {}
+
+function patchAll (zoneService, beforeBootstrap) {
+  var weDeferred = patchDeferredBootstrap(zoneService, beforeBootstrap)
+  patchMainBootstrap(zoneService, beforeBootstrap, weDeferred)
+}
+
 function patchAngularBootstrap (zoneService, beforeBootstrap) {
   if (typeof beforeBootstrap !== 'function') {
     beforeBootstrap = noop
   }
 
   if (window.angular) {
-    patchMainBootstrap(zoneService, beforeBootstrap)
-    patchDeferredBootstrap(zoneService, beforeBootstrap)
+    patchAll(zoneService, beforeBootstrap)
   } else {
     createAngular(zoneService, beforeBootstrap)
   }

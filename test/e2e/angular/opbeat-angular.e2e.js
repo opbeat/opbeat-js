@@ -1,6 +1,5 @@
 var ServiceContainer = require('../../../src/common/serviceContainer')
 var ServiceFactory = require('../../../src/common/serviceFactory')
-var ngOpbeat = require('../../../src/angular/ngOpbeat')
 var Subscription = require('../../../src/common/subscription')
 var angularInitializer = require('../../../src/angular/angularInitializer')
 
@@ -50,15 +49,18 @@ function init () {
   // })
 
   var logger = services.logger
-  var transactionService = services.transactionService
 
   var opbeatBackend = serviceFactory.getOpbeatBackend()
 
   angularInitializer(serviceContainer)
 
-  transactionService.subscribe(function (tr) {
-    opbeatBackend.sendTransactions([tr])
-  })
+  var configService = services.configService
+  if (configService.isPlatformSupported()) {
+    var transactionService = services.transactionService
+    transactionService.subscribe(function (tr) {
+      opbeatBackend.sendTransactions([tr])
+    })
+  }
 
   function getTransactions (callback, start, end) {
     if (transportMock.transactions.length >= end) {
@@ -77,7 +79,6 @@ function init () {
     })
   }
 
-  ngOpbeat(services.transactionService, services.logger, services.configService, services.exceptionHandler)
 
   window.e2e = {
     transactionService: transactionService,

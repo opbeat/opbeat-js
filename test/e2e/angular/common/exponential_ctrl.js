@@ -29,6 +29,9 @@ function exponentialCtrl ($scope, $http) {
   $http.get('common/confirmation.json').then(function (response) {
     $scope.confirmation(response.data)
     $scope.repeatArray = exponentialize(repeatArray, 8)
+    if (window.e2e && typeof window.e2e.appInitialized === 'function') {
+      window.e2e.appInitialized()
+    }
   }, function () {
     throw new Error('Confirmation failed.')
   })

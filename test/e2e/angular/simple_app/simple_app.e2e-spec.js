@@ -13,7 +13,8 @@ describe('angular.simple_app', function () {
             }, 0, 1)
             app.init()
           },
-          useNgApp: false,
+          appName: 'simple_app',
+          useNgApp: undefined,
           uiRouter: false
         })
       })

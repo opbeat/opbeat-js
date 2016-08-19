@@ -28,6 +28,7 @@ module.exports = {
         console.log('Erros: ', filteredLog)
         console.log('infoLogs:', infoLogs)
       }
+      // console.log('infoLogs:', infoLogs)
       expect(filteredLog.length).toEqual(0, 'Expected no errors in the browserLog but got ' + filteredLog.length + ' error(s)') // .because()
       if (typeof done === 'function') {
         done()
