@@ -6,7 +6,6 @@
   <script src="/e2e/browser_utils.js"></script>
   <script src="/node_modules/systemjs/dist/system.src.js"></script>
 
-  <script src="/node_modules/angular/angular.js"></script>
 
   <script>
     window.System.config({
@@ -17,6 +16,9 @@
         '*': '/node_modules/*'
       },
       meta: {
+        'offline-js':{
+          deps:['opbeat-angular']
+        },
         './app.js': {
           format: 'cjs'
         },
@@ -25,7 +27,13 @@
         },
         '../dist/dev/opbeat-angular.js':{
           format:'cjs'
-        }
+        },
+        // '/node_modules/angular-route/angular-route.js':{
+        //   deps:['angular']
+        // },
+        // '/node_modules/angular/angular.js':{
+        //   deps:['opbeat-angular']
+        // }
       },
       packageConfigPaths: ['/node_modules/*/package.json'],
       'defaultJSExtensions': true
@@ -34,7 +42,7 @@
     var fixtures = {
         'ui_router_app':{
           path:'./ui_router_app/ui_router_app.js',
-          deps:['opbeat-angular', 'angular-ui-router','angular-resource'],
+          deps:['opbeat-angular', 'offline-js', 'angular', 'angular-ui-router', 'angular-resource'],
           options:{
             appName:'ui_router_app',
             useNgApp:false,
@@ -70,7 +78,7 @@
         },
         'minified_module_app':{
           path:'./minified_module_app/minified_module_app.js',
-          deps:['../dist/dev/opbeat-angular.js', 'angular-ui-router'],
+          deps:['../dist/dev/opbeat-angular.js','angular', 'angular-ui-router'],
           options:{
             appName:'minified_module_app',
             useNgApp:false,
@@ -99,17 +107,20 @@
         },
         'simple_app':{
           path:'./simple_app/simple_app.js',
-          deps:['opbeat-angular', 'angular-route'],
+          deps:['opbeat-angular','angular','angular-route'],//,  , 'offline-js'
           options:{
+            beforeInit: function (app, deps) {
+              app.init()
+            },
             appName:'simple_app',
-            useNgApp:false,
+            useNgApp:undefined,
             uiRouter:false
           }
         }     
     }
     
-    var fx = fixtures['ui_router_app']
-    runFixture(fx.path, fx.deps, fx.options)
+    var fx = fixtures['simple_app']
+    e2eUtils.runFixture(fx.path, fx.deps, fx.options)
   </script>
 
 </body>
