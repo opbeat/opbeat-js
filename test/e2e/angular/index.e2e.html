@@ -3,31 +3,9 @@
 
 <body>
 
-  <script src="/e2e/browser_utils.js"></script>
   <script src="/node_modules/systemjs/dist/system.js"></script>
+  <script src="/e2e/browser_utils.js"></script>
 
-  
-  <script>
-    window.System.config({
-      paths: {
-        '*': '/node_modules/*',
-        'zone.js':'/node_modules/zone.js/dist/zone.js',
-      },
-      meta: {
-        './app.js': {
-          format: 'cjs'
-        },
-        '../../dist/dev/opbeat-angular.e2e.js':{
-          format:'cjs'
-        },
-        '../../dist/dev/opbeat-angular.e2e.min.js':{
-          format:'cjs'
-        }
-      },
-      packageConfigPaths: ['/node_modules/*/package.json'],
-      'defaultJSExtensions': true
-    })
-  </script>
 </body>
 
 </html>

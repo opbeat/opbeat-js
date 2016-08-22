@@ -105,35 +105,26 @@ function setup () {
   window.getNextTransaction = utils.getNextTransaction
   window.runFixture = utils.runFixture
 
-  // window.__httpInterceptor = {
-  //   requests: []
-  // }
-  // var _XHR = window.XMLHttpRequest
-  // window.XMLHttpRequest = function () {
-  //   var xhr = new _XHR()
-  //   var originalOpen = xhr.open
-  //   var lastMethod
-  //   var lastURL
-  //   xhr.open = function () {
-  //     lastMethod = arguments[0]
-  //     lastURL = arguments[1]
-  //     originalOpen.apply(xhr, arguments)
-  //   }
-
-  //   // var originalSend = xhr.send
-  //   // xhr.send = function(){
-  //   //   return originalSend.apply(xhr, arguments)
-  //   // }
-
-//   xhr.addEventListener('load', function () {
-//     window.__httpInterceptor.requests.push({
-//       requestedMethod: lastMethod.toUpperCase(),
-//       requestedURL: lastURL,
-//       xhr: this
-//     })
-//   })
-//   return xhr
-// }
+  // config systemjs
+  window.System.config({
+    paths: {
+      '*': '/node_modules/*',
+      'zone.js': '/node_modules/zone.js/dist/zone.js'
+    },
+    meta: {
+      './app.js': {
+        format: 'cjs'
+      },
+      '../../dist/dev/opbeat-angular.e2e.js': {
+        format: 'cjs'
+      },
+      '../../dist/dev/opbeat-angular.e2e.min.js': {
+        format: 'cjs'
+      }
+    },
+    packageConfigPaths: ['/node_modules/*/package.json'],
+    'defaultJSExtensions': true
+  })
 }
 
 setup()
