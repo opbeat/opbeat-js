@@ -39,7 +39,7 @@ describe('transaction.Transaction', function () {
     transaction.detectFinish()
 
     expect(transaction._rootTrace._start).toBe(firstTrace._start)
-    expect(transaction._rootTrace._end).toBeGreaterThan(lastTrace._end)
+    expect(transaction._rootTrace._end >= lastTrace._end).toBeTruthy()
     done()
   })
 
