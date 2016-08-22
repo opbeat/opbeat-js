@@ -186,4 +186,12 @@ ZoneService.prototype.runOuter = function (fn) {
   return this.outer.run(fn)
 }
 
+ZoneService.prototype.runInOpbeatZone = function runInOpbeatZone (fn, applyThis, applyArgs) {
+  if (this.zone.name === window.Zone.current.name) {
+    return fn.apply(applyThis, applyArgs)
+  } else {
+    return this.zone.run(fn, applyThis, applyArgs)
+  }
+}
+
 module.exports = ZoneService

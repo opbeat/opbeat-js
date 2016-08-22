@@ -20,5 +20,9 @@ function ZoneServiceMock () {
   this.zone.run = function (callback, applyThis, applyArgs, source) {
     callback.apply(applyThis, applyArgs)
   }
+
+  this.runInOpbeatZone = function (fn, applyThis, applyArgs) {
+    fn.apply(applyThis, applyArgs)
+  }
 }
 module.exports = ZoneServiceMock

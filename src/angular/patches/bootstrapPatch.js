@@ -1,11 +1,3 @@
-function runInOpbeatZone (zoneService, fn, applyThis, applyArgs) {
-  if (zoneService.zone.name === window.Zone.current.name) {
-    return fn.apply(applyThis, applyArgs)
-  } else {
-    return zoneService.zone.run(fn, applyThis, applyArgs)
-  }
-}
-
 var DEFER_LABEL = 'NG_DEFER_BOOTSTRAP!'
 var deferRegex = new RegExp('^' + DEFER_LABEL + '.*')
 
@@ -20,7 +12,7 @@ function patchMainBootstrap (zoneService, beforeBootstrap, weDeferred) {
     if (weDeferred && deferRegex.test(window.name)) {
       window.name = window.name.substring(DEFER_LABEL.length)
     }
-    return runInOpbeatZone(zoneService, originalBootstrapFn, window.angular, arguments)
+    return zoneService.runInOpbeatZone(originalBootstrapFn, window.angular, arguments)
   }
 
   Object.defineProperty(window.angular, 'bootstrap', {
@@ -49,7 +41,7 @@ function patchDeferredBootstrap (zoneService, beforeBootstrap) {
       get: function () {
         return function (modules) {
           beforeBootstrap(modules)
-          return runInOpbeatZone(zoneService, originalResumeBootstrap, window.angular, arguments)
+          return zoneService.runInOpbeatZone(originalResumeBootstrap, window.angular, arguments)
         }
       },
       set: function (resumeBootstrap) {
@@ -64,7 +56,7 @@ function patchDeferredBootstrap (zoneService, beforeBootstrap) {
     window.angular.resumeDeferredBootstrap = function () {
       var modules = []
       beforeBootstrap(modules)
-      return runInOpbeatZone(zoneService, window.angular.resumeBootstrap, window.angular, [modules])
+      return zoneService.runInOpbeatZone(window.angular.resumeBootstrap, window.angular, [modules])
     }
     /* angular should remove DEFER_LABEL from window.name, but if angular is never loaded, we want
      to remove it ourselves */
