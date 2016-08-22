@@ -35,6 +35,30 @@ describe('angular.simple_app', function () {
       })
   })
 
+  it('should have correct number of transactions and traces using ng-app', function (done) {
+    browser.url('/angular/index.ngApp.html')
+      .executeAsync(function (cb) {
+        window.simple_app.init()
+        window.e2e.getTransactions(function (trs) {
+          cb(trs)
+        }, 0, 1)
+      })
+      .then(function (response) {
+        var transactions = response.value
+        expect(transactions.length).toBe(1)
+
+        var first = transactions[0]
+        expect(first.traces.groups.length).toBeGreaterThan(7)
+        expect(first.traces.raw[0].length).toBeGreaterThan(11)
+        expect(first.transactions.length).toBe(1)
+        expect(first.transactions[0].transaction).toBe('/')
+
+        done()
+      }, function (error) {
+        console.log(error)
+      })
+  })
+
   it('should be running the correct major/minor version of angular', function (done) {
     browser.url('/angular/index.e2e.html').then(function () {
       browser.executeAsync(function (cb) {
