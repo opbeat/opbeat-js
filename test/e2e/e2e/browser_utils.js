@@ -97,13 +97,33 @@ function setup () {
         cb(tr)
         cancelFn()
       })
+    },
+    chooseBootstrap: function chooseBootstrap (options, bootstrap) {
+      var useNgApp
+      if (typeof useNgApp === 'undefined') {
+        useNgApp = (window.angular.version.major >= 1 && window.angular.version.minor >= 3)
+      }
+
+      var div = document.createElement('div')
+
+      if (useNgApp) {
+        div.setAttribute('ng-app', options.appName)
+      }
+
+      if (options.uiRouter) {
+        div.innerHTML = '<div ui-view></div>'
+      } else {
+        div.innerHTML = '<div ng-view></div>'
+      }
+      document.body.appendChild(div)
+
+      if (!useNgApp) {
+        bootstrap(div)
+      }
     }
   }
 
-  window.loadDependencies = utils.loadDependencies
-  window.loadFixture = utils.loadFixture
-  window.getNextTransaction = utils.getNextTransaction
-  window.runFixture = utils.runFixture
+  window.e2eUtils = utils
 
   // config systemjs
   window.System.config({

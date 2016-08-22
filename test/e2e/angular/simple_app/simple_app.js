@@ -47,7 +47,6 @@ function init () {
 
     var repeatArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-
     $http.get('simple_app/confirmation.json').then(function (response) {
       $scope.confirmation(response.data)
       $scope.repeatArray = exponentialize(repeatArray, 8)

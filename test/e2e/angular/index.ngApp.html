@@ -14,11 +14,10 @@
 
   <script>
     simple_app.init()
+    e2eUtils.chooseBootstrap({appName:'simple_app',uiRouter:false},function(element){
+      simple_app.bootstrap(element)
+    })
   </script>
-  <div ng-app="simple_app">
-    <ng-view />
-  </div>
-
 </body>
 
 </html>

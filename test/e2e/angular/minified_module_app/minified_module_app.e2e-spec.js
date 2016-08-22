@@ -5,7 +5,7 @@ describe('minified_module_app', function () {
   it('should have correct number of transactions and traces', function (done) {
     browser.url('/angular/index.e2e.html')
       .executeAsync(function (cb) {
-        window.runFixture('./minified_module_app/minified_module_app.js', ['../../dist/dev/opbeat-angular.e2e.min.js', 'offline-js', 'angular', 'angular-ui-router'], {
+        window.e2eUtils.runFixture('./minified_module_app/minified_module_app.js', ['../../dist/dev/opbeat-angular.e2e.min.js', 'offline-js', 'angular', 'angular-ui-router'], {
           beforeInit: function (app, deps) {
             window.e2e.getTransactions(function (trs) {
               cb(trs)

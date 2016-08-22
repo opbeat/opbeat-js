@@ -6,7 +6,7 @@ describe('angular.simple_app', function () {
   it('should have correct number of transactions and traces', function (done) {
     browser.url('/angular/index.e2e.html')
       .executeAsync(function (cb) {
-        window.runFixture('./simple_app/simple_app.js', ['angular', './opbeat-angular.e2e.js', 'angular-route'], {
+        window.e2eUtils.runFixture('./simple_app/simple_app.js', ['angular', './opbeat-angular.e2e.js', 'angular-route'], {
           beforeInit: function (app, deps) {
             window.e2e.getTransactions(function (trs) {
               cb(trs)
@@ -62,7 +62,7 @@ describe('angular.simple_app', function () {
   it('should be running the correct major/minor version of angular', function (done) {
     browser.url('/angular/index.e2e.html').then(function () {
       browser.executeAsync(function (cb) {
-        window.loadDependencies(['angular'], function () {
+        window.e2eUtils.loadDependencies(['angular'], function () {
           cb(window.angular.version)
         })
       }).then(function (response) {
