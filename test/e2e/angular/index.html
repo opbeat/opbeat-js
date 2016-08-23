@@ -2,42 +2,12 @@
 <html>
 
 <body>
-
-  <script src="/e2e/browser_utils.js"></script>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
   <script src="/node_modules/systemjs/dist/system.src.js"></script>
 
+  <script src="/e2e/browser_utils.js"></script>
 
   <script>
-    window.System.config({
-      paths: {
-        'opbeat-angular':'../src/angular/opbeat-angular.js',
-        'zone.js':'/node_modules/zone.js/dist/zone.js',
-        // 'zone.js':'/angular/zone.js0.6/node_modules/zone.js/dist/zone.js',
-        '*': '/node_modules/*'
-      },
-      meta: {
-        'offline-js':{
-          deps:['opbeat-angular']
-        },
-        './app.js': {
-          format: 'cjs'
-        },
-        '../dist/dev/opbeat-angular.e2e.js':{
-          format:'cjs'
-        },
-        '../dist/dev/opbeat-angular.js':{
-          format:'cjs'
-        },
-        // '/node_modules/angular-route/angular-route.js':{
-        //   deps:['angular']
-        // },
-        // '/node_modules/angular/angular.js':{
-        //   deps:['opbeat-angular']
-        // }
-      },
-      packageConfigPaths: ['/node_modules/*/package.json'],
-      'defaultJSExtensions': true
-    })
     
     var fixtures = {
         'ui_router_app':{
@@ -116,10 +86,22 @@
             useNgApp:undefined,
             uiRouter:false
           }
-        }     
+        },
+        'semantic_ui':{
+          path:'./semantic_ui/semantic_ui.js',
+          deps:['opbeat-angular','semantic-ui-dropdown','angular','angular-route'],
+          options:{
+            beforeInit: function (app, deps) {
+              app.init()
+            },
+            appName:'semantic_ui',
+            useNgApp:undefined,
+            uiRouter:false
+          }
+        }         
     }
     
-    var fx = fixtures['simple_app']
+    var fx = fixtures['semantic_ui']
     e2eUtils.runFixture(fx.path, fx.deps, fx.options)
   </script>
 

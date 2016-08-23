@@ -126,20 +126,40 @@ function setup () {
   window.e2eUtils = utils
 
   // config systemjs
+
   window.System.config({
+    map: {
+      css: '/node_modules/systemjs-plugin-css/css.js'
+    },
     paths: {
-      '*': '/node_modules/*',
-      'zone.js': '/node_modules/zone.js/dist/zone.js'
+      'opbeat-angular': '../src/angular/opbeat-angular.js',
+      'zone.js': '/node_modules/zone.js/dist/zone.js',
+      'semantic-ui-dropdown': '/node_modules/semantic-ui-dropdown/dropdown.js',
+      'semantic-ui-transition': '/node_modules/semantic-ui-transition/transition.js',
+      '*': '/node_modules/*'
     },
     meta: {
+      '*.css': { loader: 'css' },
+      'offline-js': {
+        deps: ['opbeat-angular']
+      },
       './app.js': {
         format: 'cjs'
       },
-      '../../dist/dev/opbeat-angular.e2e.js': {
+      '../dist/dev/opbeat-angular.e2e.js': {
         format: 'cjs'
       },
-      '../../dist/dev/opbeat-angular.e2e.min.js': {
+      '../dist/dev/opbeat-angular.e2e.min.js': {
         format: 'cjs'
+      },
+      '../dist/dev/opbeat-angular.js': {
+        format: 'cjs'
+      },
+      '/node_modules/semantic-ui-dropdown/dropdown.js': {
+        deps: ['jquery', '/node_modules/semantic-ui-dropdown/dropdown.css', 'semantic-ui-transition']
+      },
+      '/node_modules/semantic-ui-transition/transition.js': {
+        deps: ['jquery', '/node_modules/semantic-ui-transition/transition.css']
       }
     },
     packageConfigPaths: ['/node_modules/*/package.json'],
