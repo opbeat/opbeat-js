@@ -1,5 +1,5 @@
 #!/bin/bash
-./scripts/export-build ../opbeat-js-release/ ./dist/opbeat-js/*
+./scripts/export-build opbeat-js ../opbeat-js-release/ ./dist/opbeat-js/*
 
 cd ../opbeat-js-release/
 

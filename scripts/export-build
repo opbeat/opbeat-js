@@ -1,18 +1,19 @@
 #!/bin/bash
 
-if [ $# -lt 2 ];
+if [ $# -lt 3 ];
 then
-    echo "Usage: $0 <export_repository_path> <file_to_export> [file_to_export ...]"
+    echo "Usage: $0 <integration_key> <export_repository_path> <file_to_export> [file_to_export ...]"
     exit
 fi
 
 FILES_TO_COPY=""
-for ((i=2; i <= $#; i++)) do FILES_TO_COPY="$FILES_TO_COPY ${!i}"; done
+for ((i=3; i <= $#; i++)) do FILES_TO_COPY="$FILES_TO_COPY ${!i}"; done
 
 BASE_WORKING_DIR=`pwd`
 # DISTRIBUTION_DIR="./dist/"
-TARGET_REPO_DIR="$1"
-DISTRIBUTION_VERSION=`node -e "console.log(require('./package.json').version);"`
+TARGET_REPO_DIR="$2"
+INTEGRATION_KEY="$1"
+DISTRIBUTION_VERSION=`node -e "console.log(require('./release/integrations.json')['$INTEGRATION_KEY'].version);"`
 TAG_NAME="v$DISTRIBUTION_VERSION"
 
 echo "Building files for copy."

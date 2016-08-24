@@ -1,5 +1,5 @@
 #!/bin/bash
-./scripts/export-build ../opbeat-angular-release/ ./dist/opbeat-angular/*
+./scripts/export-build opbeat-angular ../opbeat-angular-release/ ./dist/opbeat-angular/*
 
 cd ../opbeat-angular-release/
 
