@@ -28,7 +28,7 @@ addons:
  firefox: "38.0"
 
 before_script:
-  - (cd test/e2e && npm install && npm install angular@$ANGULAR_VERSION angular-animate@$ANGULAR_VERSION angular-resource@$ANGULAR_VERSION angular-route@$ANGULAR_VERSION)
+  - (cd test/e2e && npm install && npm install angular@$ANGULAR_VERSION angular-resource@$ANGULAR_VERSION angular-route@$ANGULAR_VERSION)
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
