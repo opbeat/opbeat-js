@@ -2,7 +2,7 @@
   "opbeat-angular": {
     "entry": "./src/angular/opbeat-angular.js",
     "description": "Official AngularJS client for logging exceptions, stacktraces and performance data to Opbeat",
-    "version": "3.1.4"
+    "version": "3.2.0"
   },
   "opbeat-js": {
     "entry": "./src/opbeat.js",
