@@ -8,7 +8,7 @@
     "Hamidreza Jahtalab",
     "Kenneth Auchenberg"
   ],
-  "main": "src/opbeat.js",
+  "main": "src/opbeat-js/opbeat.js",
   "scripts": {
     "build": "gulp build:release",
     "karma": "node node_modules/karma/bin/karma start",

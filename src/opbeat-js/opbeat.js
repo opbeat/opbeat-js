@@ -1,7 +1,7 @@
-var logger = require('./lib/logger')
-var API = require('./lib/api')
+var logger = require('../lib/logger')
+var API = require('../lib/api')
 
-var ServiceFactory = require('./common/serviceFactory')
+var ServiceFactory = require('../common/serviceFactory')
 
 function Opbeat () {
   this._serviceFactory = new ServiceFactory()

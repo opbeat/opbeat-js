@@ -5,7 +5,7 @@
     "version": "3.2.0"
   },
   "opbeat-js": {
-    "entry": "./src/opbeat.js",
+    "entry": "./src/opbeat-js/opbeat.js",
     "description": "This is the official frontend JavaScript module for Opbeat",
     "version": "3.1.4"
   }
