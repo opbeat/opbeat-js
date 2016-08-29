@@ -82,7 +82,7 @@ describe('ngOpbeat', function () {
   })
 
   it('should consider isPlatformSupported', function () {
-    serviceContainer.services.transactionservice = undefined
+    serviceContainer.services.transactionService = undefined
     serviceContainer.services.configService.isPlatformSupported = function () {
       return false
     }
