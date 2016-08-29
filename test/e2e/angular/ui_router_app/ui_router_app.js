@@ -1,6 +1,6 @@
 function init (opbeatConfig) {
   var ctrl = require('../common/exponential_ctrl')
-  var app = window.angular.module('ui_router_app', ['ui.router'])
+  var app = window.angular.module('ui_router_app', ['ui.router', 'ngOpbeat'])
 
   app.config(function ($stateProvider, $urlRouterProvider) {
     var routeConfig = {
