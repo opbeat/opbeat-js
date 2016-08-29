@@ -98,7 +98,7 @@ function registerOpbeatModule (transactionService, logger, configService, except
     patchAll($provide, transactionService)
   }
 
-  if (window.angular) {
+  if (window.angular && typeof window.angular.module === 'function') {
     if (!configService.isPlatformSupported()) {
       window.angular.module('ngOpbeat', [])
         .provider('$opbeat', new NgOpbeatProvider(logger, configService, exceptionHandler))
@@ -111,6 +111,7 @@ function registerOpbeatModule (transactionService, logger, configService, except
         .run(['$rootScope', moduleRun])
     }
     window.angular.module('opbeat-angular', ['ngOpbeat'])
+    return true
   }
 }
 

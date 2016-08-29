@@ -57,6 +57,7 @@ module.exports = function (config) {
       'node_modules/angular/angular.js',
       'node_modules/angular-resource/angular-resource.js',
       'node_modules/zone.js/dist/zone.js',
+      'node_modules/angular-mocks/angular-mocks.js',
       specPattern,
       { pattern: 'test/exceptions/data/*.js', included: false, watched: false },
       { pattern: 'src/**/*.js', included: false, watched: true }
@@ -134,8 +135,8 @@ module.exports = function (config) {
     cfg.preprocessors['src/**/*.js'] = ['coverage']
 
     cfg.reporters.push('coverage')
-  // cfg.plugins.push('karma-phantomjs2-launcher')
-  // cfg.browsers.push('PhantomJS2')
+    // cfg.plugins.push('karma-phantomjs2-launcher')
+    // cfg.browsers.push('PhantomJS2')
   }
 
   if (isSauce) {

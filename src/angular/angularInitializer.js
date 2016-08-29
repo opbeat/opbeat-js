@@ -14,22 +14,16 @@ function initialize (serviceContainer) {
   patchCommon(serviceContainer)
 
   function beforeBootstrap (modules) {
-    // We're adding 'ngOpbeat' just before bootstrap, so it doesn't have to be specified in the dependencies
-
-    if (modules && typeof modules.unshift === 'function') {
-      modules.unshift('ngOpbeat')
-    }
     if (!alreadyRegistered) {
-      alreadyRegistered = true
-      registerOpbeatModule(services)
+      alreadyRegistered = registerOpbeatModule(services)
     }
   }
-
+  alreadyRegistered = registerOpbeatModule(services)
   patchAngularBootstrap(services.zoneService, beforeBootstrap)
 }
 
 function registerOpbeatModule (services) {
-  ngOpbeat(services.transactionService, services.logger, services.configService, services.exceptionHandler)
+  return ngOpbeat(services.transactionService, services.logger, services.configService, services.exceptionHandler)
 }
 
 module.exports = initialize
