@@ -7,6 +7,16 @@ function exponentialize (seed, times) {
 }
 
 function exponentialCtrl ($scope, $http) {
+  setTimeout(function () {
+    var req = new window.XMLHttpRequest()
+
+    function reqListener () {
+    }
+    req.addEventListener('load', reqListener)
+    req.open('GET', 'common/confirmation.json', false)
+    req.send()
+  })
+
   $scope.confirmation = function (conf) {
     $scope.confirmation = conf
   }

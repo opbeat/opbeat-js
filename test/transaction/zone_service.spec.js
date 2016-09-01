@@ -260,6 +260,14 @@ describe('ZoneService', function () {
     })
   })
 
+  it('should work with synchronous XMLHttpRequest', function () {
+    window.Zone.current.fork({}).run(function () {
+      var req = new window.XMLHttpRequest()
+      req.open('get', '/', false)
+      req.send()
+    })
+  })
+
   afterEach(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
