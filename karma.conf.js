@@ -118,25 +118,27 @@ module.exports = function (config) {
     cfg.plugins.push('karma-chrome-launcher')
     cfg.browsers.push('Chrome')
 
-    // istanbul code coverage
-    cfg.plugins.push('karma-coverage')
-    var istanbul = require('browserify-istanbul')
-    cfg.browserify.transform = [istanbul]
+    if (config.coverage) {
+      // istanbul code coverage
+      cfg.plugins.push('karma-coverage')
+      var istanbul = require('browserify-istanbul')
+      cfg.browserify.transform = [istanbul]
 
-    cfg.coverageReporter = {
-      includeAllSources: true,
-      reporters: [
-        {type: 'html', dir: 'coverage/'},
-        {type: 'text-summary'}
-      ],
-      dir: 'coverage/'
+      cfg.coverageReporter = {
+        includeAllSources: true,
+        reporters: [
+          {type: 'html', dir: 'coverage/'},
+          {type: 'text-summary'}
+        ],
+        dir: 'coverage/'
+      }
+
+      cfg.preprocessors['src/**/*.js'] = ['coverage']
+
+      cfg.reporters.push('coverage')
     }
-
-    cfg.preprocessors['src/**/*.js'] = ['coverage']
-
-    cfg.reporters.push('coverage')
-    // cfg.plugins.push('karma-phantomjs2-launcher')
-    // cfg.browsers.push('PhantomJS2')
+  // cfg.plugins.push('karma-phantomjs2-launcher')
+  // cfg.browsers.push('PhantomJS2')
   }
 
   if (isSauce) {
