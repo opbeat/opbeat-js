@@ -3,12 +3,12 @@ var config = require('./config')
 var Promise = require('es6-promise').Promise
 
 module.exports = {
-  sendError: function (data) {
-    return _sendToOpbeat('errors', data)
+  sendError: function (data, headers) {
+    return _sendToOpbeat('errors', data, headers)
   },
 
-  sendTransaction: function (data) {
-    return _sendToOpbeat('transactions', data)
+  sendTransaction: function (data, headers) {
+    return _sendToOpbeat('transactions', data, headers)
   },
 
   getFile: function (fileUrl) {
@@ -16,14 +16,10 @@ module.exports = {
   }
 }
 
-function _sendToOpbeat (endpoint, data) {
+function _sendToOpbeat (endpoint, data, headers) {
   logger.log('opbeat.transport.sendToOpbeat', data)
 
   var url = 'https://' + config.get('apiHost') + '/api/v1/organizations/' + config.get('orgId') + '/apps/' + config.get('appId') + '/client-side/' + endpoint + '/'
-
-  var headers = {
-    'X-Opbeat-Client': config.getAgentName()
-  }
 
   return _makeRequest(url, 'POST', 'JSON', data, headers)
 }

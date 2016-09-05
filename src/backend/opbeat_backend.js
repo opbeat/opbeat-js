@@ -8,10 +8,25 @@ function OpbeatBackend (transport, logger, config) {
 OpbeatBackend.prototype.sendError = function (errorData) {
   if (this._config.isValid()) {
     errorData.stacktrace.frames = backendUtils.createValidFrames(errorData.stacktrace.frames)
-    this._transport.sendError(errorData)
+    var headers = this.getHeaders()
+    this._transport.sendError(errorData, headers)
   } else {
     this._logger.debug('Config is not valid')
   }
+}
+
+OpbeatBackend.prototype.getHeaders = function () {
+  var platform = this._config.get('platform')
+  var headers = {
+    'X-Opbeat-Client': this._config.getAgentName()
+  }
+  if (platform) {
+    var pl = []
+    if (platform.platform) pl.push('platform=' + platform.platform)
+    if (platform.framework) pl.push('framework=' + platform.framework)
+    if (pl.length > 0) headers['X-Opbeat-Platform'] = pl.join(' ')
+  }
+  return headers
 }
 
 OpbeatBackend.prototype.groupSmallContinuouslySimilarTraces = function (transaction, threshold) {
@@ -96,7 +111,8 @@ OpbeatBackend.prototype.sendTransactions = function (transactionList) {
 
     if (filterTransactions.length > 0) {
       var formatedTransactions = this._formatTransactions(filterTransactions)
-      return this._transport.sendTransaction(formatedTransactions)
+      var headers = this.getHeaders()
+      return this._transport.sendTransaction(formatedTransactions, headers)
     }
   } else {
     this._logger.debug('Config is not valid')

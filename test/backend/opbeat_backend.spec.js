@@ -7,8 +7,8 @@ var ExceptionHandler = require('../../src/exceptions/exceptionHandler')
 
 function TransportMock () {
   this.transportData = []
-  this.sendTransaction = function (data) {
-    this.transportData.push(data)
+  this.sendTransaction = function (data, headers) {
+    this.transportData.push({data: data, headers: headers})
   }
   this.sendError = function () {}
 }
@@ -59,7 +59,7 @@ describe('OpbeatBackend', function () {
 
     tr.donePromise.then(function () {
       opbeatBackend.sendTransactions([tr])
-      var groups = transportMock.transportData[0].traces.groups
+      var groups = transportMock.transportData[0].data.traces.groups
       groups.forEach(function (g) {
         var frame = g.extra._frames
         if (typeof frame !== 'undefined') {
@@ -268,9 +268,21 @@ describe('OpbeatBackend', function () {
     opbeatBackend.sendTransactions([tr])
     expect(transportMock.sendTransaction).toHaveBeenCalled()
     expect(transportMock.transportData.length).toBe(1)
-    var groups = transportMock.transportData[0].traces.groups
+    var groups = transportMock.transportData[0].data.traces.groups
     groups.forEach(function (g) {
       expect(g.signature.length).toBeLessThan(512)
     })
+  })
+
+  it('should add correct headers', function () {
+    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    config.setConfig({platform: {platform: 'cordova', framework: 'angular/version'}})
+
+    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    tr.end()
+    opbeatBackend.sendTransactions([tr])
+    expect(transportMock.transportData.length).toBe(1)
+    var headers = transportMock.transportData[0].headers
+    expect(headers['X-Opbeat-Platform']).toBe('platform=cordova framework=angular/version')
   })
 })
