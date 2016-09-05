@@ -66,6 +66,12 @@ function registerOpbeatModule (transactionService, logger, configService, except
   function moduleRun ($rootScope) {
     configService.set('isInstalled', true)
     configService.set('opbeatAgentName', 'opbeat-angular')
+    configService.set('platform.framework', 'angular/' + window.angular.version.full)
+
+    var platform = getPlatform()
+    if (platform) {
+      configService.set('platform.platform', platform)
+    }
 
     logger.debug('Agent:', configService.getAgentName())
 
@@ -98,6 +104,15 @@ function registerOpbeatModule (transactionService, logger, configService, except
 
   function moduleConfig ($provide) {
     patchAll($provide, transactionService)
+  }
+
+  function getPlatform () {
+    var isCordovaApp = (typeof window.cordova !== 'undefined')
+    if (isCordovaApp) {
+      return 'cordova'
+    } else {
+      return 'browser'
+    }
   }
 
   if (window.angular && typeof window.angular.module === 'function') {

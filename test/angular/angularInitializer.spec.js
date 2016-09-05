@@ -43,7 +43,10 @@ describe('angularInitializer', function () {
         originalAngular.injector(['ng', 'test'])
         bootstrapIsCalled = true
       },
-      module: originalAngular.module.bind(originalAngular)
+      module: originalAngular.module.bind(originalAngular),
+      version: {
+        full: 'fullversion'
+      }
     }
     fakeAngular.bootstrap('<div></div>', ['test'])
     expect(bootstrapIsCalled).toBeTruthy()

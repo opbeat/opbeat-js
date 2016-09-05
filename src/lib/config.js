@@ -27,7 +27,8 @@ function Config () {
     context: {
       user: {},
       extra: null
-    }
+    },
+    platform: {}
   }
 
   this._changeSubscription = new Subscription()
