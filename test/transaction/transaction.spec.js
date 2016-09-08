@@ -126,4 +126,10 @@ describe('transaction.Transaction', function () {
     })
     tr.end()
   })
+
+  it('should store contextInfo.browser.location', function () {
+    var tr = new Transaction('/', 'transaction')
+    var location = tr.contextInfo.browser.location
+    expect(typeof location).toBe('string')
+  })
 })

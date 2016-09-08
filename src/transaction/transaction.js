@@ -33,8 +33,12 @@ var Transaction = function (name, type, options) {
 
   this.duration = this._rootTrace.duration.bind(this._rootTrace)
   this.nextId = 0
-
-  this.loadCounter = 0
+  this.contextInfo = {
+    debug: {},
+    browser: {
+      location: window.location.href
+    }
+  }
 }
 
 Transaction.prototype.startTrace = function (signature, type, options) {
@@ -67,8 +71,8 @@ Transaction.prototype.recordEvent = function (e) {
 
 Transaction.prototype.isFinished = function () {
   return (
-  Object.keys(this._scheduledTasks).length === 0 &&
-  Object.keys(this._activeTraces).length === 0)
+    Object.keys(this._scheduledTasks).length === 0 &&
+    Object.keys(this._activeTraces).length === 0)
 }
 
 Transaction.prototype.detectFinish = function () {
@@ -95,6 +99,7 @@ Transaction.prototype.addTask = function (taskId) {
 }
 
 Transaction.prototype.removeTask = function (taskId) {
+  this.contextInfo.debug.lastRemovedTask = taskId
   delete this._scheduledTasks[taskId]
 }
 
