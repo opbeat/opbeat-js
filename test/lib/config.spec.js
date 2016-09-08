@@ -50,4 +50,13 @@ describe('config', function () {
     expect(config.get('performance.enable')).toBe(true)
     expect(config.get('performance.enableStackFrames')).toBe(true)
   })
+
+  it('should return undefined if the config does not exists', function () {
+    expect(config.get('context')).toEqual({})
+    expect(config.get('context.user')).toBe(undefined)
+    config.set('context.user', {test: 'test'})
+    expect(config.get('context.user')).toEqual({test: 'test'})
+    expect(config.get('nonexisting.nonexisting')).toBe(undefined)
+    expect(config.get('context.nonexisting.nonexisting')).toBe(undefined)
+  })
 })

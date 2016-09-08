@@ -24,10 +24,7 @@ function Config () {
       captureInteractions: false
     },
     libraryPathPattern: '(node_modules|bower_components|webpack)',
-    context: {
-      user: {},
-      extra: null
-    },
+    context: {},
     platform: {}
   }
 
@@ -41,7 +38,7 @@ Config.prototype.init = function () {
 
 Config.prototype.get = function (key) {
   return utils.arrayReduce(key.split('.'), function (obj, i) {
-    return obj[i]
+    return obj && obj[i]
   }, this.config)
 }
 
