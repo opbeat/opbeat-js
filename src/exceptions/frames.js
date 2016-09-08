@@ -154,7 +154,7 @@ module.exports = {
         url: window.location.href
       },
       stacktrace: stacktrace,
-      user: userContext,
+      user: userContext || {},
       level: null,
       logger: null,
       machine: null
