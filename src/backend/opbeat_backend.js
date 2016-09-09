@@ -1,4 +1,5 @@
 var backendUtils = require('./backend_utils')
+var utils = require('../lib/utils')
 module.exports = OpbeatBackend
 function OpbeatBackend (transport, logger, config) {
   this._logger = logger
@@ -82,6 +83,9 @@ OpbeatBackend.prototype.checkBrowserResponsiveness = function (transaction, inte
 OpbeatBackend.prototype.sendTransactions = function (transactionList) {
   var opbeatBackend = this
   if (this._config.isValid()) {
+    var browserResponsivenessInterval = opbeatBackend._config.get('performance.browserResponsivenessInterval')
+    var checkBrowserResponsiveness = opbeatBackend._config.get('performance.checkBrowserResponsiveness')
+
     transactionList.forEach(function (transaction) {
       transaction.traces.sort(function (traceA, traceB) {
         return traceA._start - traceB._start
@@ -91,18 +95,37 @@ OpbeatBackend.prototype.sendTransactions = function (transactionList) {
         var similarTraceThreshold = opbeatBackend._config.get('performance.similarTraceThreshold')
         transaction.traces = opbeatBackend.groupSmallContinuouslySimilarTraces(transaction, similarTraceThreshold)
       }
-    })
-    var filterTransactions = transactionList.filter(function (tr) {
-      var checkBrowserResponsiveness = opbeatBackend._config.get('performance.checkBrowserResponsiveness')
+      var context = opbeatBackend._config.get('context')
+      if (context) {
+        transaction.contextInfo = utils.merge(transaction.contextInfo || {}, context)
+      }
 
+      var ctx = transaction.contextInfo
+      if (ctx.browser && ctx.browser.location) {
+        ctx.browser.location = ctx.browser.location.substring(0, 511)
+        var protocol = ctx.browser.location.split('://')[0]
+        var acceptedProtocols = ['http', 'https', 'file']
+        if (acceptedProtocols.indexOf(protocol) < 0) {
+          delete ctx.browser.location
+        }
+      }
       if (checkBrowserResponsiveness) {
-        var interval = opbeatBackend._config.get('performance.browserResponsivenessInterval')
+        if (!ctx.debug) {
+          ctx.debug = {}
+        }
+        ctx.debug.browserResponsivenessCounter = transaction.browserResponsivenessCounter
+        ctx.debug.browserResponsivenessInterval = browserResponsivenessInterval
+      }
+    })
+
+    var filterTransactions = transactionList.filter(function (tr) {
+      if (checkBrowserResponsiveness) {
         var buffer = opbeatBackend._config.get('performance.browserResponsivenessBuffer')
 
         var duration = tr._rootTrace.duration()
-        var wasBrowserResponsive = opbeatBackend.checkBrowserResponsiveness(tr, interval, buffer)
+        var wasBrowserResponsive = opbeatBackend.checkBrowserResponsiveness(tr, browserResponsivenessInterval, buffer)
         if (!wasBrowserResponsive) {
-          opbeatBackend._logger.debug('Transaction was discarded! browser was not responsive enough during the transaction.', ' duration:', duration, ' browserResponsivenessCounter:', tr.browserResponsivenessCounter, 'interval:', interval)
+          opbeatBackend._logger.debug('Transaction was discarded! browser was not responsive enough during the transaction.', ' duration:', duration, ' browserResponsivenessCounter:', tr.browserResponsivenessCounter, 'interval:', browserResponsivenessInterval)
           return false
         }
       }
@@ -201,6 +224,9 @@ OpbeatBackend.prototype.getRawGroupedTracesTimings = function getRawGroupedTrace
       }
     })
 
+    if (transaction.contextInfo && Object.keys(transaction.contextInfo).length > 0) {
+      data.push(transaction.contextInfo)
+    }
     return data
   })
 }

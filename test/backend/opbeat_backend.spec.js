@@ -285,4 +285,30 @@ describe('OpbeatBackend', function () {
     var headers = transportMock.transportData[0].headers
     expect(headers['X-Opbeat-Platform']).toBe('platform=cordova framework=angular/version')
   })
+
+  it('should add contextInfo if it exists', function () {
+    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    var tr = new Transaction('transaction', 'transaction')
+    tr.end()
+    tr.contextInfo = {test: 'test'}
+    opbeatBackend.sendTransactions([tr])
+    expect(transportMock.transportData.length).toBe(1)
+    var data = transportMock.transportData[0].data
+    var raw = data.traces.raw[0]
+    var contextInfo = raw[raw.length - 1]
+    expect(contextInfo.test).toEqual('test')
+  })
+
+  it('should check for accepted protocols in contextInfo.browser.location', function () {
+    config.setConfig({appId: 'test', orgId: 'test', isInstalled: true})
+    var tr = new Transaction('transaction', 'transaction')
+    tr.end()
+    tr.contextInfo = {browser: {location: 'test://test.com'}}
+    opbeatBackend.sendTransactions([tr])
+    expect(transportMock.transportData.length).toBe(1)
+    var data = transportMock.transportData[0].data
+    var raw = data.traces.raw[0]
+    var contextInfo = raw[raw.length - 1]
+    expect(contextInfo.browser.location).toBeUndefined()
+  })
 })
