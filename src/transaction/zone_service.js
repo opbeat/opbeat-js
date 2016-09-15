@@ -53,9 +53,6 @@ function ZoneService (zone, logger, config) {
             task[opbeatTaskSymbol] = opbeatTask
             spec.onScheduleTask(opbeatTask)
           }
-        } else if (task.source === 'requestAnimationFrame') {
-          task[opbeatTaskSymbol] = opbeatTask
-          spec.onScheduleTask(opbeatTask)
         } else if (task.source === XMLHttpRequest_send) {
           /*
                   "XMLHttpRequest.addEventListener:load"
@@ -117,7 +114,7 @@ function ZoneService (zone, logger, config) {
         if (opbeatTask && (!opbeatData.registeredEventListeners['load'] || opbeatData.registeredEventListeners['load'].resolved) && (!opbeatData.registeredEventListeners['readystatechange'] || opbeatData.registeredEventListeners['readystatechange'].resolved) && opbeatTask.XHR.resolved) {
           spec.onInvokeTask(opbeatTask)
         }
-      } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
+      } else if (task[opbeatTaskSymbol] && (task.source === 'setTimeout')) {
         spec.onBeforeInvokeTask(task[opbeatTaskSymbol])
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
         spec.onInvokeTask(task[opbeatTaskSymbol])
@@ -133,7 +130,7 @@ function ZoneService (zone, logger, config) {
         if (task.source === XMLHttpRequest_send) {
           opbeatTask = task.data.target[opbeatDataSymbol].task
           spec.onCancelTask(opbeatTask)
-        } else if (task[opbeatTaskSymbol] && (task.source === 'requestAnimationFrame' || task.source === 'setTimeout')) {
+        } else if (task[opbeatTaskSymbol] && (task.source === 'setTimeout')) {
           opbeatTask = task[opbeatTaskSymbol]
           spec.onCancelTask(opbeatTask)
         }

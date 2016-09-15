@@ -229,7 +229,7 @@ describe('ZoneService', function () {
     })
   })
 
-  it('should call registered event listeners for requestAnimationFrame', function (done) {
+  xit('should call registered event listeners for requestAnimationFrame', function (done) {
     var callbackFlag = false
     // zoneService = new ZoneService(window.Zone.current.parent, logger)
     resetZoneCallbacks(zoneService)
