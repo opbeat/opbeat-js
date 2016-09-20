@@ -3,7 +3,6 @@ var OpbeatBackend = require('../../src/backend/opbeat_backend')
 var logger = Object.create(require('loglevel'))
 
 var Transaction = require('../../src/transaction/transaction')
-var ExceptionHandler = require('../../src/exceptions/exceptionHandler')
 
 function TransportMock () {
   this.transportData = []
@@ -178,11 +177,9 @@ describe('OpbeatBackend', function () {
 
   it('should not send errors if the config is not valid', function () {
     expect(config.isValid()).toBe(false)
-    var exc = new ExceptionHandler(opbeatBackend)
-    exc.processError(new Error()).then(function () {
-      expect(logger.debug).toHaveBeenCalledWith('Config is not valid')
-      expect(transportMock.sendError).not.toHaveBeenCalled()
-    })
+    opbeatBackend.sendError(new Error())
+    expect(logger.debug).toHaveBeenCalledWith('Config is not valid')
+    expect(transportMock.sendError).not.toHaveBeenCalled()
   })
 
   it('should calculate browser responsiveness', function () {
