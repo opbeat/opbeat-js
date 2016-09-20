@@ -1,6 +1,5 @@
 var Transaction = require('../../src/transaction/transaction')
 var Trace = require('../../src/transaction/trace')
-var Promise = require('es6-promise').Promise
 
 describe('transaction.Transaction', function () {
   beforeEach(function () {})

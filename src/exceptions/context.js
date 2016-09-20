@@ -1,4 +1,3 @@
-var Promise = require('es6-promise').Promise
 var utils = require('../lib/utils')
 var fileFetcher = require('../lib/fileFetcher')
 

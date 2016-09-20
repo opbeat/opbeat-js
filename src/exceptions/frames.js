@@ -1,5 +1,3 @@
-var Promise = require('es6-promise').Promise
-
 var logger = require('../lib/logger')
 var config = require('../lib/config')
 var utils = require('../lib/utils')

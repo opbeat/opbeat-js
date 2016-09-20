@@ -1,4 +1,3 @@
-var Promise = require('es6-promise').Promise
 var stackTrace = require('./stacktrace')
 var frames = require('./frames')
 

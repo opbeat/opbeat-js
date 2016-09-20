@@ -1,5 +1,4 @@
 var Trace = require('./trace')
-var Promise = require('es6-promise').Promise
 var utils = require('../lib/utils')
 
 var Transaction = function (name, type, options) {

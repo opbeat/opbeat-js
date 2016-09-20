@@ -1,4 +1,3 @@
-var Promise = require('es6-promise').Promise
 var frames = require('../exceptions/frames')
 var traceCache = require('./traceCache')
 var utils = require('../lib/utils')
