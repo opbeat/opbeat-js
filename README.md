@@ -1,35 +1,15 @@
-# Opbeat for frontend JS
+# Deprecated ⚠️
 
-[![Build status](https://travis-ci.org/opbeat/opbeat-js.svg?branch=master)](https://travis-ci.org/opbeat/opbeat-js)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
-<a href="https://opbeat.com" title="Opbeat"><img src="http://opbeat-brand-assets.s3-website-us-east-1.amazonaws.com/svg/logo/logo.svg" align="right" height="25px"></a>
+This used to be the official frontend JavaScript module for [Opbeat](https://opbeat.com). 
 
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/opbeat.svg)](https://saucelabs.com/u/opbeat)
+You might be looking for:
+
+#### [opbeat-angular](https://github.com/opbeat/opbeat-angular) - Opbeat for AngularJS apps
+#### [opbeat-plain-js](https://github.com/opbeat/opbeat-plain-js) - Opbeat for plain (non-framework) JavaScript apps
+#### [opbeat-node](https://github.com/opbeat/opbeat-node) - Opbeat for Node.js apps
+#### [opbeat-js-core](https://github.com/opbeat/opbeat-js-core) - Core dependency for developing Opbeat integrations for frontend frameworks
 
 
-This is the official frontend JavaScript module for [Opbeat](https://opbeat.com). 
-
-It enables error logging for frontend applications and performance monitoring for AngularJS applications.
-
-If you are looking for a module for your Node.js applications, please see [Opbeat for Node.js](https://github.com/opbeat/opbeat-node) on GitHub.
-
-## Documentation
-
-- [Documentation overview](https://opbeat.com/docs/topics/javascript/)
-- [Get started with Opbeat for JavaScript](https://opbeat.com/docs/articles/get-started-with-javascript/) 
-- [Get started with Opbeat for AngularJS](https://opbeat.com/docs/articles/get-started-with-angularjs/)
-- [Module API](https://opbeat.com/docs/articles/opbeat-for-javascript-api/)
-
-
-## Development
-
-Use `npm run karma` to continuously run unit tests during development
-
-Use `npm test` to run both unit tests and e2e tests
-
-
-## License
-MIT
 
 <br>Made with ♥️ and ☕️ by Opbeat and our community.
