@@ -1,9 +1,0 @@
-gulp build
-gulp build:release
-
-
-./scripts/opbeat-angular-export
-./scripts/opbeat-js-export
-
-
-gulp deploy

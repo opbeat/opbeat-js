@@ -1,7 +1,0 @@
-{
-  "private": true,
-  "dependencies": {
-    "angular": "^1.4.1",
-    "requirejs": "^2.1.22"
-  }
-}
